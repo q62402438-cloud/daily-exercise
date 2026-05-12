@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyTextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:textColorHint">@color/gray</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:fontFamily">@font/yuanshen</item>
+        <item name="hintTextAppearance">@style/MyHintTextAppearance</item>
+    </style>
+
+    <style name="MyTextStyle">
+        <item name="android:fontFamily">@font/yuanshen</item>
+    </style>
+
+
+    <style name="MyHintTextAppearance">
+        <item name="android:fontFamily">@font/yuanshen</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+</resources>

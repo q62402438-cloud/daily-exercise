@@ -1,0 +1,48 @@
+# ========================
+# Android
+# ========================
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/build
+/app/build
+/gradle/wrapper/gradle-wrapper.jar
+
+# ========================
+# Java / IDEA / Spring Boot
+# ========================
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# IDEA
+.idea/
+*.ipr
+*.iws
+
+# 编译目录
+target/
+out/
+
+# ========================
+# Web
+# ========================
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ========================
+# 通用
+# ========================
+.env
+.DS_Store
+Thumbs.db
