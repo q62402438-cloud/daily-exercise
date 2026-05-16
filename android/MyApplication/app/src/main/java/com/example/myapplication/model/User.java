@@ -13,7 +13,7 @@ public class User implements Serializable { // 实现Serializable以便通过Int
     private String userPassword;
     
     @SerializedName("userType")
-    private Integer userType;
+    private int userType;
     
     @SerializedName("userName")
     private String userName;
@@ -28,7 +28,7 @@ public class User implements Serializable { // 实现Serializable以便通过Int
     }
 
     // 全参构造函数
-    public User(Integer userID, String userPassword, Integer userType, String userName, String phoneNumber) {
+    public User(Integer userID, String userPassword, int userType, String userName, String phoneNumber) {
         this.userID = userID;
         this.userPassword = userPassword;
         this.userType = userType;
@@ -53,11 +53,11 @@ public class User implements Serializable { // 实现Serializable以便通过Int
         this.userPassword = userPassword;
     }
 
-    public Integer getUserType() {
+    public int getUserType() {
         return userType;
     }
 
-    public void setUserType(Integer userType) {
+    public void setUserType(int userType) {
         this.userType = userType;
     }
 

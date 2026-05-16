@@ -1,8 +1,10 @@
 package com.example.dailyexerciseauth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
     private Integer userID;       // 主键
     private String userPassword;  // 密码

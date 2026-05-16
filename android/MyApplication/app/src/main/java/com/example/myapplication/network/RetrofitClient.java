@@ -22,11 +22,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
 
     private static final String BASE_URL =
-            "http://192.168.222.101:8082/";
+            "http://192.168.139.101:8082/";
 
     private static Retrofit retrofit;
 
     public static Retrofit getInstance() {
+        retrofit = null;
         if (retrofit == null) {
             // 创建 OkHttpClient 并添加拦截器
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -67,9 +68,10 @@ public class RetrofitClient {
                     })
                     .build();
 
-            // 配置 Gson，确保继承的字段也被正确序列化
+            // 配置 Gson，确保继承的字段也被正确序列化，且不省略默认值
             Gson gson = new GsonBuilder()
                     .enableComplexMapKeySerialization()
+                    .serializeNulls()
                     .create();
 
             retrofit = new Retrofit.Builder()

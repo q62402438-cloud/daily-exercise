@@ -1,5 +1,6 @@
 package com.example.dailyexerciseauth.mapper;
 
+import com.example.dailyexerciseauth.entity.Administrator;
 import com.example.dailyexerciseauth.entity.OrdinaryUser;
 import com.example.dailyexerciseauth.entity.User;
 import org.apache.ibatis.annotations.*;
@@ -7,15 +8,27 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface UserMapper {
 
-    // 统一登录接口
+    // 普通用户登录
     @Select("""
-        SELECT u.*, 0 AS userType
+        SELECT u.userID, u.userPassword, u.userType, o.userName, o.phoneNumber
         FROM ordinary_user o
         JOIN user u ON o.userID = u.userID
         WHERE (o.userName = #{userName} OR o.phoneNumber = #{phoneNumber})
           AND u.userPassword = #{userPassword}
+          AND u.userType = 1
         """)
-    User login(User user);
+    User loginOrdinaryUser(User user);
+
+    // 管理员登录
+    @Select("""
+        SELECT u.userID, u.userPassword, u.userType, a.userName, a.phoneNumber
+        FROM administrator a
+        JOIN user u ON a.userID = u.userID
+        WHERE (a.userName = #{userName} OR a.phoneNumber = #{phoneNumber})
+          AND u.userPassword = #{userPassword}
+          AND u.userType = 0
+        """)
+    User loginAdmin(User user);
 
     // 插入用户基础信息
     @Insert("INSERT INTO user (userPassword, userType) VALUES (#{userPassword}, #{userType})")
@@ -61,7 +74,13 @@ public interface UserMapper {
         """)
     OrdinaryUser getOrdinaryUserByUserId(Integer userID);
 
-    @Select("SELECT u.userID, u.userPassword, u.userType FROM user u JOIN ordinary_user o ON u.userID = o.userID WHERE o.phoneNumber = #{phoneNumber}")
+    @Select("""
+        SELECT u.userID, u.userPassword, u.userType, COALESCE(o.userName, a.userName) as userName, COALESCE(o.phoneNumber, a.phoneNumber) as phoneNumber
+        FROM user u 
+        LEFT JOIN ordinary_user o ON u.userID = o.userID
+        LEFT JOIN administrator a ON u.userID = a.userID
+        WHERE o.phoneNumber = #{phoneNumber} OR a.phoneNumber = #{phoneNumber}
+        """)
     User findUserByPhoneNumber(String phoneNumber);
 
     @Update("UPDATE user SET userPassword = #{newPassword} WHERE userID = #{userID}")
