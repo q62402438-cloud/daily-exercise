@@ -1,42 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.myapplication"
-    >
+    package="com.example.myapplication">
+
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:usesCleartextTraffic="true">
-
-        <!-- 登录页作为启动页 -->
+        <activity
+            android:name=".SportPage"
+            android:exported="false" />
+        <activity
+            android:name=".HomePage"
+            android:exported="false" /> <!-- 登录页作为启动页 -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- 其他页面 -->
+        </activity> <!-- 其他页面 -->
         <activity
             android:name=".register"
             android:exported="false" />
-
         <activity
             android:name=".forgetpassword"
             android:exported="false" />
-
         <activity
             android:name=".ChangeUserInfo"
             android:exported="false" />
-
+        <activity
+            android:name=".ForumActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminPage"
+            android:exported="false" />
+        <activity
+            android:name=".FavoritePostsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FavoritePlansActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MyPostsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ExerciseCheckInActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CheckInRecordsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateExercisePlanActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreatePostActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PlanDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PostDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SearchResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AllPlansActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminPlanReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminPlanReviewDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminPostReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminPostReviewDetailActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

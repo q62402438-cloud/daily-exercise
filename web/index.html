@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跃动 - 运动健身平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        
+        /* 导航栏 */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #3498db;
+        }
+        
+        .site-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .nav-link {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: #3498db;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 15px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #3498db;
+            border: 2px solid #3498db;
+        }
+        
+        .btn-secondary:hover {
+            background: #3498db;
+            color: white;
+        }
+        
+        /* Hero 区域 */
+        .hero {
+            padding: 180px 40px 120px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(41, 128, 185, 0.1) 100%);
+        }
+        
+        .hero-title {
+            font-size: 48px;
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .hero-subtitle {
+            font-size: 20px;
+            color: #bdc3c7;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-large {
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 10px;
+        }
+        
+        /* 功能介绍 */
+        .features {
+            padding: 80px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            color: white;
+            margin-bottom: 60px;
+            font-weight: 600;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 40px;
+        }
+        
+        .icon-plan {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .icon-record {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+        
+        .icon-community {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+        
+        .icon-data {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .feature-desc {
+            color: #7f8c8d;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        /* 统计数据 */
+        .stats {
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #bdc3c7;
+            font-size: 16px;
+        }
+        
+        /* 页脚 */
+        .footer {
+            background: rgba(0,0,0,0.2);
+            padding: 40px;
+            text-align: center;
+            color: #bdc3c7;
+            font-size: 14px;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-link {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: #3498db;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-title {
+                font-size: 32px;
+            }
+            
+            .hero-subtitle {
+                font-size: 16px;
+            }
+            
+            .btn-large {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+            
+            .features {
+                padding: 60px 20px;
+            }
+            
+            .section-title {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo-section">
+            <img src="asserts/images/logo.png" alt="跃动Logo" class="logo">
+            <div class="site-title">跃动</div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="#features" class="nav-link">功能介绍</a>
+            <a href="#about" class="nav-link">关于我们</a>
+            <a href="#contact" class="nav-link">联系我们</a>
+        </div>
+        
+        <div class="auth-buttons">
+            <button class="btn btn-secondary" onclick="goToLogin()">登录</button>
+            <button class="btn btn-primary" onclick="goToRegister()">注册</button>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 -->
+    <section class="hero">
+        <h1 class="hero-title">开启您的运动之旅</h1>
+        <p class="hero-subtitle">专业的运动健身平台，帮助您制定训练计划、记录运动数据、分享健身心得</p>
+        <div class="hero-buttons">
+            <button class="btn btn-primary btn-large" onclick="goToRegister()">立即加入</button>
+            <button class="btn btn-secondary btn-large" onclick="learnMore()">了解更多</button>
+        </div>
+    </section>
+
+    <!-- 功能介绍 -->
+    <section class="features" id="features">
+        <h2 class="section-title">核心功能</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon icon-plan">📋</div>
+                <div class="feature-title">智能训练计划</div>
+                <div class="feature-desc">根据您的身体状况和目标，定制个性化的运动训练计划，科学高效地达成健身目标。</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon icon-record">📊</div>
+                <div class="feature-title">运动数据记录</div>
+                <div class="feature-desc">每日打卡记录，追踪运动量、卡路里消耗、心率变化等数据，直观了解运动成果。</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon icon-community">💬</div>
+                <div class="feature-title">运动社区</div>
+                <div class="feature-desc">与志同道合的运动爱好者交流分享，获取专业指导，相互鼓励共同进步。</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon icon-data">📈</div>
+                <div class="feature-title">数据分析</div>
+                <div class="feature-desc">详细的运动数据分析报告，助您洞察运动规律，优化训练方案，提升运动效果。</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 统计数据 -->
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">10万+</div>
+                <div class="stat-label">活跃用户</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100万+</div>
+                <div class="stat-label">运动记录</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">训练计划</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">98%</div>
+                <div class="stat-label">用户满意度</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#privacy" class="footer-link">隐私政策</a>
+            <a href="#terms" class="footer-link">服务条款</a>
+            <a href="#help" class="footer-link">帮助中心</a>
+            <a href="#feedback" class="footer-link">意见反馈</a>
+        </div>
+        <p>&copy; 2024 跃动运动健身平台. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function goToLogin() {
+            window.location.href = 'pages/user/signin.html';
+        }
+        
+        function goToRegister() {
+            window.location.href = 'pages/user/signupOrdinaryUser.html';
+        }
+        
+        function learnMore() {
+            document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

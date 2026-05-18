@@ -22,64 +22,62 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
 
     private static final String BASE_URL =
-            "http://192.168.139.101:8082/";
+            "http://192.168.33.101:8082/";
 
     private static Retrofit retrofit;
 
     public static Retrofit getInstance() {
-        retrofit = null;
-        if (retrofit == null) {
-            // 创建 OkHttpClient 并添加拦截器
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new Interceptor() {
-                        @Override
-                        public Response intercept(Chain chain) throws IOException {
-                            Request originalRequest = chain.request();
-                            
-                            // 打印请求信息（仅调试用）
-                            Log.d("Retrofit", "请求URL: " + originalRequest.url());
-                            Log.d("Retrofit", "请求方法: " + originalRequest.method());
-                            
-                            // 打印请求体
-                            if (originalRequest.body() != null) {
-                                RequestBody body = originalRequest.body();
-                                Buffer buffer = new Buffer();
-                                body.writeTo(buffer);
-                                Log.d("Retrofit", "请求体: " + buffer.readUtf8());
-                            }
-
-                            // 添加必要的请求头
-                            Request requestWithHeaders = originalRequest.newBuilder()
-                                    .header("Content-Type", "application/json")
-                                    .header("Accept", "application/json")
-                                    .build();
-                            
-                            // 打印请求头
-                            Log.d("Retrofit", "请求头: " + requestWithHeaders.headers());
-
-                            Response response = chain.proceed(requestWithHeaders);
-
-                            // 打印响应信息
-                            Log.d("Retrofit", "响应码: " + response.code());
-                            Log.d("Retrofit", "响应消息: " + response.message());
-
-                            return response;
+        // 每次调用都创建新实例，确保使用最新配置
+        // 创建 OkHttpClient 并添加拦截器
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request originalRequest = chain.request();
+                        
+                        // 打印请求信息（仅调试用）
+                        Log.d("Retrofit", "请求URL: " + originalRequest.url());
+                        Log.d("Retrofit", "请求方法: " + originalRequest.method());
+                        
+                        // 打印请求体
+                        if (originalRequest.body() != null) {
+                            RequestBody body = originalRequest.body();
+                            Buffer buffer = new Buffer();
+                            body.writeTo(buffer);
+                            Log.d("Retrofit", "请求体: " + buffer.readUtf8());
                         }
-                    })
-                    .build();
 
-            // 配置 Gson，确保继承的字段也被正确序列化，且不省略默认值
-            Gson gson = new GsonBuilder()
-                    .enableComplexMapKeySerialization()
-                    .serializeNulls()
-                    .create();
+                        // 添加必要的请求头
+                        Request requestWithHeaders = originalRequest.newBuilder()
+                                .header("Content-Type", "application/json")
+                                .header("Accept", "application/json")
+                                .build();
+                        
+                        // 打印请求头
+                        Log.d("Retrofit", "请求头: " + requestWithHeaders.headers());
 
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .client(okHttpClient)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .build();
-        }
+                        Response response = chain.proceed(requestWithHeaders);
+
+                        // 打印响应信息
+                        Log.d("Retrofit", "响应码: " + response.code());
+                        Log.d("Retrofit", "响应消息: " + response.message());
+
+                        return response;
+                    }
+                })
+                .build();
+
+        // 配置 Gson，确保继承的字段也被正确序列化
+        Gson gson = new GsonBuilder()
+                .enableComplexMapKeySerialization()
+                .create();
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        
         return retrofit;
     }
 }

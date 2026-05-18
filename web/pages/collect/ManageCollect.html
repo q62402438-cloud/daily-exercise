@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收藏管理 - 悦动</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        
+        .header {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+        
+        .site-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .main-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: white;
+        }
+        
+        .back-button {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #ecf0f1;
+        }
+        
+        /* 收藏管理容器 */
+        .favorites-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .favorites-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .favorites-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .manage-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-remove {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-remove:hover {
+            background: #c0392b;
+        }
+        
+        .favorites-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .favorite-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .favorite-item:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .item-type {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-view {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background: #2980b9;
+        }
+        
+        .btn-unfavorite {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-unfavorite:hover {
+            background: #c0392b;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-text {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        /* 取消收藏确认 */
+        .unfavorite-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #e74c3c;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .modal-text {
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .btn-cancel {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        
+        .btn-cancel:hover {
+            background: #bdc3c7;
+        }
+        
+        .btn-confirm {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-confirm:hover {
+            background: #c0392b;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .favorite-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .item-actions {
+                align-self: flex-end;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部栏 -->
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">悦动</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name">用户123</div>
+            <div class="user-avatar">用</div>
+        </div>
+    </div>
+
+    <!-- 主要内容 -->
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">收藏管理</h1>
+            <button class="back-button">返回控制台</button>
+        </div>
+
+        <!-- 收藏管理内容 -->
+        <div class="favorites-container">
+            <div class="favorites-header">
+                <h2 class="favorites-title">我的收藏</h2>
+                <div class="manage-actions">
+                    <button class="action-btn btn-remove">批量取消收藏</button>
+                </div>
+            </div>
+            
+            <div class="favorites-list">
+                <!-- 收藏项会在这里动态生成 -->
+            </div>
+            
+            <!-- 空状态 -->
+            <div class="empty-state">
+                <div class="empty-icon">⭐</div>
+                <div class="empty-text">暂无收藏内容</div>
+                <div>您还没有收藏任何训练计划</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 取消收藏确认弹窗 -->
+    <div class="unfavorite-modal" id="unfavoriteModal">
+        <div class="modal-content">
+            <div class="modal-icon">⚠️</div>
+            <h3 class="modal-title">取消收藏</h3>
+            <p class="modal-text">确定要取消收藏这个训练计划吗？</p>
+            <div class="modal-actions">
+                <button class="btn action-btn btn-cancel">取消</button>
+                <button class="btn action-btn btn-confirm">确定取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面功能将在后续实现
+    </script>
+</body>
+</html>

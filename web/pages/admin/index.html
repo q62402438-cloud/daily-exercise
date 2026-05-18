@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        
+        /* 顶部栏 */
+        .header {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+        
+        .site-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .admin-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .admin-name {
+            font-weight: 600;
+        }
+        
+        /* 主要内容 */
+        .main-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+        
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .welcome-title {
+            font-size: 32px;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-subtitle {
+            color: #bdc3c7;
+            font-size: 16px;
+        }
+        
+        /* 功能按钮 */
+        .features-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .feature-button {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .feature-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .button-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .button-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .button-desc {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        /* 运动计划按钮样式 */
+        .sports-plan {
+            border-top: 4px solid #3498db;
+        }
+        
+        .sports-plan .button-icon {
+            color: #3498db;
+        }
+        
+        /* 主题帖按钮样式 */
+        .topic-review {
+            border-top: 4px solid #e74c3c;
+        }
+        
+        .topic-review .button-icon {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部栏 -->
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">跃动管理系统</div>
+        </div>
+        <div class="admin-info">
+            <div class="admin-name">管理员</div>
+            <div class="admin-avatar">管</div>
+        </div>
+    </div>
+
+    <!-- 主要内容 -->
+    <div class="main-container">
+        <div class="welcome-section">
+            <h1 class="welcome-title">管理员工作台</h1>
+            <p class="welcome-subtitle">请选择功能</p>
+        </div>
+
+        <div class="features-container">
+            <!-- 审核运动计划 -->
+            <button class="feature-button sports-plan" onclick="goToSportsPlan()">
+                <div class="button-icon">🏃‍️</div>
+                <div class="button-title">审核运动计划</div>
+                <div class="button-desc">审核用户提交的运动健身计划</div>
+            </button>
+
+            <!-- 审核主题帖 -->
+            <button class="feature-button topic-review" onclick="goToTopicReview()">
+                <div class="button-icon">📝</div>
+                <div class="button-title">审核主题帖</div>
+                <div class="button-desc">审核用户发布的社区主题帖</div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function goToSportsPlan() {
+            window.location.href = 'auditVolunteerActivity.html';
+        }
+
+        function goToTopicReview() {
+            window.location.href = 'auditThemePost.html';
+        }
+    </script>
+</body>
+</html>

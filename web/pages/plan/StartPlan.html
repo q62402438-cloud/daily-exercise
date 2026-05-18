@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开始计划 - 悦动</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        
+        .header {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+        
+        .site-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .main-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: white;
+        }
+        
+        .back-button {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #ecf0f1;
+        }
+        
+        /* 开始计划容器 */
+        .start-container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .start-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #27ae60;
+        }
+        
+        .start-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        
+        .start-description {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        
+        .plan-selector {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 30px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .plan-selector:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .selected-plan {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .plan-name {
+            font-weight: 600;
+            font-size: 20px;
+            color: #2c3e50;
+        }
+        
+        .plan-status {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #27ae60;
+            color: white;
+        }
+        
+        .plan-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .plan-description {
+            color: #7f8c8d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .start-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+        
+        .btn-cancel {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        
+        .btn-cancel:hover {
+            background: #bdc3c7;
+        }
+        
+        .btn-start {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-start:hover {
+            background: #219653;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .start-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .plan-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部栏 -->
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">悦动</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name">用户123</div>
+            <div class="user-avatar">用</div>
+        </div>
+    </div>
+
+    <!-- 主要内容 -->
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">开始训练计划</h1>
+            <button class="back-button" onclick="goBack()">返回计划管理</button>
+        </div>
+
+        <!-- 开始计划内容 -->
+        <div class="start-container">
+            <div class="start-icon">🏃‍♂️</div>
+            <h2 class="start-title">开始执行训练计划</h2>
+            <p class="start-description">选择要开始的训练计划，查看计划详情并开始您的健身之旅</p>
+            
+            <select class="plan-selector" id="plan-select" onchange="showSelectedPlan()">
+                <option value="">-- 请选择要开始的计划 --</option>
+                <option value="plan1">减脂燃脂计划</option>
+                <option value="plan2">增肌力量训练</option>
+                <option value="plan3">康复训练计划</option>
+                <option value="plan4">全身塑形计划</option>
+                <option value="plan5">心肺功能提升计划</option>
+            </select>
+            
+            <div class="selected-plan" id="selected-plan" style="display: none;">
+                <div class="plan-header">
+                    <div class="plan-name" id="selected-plan-name">计划名称</div>
+                    <div class="plan-status">可开始</div>
+                </div>
+                
+                <div class="plan-details">
+                    <div class="detail-item">
+                        <span class="detail-label">运动类型</span>
+                        <span class="detail-value" id="plan-type">减脂运动</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">运动强度</span>
+                        <span class="detail-value" id="plan-intensity">中级</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">训练频率</span>
+                        <span class="detail-value" id="plan-frequency">每周3天</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">每次时长</span>
+                        <span class="detail-value" id="plan-duration">45分钟</span>
+                    </div>
+                </div>
+                
+                <div class="plan-description" id="plan-description">
+                    此计划专注于减脂燃脂，包含有氧运动和力量训练的结合，帮助您有效燃烧脂肪，塑造完美体型。
+                </div>
+            </div>
+            
+            <div class="start-actions">
+                <button class="btn btn-cancel" onclick="cancelStart()">取消</button>
+                <button class="btn btn-start" onclick="startTraining()" id="start-btn" disabled>开始训练</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = 'MyPlans.html';
+        }
+        
+        function showSelectedPlan() {
+            const planSelect = document.getElementById('plan-select');
+            const selectedPlanDiv = document.getElementById('selected-plan');
+            const startBtn = document.getElementById('start-btn');
+            
+            if (planSelect.value) {
+                selectedPlanDiv.style.display = 'block';
+                const planText = planSelect.options[planSelect.selectedIndex].text;
+                document.getElementById('selected-plan-name').textContent = planText;
+                updatePlanDetails(planSelect.value);
+                startBtn.disabled = false;
+            } else {
+                selectedPlanDiv.style.display = 'none';
+                startBtn.disabled = true;
+            }
+        }
+        
+        function updatePlanDetails(planId) {
+            const planDetails = {
+                'plan1': {
+                    type: '减脂运动',
+                    intensity: '中级',
+                    frequency: '每周3天',
+                    duration: '45分钟',
+                    description: '此计划专注于减脂燃脂，包含有氧运动和力量训练的结合，帮助您有效燃烧脂肪，塑造完美体型。'
+                },
+                'plan2': {
+                    type: '增肌运动',
+                    intensity: '高级',
+                    frequency: '每周4天',
+                    duration: '60分钟',
+                    description: '专注于肌肉增长的力量训练计划，通过科学的训练方法和营养搭配，帮助您增加肌肉质量。'
+                },
+                'plan3': {
+                    type: '康复运动',
+                    intensity: '低级',
+                    frequency: '每周5天',
+                    duration: '30分钟',
+                    description: '针对康复需求的温和训练计划，帮助恢复身体功能，改善柔韧性和平衡能力。'
+                },
+                'plan4': {
+                    type: '塑形运动',
+                    intensity: '中级',
+                    frequency: '每周3天',
+                    duration: '50分钟',
+                    description: '全身塑形训练计划，结合有氧和无氧运动，帮助塑造完美身体线条。'
+                },
+                'plan5': {
+                    type: '心肺运动',
+                    intensity: '中高级',
+                    frequency: '每周4天',
+                    duration: '40分钟',
+                    description: '提升心肺功能的训练计划，通过有氧运动增强心血管健康，提高耐力水平。'
+                }
+            };
+            
+            const details = planDetails[planId] || planDetails['plan1'];
+            
+            document.getElementById('plan-type').textContent = details.type;
+            document.getElementById('plan-intensity').textContent = details.intensity;
+            document.getElementById('plan-frequency').textContent = details.frequency;
+            document.getElementById('plan-duration').textContent = details.duration;
+            document.getElementById('plan-description').textContent = details.description;
+        }
+        
+        function cancelStart() {
+            window.location.href = 'MyPlans.html';
+        }
+        
+        function startTraining() {
+            const planSelect = document.getElementById('plan-select');
+            
+            if (!planSelect.value) {
+                alert('请先选择一个计划');
+                return;
+            }
+            
+            const planName = planSelect.options[planSelect.selectedIndex].text;
+            
+            if (confirm(`确定要开始 "${planName}" 训练计划吗？`)) {
+                alert(`"${planName}" 训练计划已开始！祝您训练愉快！`);
+                window.location.href = 'MyPlans.html';
+            }
+        }
+
+        async function loadUserInfo() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+
+            try {
+                const response = await window.getUserInfo(userSession.userID);
+                
+                if (response && response.code === 200) {
+                    const user = response.data || {};
+                    const userName = user.userName || '用户';
+                    document.querySelector('.user-name').textContent = userName;
+                    document.querySelector('.user-avatar').textContent = userName.charAt(0);
+                }
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUserInfo);
+    </script>
+</body>
+</html>

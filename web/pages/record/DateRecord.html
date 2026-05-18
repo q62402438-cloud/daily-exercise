@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>按日期查询</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        
+        .header {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+        
+        .site-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .main-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: white;
+        }
+        
+        .back-button {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #ecf0f1;
+        }
+        
+        /* 查询表单 */
+        .search-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .search-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .date-range {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-input {
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #f8f9fa;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+        }
+        
+        .search-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-btn:hover {
+            background: #2980b9;
+        }
+        
+        /* 查询结果 */
+        .results-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .results-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .no-results {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 40px;
+        }
+        
+        .records-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            padding: 15px 0;
+            border-bottom: 2px solid #ecf0f1;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .record-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid #ecf0f1;
+            transition: all 0.3s ease;
+        }
+        
+        .record-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .record-date {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .record-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        
+        .data-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .data-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .data-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部栏 -->
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">悦动</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name">用户123</div>
+            <div class="user-avatar">用</div>
+        </div>
+    </div>
+
+    <!-- 主要内容 -->
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">按日期查询</h1>
+            <button class="back-button" onclick="goBack()">返回</button>
+        </div>
+
+        <!-- 查询表单 -->
+        <div class="search-container">
+            <h2 class="search-title">选择查询日期范围</h2>
+            <div class="date-range">
+                <div class="form-group">
+                    <label class="form-label">开始日期</label>
+                    <input type="date" class="form-input" id="startDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">结束日期</label>
+                    <input type="date" class="form-input" id="endDate">
+                </div>
+            </div>
+            <button class="search-btn" onclick="searchRecords()">查询</button>
+        </div>
+
+        <!-- 查询结果 -->
+        <div class="results-container">
+            <h2 class="results-title">查询结果</h2>
+            <div class="records-header">
+                <div>打卡日期</div>
+                <div>运动数据</div>
+            </div>
+            
+            <!-- 查询结果容器 -->
+            <div id="searchResults">
+                <div class="no-results">
+                    请选择日期范围并点击查询按钮
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = 'total.html';
+        }
+
+        function searchRecords() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const searchResults = document.getElementById('searchResults');
+
+            if (!startDate || !endDate) {
+                alert('请选择完整的日期范围');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                alert('开始日期不能晚于结束日期');
+                return;
+            }
+
+            const mockRecords = [
+                { date: '2024-01-12', type: '瑜伽', duration: '40分钟', calories: '280', steps: '800' },
+                { date: '2024-01-11', type: '跑步', duration: '25分钟', calories: '290', steps: '4500' },
+                { date: '2024-01-10', type: '骑行', duration: '45分钟', calories: '400', steps: '0' }
+            ];
+
+            searchResults.innerHTML = mockRecords.map(record => `
+                <div class="record-item">
+                    <div class="record-date">${record.date}</div>
+                    <div class="record-data">
+                        <div class="data-item">
+                            <span class="data-label">运动类型</span>
+                            <span class="data-value">${record.type}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">运动时长</span>
+                            <span class="data-value">${record.duration}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">消耗热量</span>
+                            <span class="data-value">${record.calories} kcal</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">步数</span>
+                            <span class="data-value">${record.steps}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadUserInfo() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+
+            try {
+                const response = await window.getUserInfo(userSession.userID);
+                
+                if (response && response.code === 200) {
+                    const user = response.data || {};
+                    const userName = user.userName || '用户';
+                    document.querySelector('.user-name').textContent = userName;
+                    document.querySelector('.user-avatar').textContent = userName.charAt(0);
+                }
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUserInfo);
+    </script>
+</body>
+</html>

@@ -8,23 +8,23 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface UserMapper {
 
-    // 普通用户登录
+    // 普通用户登录 - 支持用户名或手机号登录
     @Select("""
         SELECT u.userID, u.userPassword, u.userType, o.userName, o.phoneNumber
         FROM ordinary_user o
         JOIN user u ON o.userID = u.userID
-        WHERE (o.userName = #{userName} OR o.phoneNumber = #{phoneNumber})
+        WHERE (o.userName = #{userName} OR o.phoneNumber = #{userName} OR o.phoneNumber = #{phoneNumber})
           AND u.userPassword = #{userPassword}
           AND u.userType = 1
         """)
     User loginOrdinaryUser(User user);
 
-    // 管理员登录
+    // 管理员登录 - 支持用户名或手机号登录
     @Select("""
         SELECT u.userID, u.userPassword, u.userType, a.userName, a.phoneNumber
         FROM administrator a
         JOIN user u ON a.userID = u.userID
-        WHERE (a.userName = #{userName} OR a.phoneNumber = #{phoneNumber})
+        WHERE (a.userName = #{userName} OR a.phoneNumber = #{userName} OR a.phoneNumber = #{phoneNumber})
           AND u.userPassword = #{userPassword}
           AND u.userType = 0
         """)

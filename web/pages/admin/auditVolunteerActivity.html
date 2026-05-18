@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审核运动计划</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        
+        /* 顶部栏 */
+        .header {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+        
+        .site-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .admin-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .admin-name {
+            font-weight: 600;
+        }
+        
+        /* 主要内容 */
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: white;
+        }
+        
+        .stats-info {
+            color: #bdc3c7;
+            font-size: 16px;
+        }
+        
+        .back-button {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #ecf0f1;
+        }
+        
+        /* 筛选栏 */
+        .filter-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .filter-select {
+            padding: 8px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            background: white;
+            color: #2c3e50;
+        }
+        
+        .search-input {
+            padding: 8px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            flex: 1;
+        }
+        
+        /* 计划列表 */
+        .plans-container {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .plan-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        .plan-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .plan-content {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .plan-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .plan-status {
+            background: #f39c12;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .plan-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .meta-label {
+            font-size: 12px;
+            color: #95a5a6;
+        }
+        
+        .meta-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .plan-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .view-details {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .view-details:hover {
+            background: #2980b9;
+        }
+        
+        /* 审核操作区域 */
+        .review-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 120px;
+        }
+        
+        .approve-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .approve-btn:hover {
+            background: #219a52;
+        }
+        
+        .reject-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .reject-btn:hover {
+            background: #c0392b;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .page-btn {
+            padding: 8px 15px;
+            border: 2px solid #ecf0f1;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .page-btn:hover:not(.active) {
+            background: #ecf0f1;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部栏 -->
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">运动社区管理系统</div>
+        </div>
+        <div class="admin-info">
+            <div class="admin-name">管理员</div>
+            <div class="admin-avatar">管</div>
+        </div>
+    </div>
+
+    <!-- 主要内容 -->
+    <div class="main-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">审核运动计划</h1>
+            </div>
+            <button class="back-button" onclick="goBack()">返回首页</button>
+        </div>
+
+        <!-- 筛选栏 -->
+        <div class="filter-bar">
+            <select class="filter-select">
+                <option>全部类型</option>
+                <option>减脂计划</option>
+                <option>增肌计划</option>
+                <option>康复训练</option>
+				<option>其他计划</option>
+            </select>
+            <select class="filter-select">
+                <option>全部难度</option>
+                <option>低级</option>
+                <option>中级</option>
+                <option>高级</option>
+            </select>
+            <input type="text" class="search-input" placeholder="搜索计划名称或用户...">
+            <button class="view-details">搜索</button>
+        </div>
+
+        <!-- 计划列表 -->
+        <div class="plans-container">
+            <!-- 计划卡片模板 -->
+            <div class="plan-card">
+                <div class="plan-content">
+                    <div class="plan-header">
+                        <div class="plan-title">计划标题</div>
+                        <div class="plan-status">待审核</div>
+                    </div>
+                    
+                    <div class="plan-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">提交用户</div>
+                            <div class="meta-value">用户名</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">提交时间</div>
+                            <div class="meta-value">XXXX-XX-XX XX:XX</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">训练周期</div>
+                            <div class="meta-value">XX天</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">难度级别</div>
+                            <div class="meta-value">中级</div>
+                        </div>
+                    </div>
+                    
+                    <div class="plan-actions">
+                        <button class="view-details" onclick="viewPlanDetails()">查看详情</button>
+                    </div>
+                </div>
+                
+                <div class="review-actions">
+                    <button class="approve-btn" onclick="approvePlan()">通过</button>
+                    <button class="reject-btn" onclick="rejectPlan()">打回</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分页 -->
+        <div class="pagination">
+            <button class="page-btn">上一页</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">下一页</button>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            // 返回首页
+            console.log('返回首页');
+        }
+        
+        function viewPlanDetails() {
+            // 查看计划详情
+            console.log('查看计划详情');
+        }
+        
+        function approvePlan() {
+            // 通过计划
+            console.log('通过计划');
+        }
+        
+        function rejectPlan() {
+            // 打回计划
+            console.log('打回计划');
+        }
+    </script>
+</body>
+</html>

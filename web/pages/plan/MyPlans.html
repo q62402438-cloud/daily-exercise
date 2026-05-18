@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的训练计划</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
+        .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; }
+        .site-title { font-size: 24px; font-weight: 600; color: #2c3e50; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .user-name { font-weight: 600; }
+        .main-container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 28px; color: white; }
+        .button-group { display: flex; gap: 15px; }
+        .back-button, .new-plan-btn { padding: 12px 25px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .back-button { background: white; color: #2c3e50; }
+        .back-button:hover { background: #ecf0f1; }
+        .new-plan-btn { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
+        .new-plan-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4); }
+        .plans-container { background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); overflow: hidden; }
+        .plans-header { padding: 20px 25px; background: #f8f9fa; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center; }
+        .plans-title { font-size: 18px; font-weight: 600; color: #2c3e50; }
+        .plans-count { color: #7f8c8d; font-size: 14px; }
+        .plans-list { padding: 20px; }
+        .plan-card { padding: 25px; border-bottom: 1px solid #ecf0f1; transition: all 0.3s ease; }
+        .plan-card:last-child { border-bottom: none; }
+        .plan-card:hover { background: #fafafa; }
+        .plan-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .plan-title { font-size: 22px; font-weight: 600; color: #2c3e50; margin-bottom: 8px; }
+        .plan-meta { display: flex; align-items: center; gap: 20px; color: #7f8c8d; font-size: 14px; }
+        .plan-duration { display: flex; align-items: center; gap: 5px; }
+        .plan-type { padding: 4px 12px; background: #3498db; color: white; border-radius: 12px; font-size: 12px; }
+        .plan-description { color: #555; line-height: 1.6; margin-bottom: 15px; }
+        .plan-progress { margin-bottom: 15px; }
+        .progress-bar { height: 8px; background: #ecf0f1; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #3498db, #27ae60); border-radius: 4px; transition: width 0.5s ease; }
+        .progress-text { margin-top: 5px; font-size: 14px; color: #7f8c8d; }
+        .plan-actions { display: flex; gap: 10px; }
+        .action-btn { padding: 8px 18px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .start-btn { background: #27ae60; color: white; }
+        .start-btn:hover { background: #2ecc71; }
+        .edit-btn { background: #f39c12; color: white; }
+        .edit-btn:hover { background: #f1c40f; }
+        .delete-btn { background: #e74c3c; color: white; }
+        .delete-btn:hover { background: #c0392b; }
+        .status-badge { padding: 6px 14px; border-radius: 12px; font-size: 14px; font-weight: 600; }
+        .status-active { background: #27ae60; color: white; }
+        .status-inactive { background: #95a5a6; color: white; }
+        .status-completed { background: #3498db; color: white; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #7f8c8d; }
+        .empty-icon { font-size: 64px; margin-bottom: 20px; }
+        .empty-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: #2c3e50; }
+        .empty-desc { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">跃动</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">我的训练计划</h1>
+            <div class="button-group">
+                <button class="back-button" onclick="goBack()">返回训练计划管理</button>
+                <button class="new-plan-btn" onclick="createPlan()">创建新计划</button>
+            </div>
+        </div>
+
+        <div class="plans-container">
+            <div class="plans-header">
+                <div class="plans-title">我的计划列表</div>
+                <div class="plans-count">共 <span id="planCount">3</span> 个计划</div>
+            </div>
+            
+            <div class="plans-list" id="plansList">
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <div>
+                            <div class="plan-title">减脂训练计划</div>
+                            <div class="plan-meta">
+                                <span class="plan-duration">⏱️ 8周</span>
+                                <span class="plan-type">减脂</span>
+                            </div>
+                        </div>
+                        <span class="status-badge status-active">进行中</span>
+                    </div>
+                    <div class="plan-description">科学的减脂训练方案，结合有氧运动和力量训练，帮助您在8周内达到理想体重。每周训练5天，休息2天。</div>
+                    <div class="plan-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 62.5%"></div>
+                        </div>
+                        <div class="progress-text">已完成 5/8 周</div>
+                    </div>
+                    <div class="plan-actions">
+                        <button class="action-btn start-btn" onclick="startPlan(1)">继续训练</button>
+                        <button class="action-btn edit-btn" onclick="editPlan(1)">编辑计划</button>
+                        <button class="action-btn delete-btn" onclick="deletePlan(1)">删除计划</button>
+                    </div>
+                </div>
+
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <div>
+                            <div class="plan-title">增肌训练计划</div>
+                            <div class="plan-meta">
+                                <span class="plan-duration">⏱️ 12周</span>
+                                <span class="plan-type">增肌</span>
+                            </div>
+                        </div>
+                        <span class="status-badge status-completed">已完成</span>
+                    </div>
+                    <div class="plan-description">针对全身肌群的增肌训练计划，分为胸、背、腿、肩、手臂五个训练日，每组动作完成3-4组，每组8-12次。</div>
+                    <div class="plan-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">已完成 12/12 周</div>
+                    </div>
+                    <div class="plan-actions">
+                        <button class="action-btn start-btn" onclick="startPlan(2)">重新开始</button>
+                        <button class="action-btn edit-btn" onclick="editPlan(2)">编辑计划</button>
+                        <button class="action-btn delete-btn" onclick="deletePlan(2)">删除计划</button>
+                    </div>
+                </div>
+
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <div>
+                            <div class="plan-title">跑步训练计划</div>
+                            <div class="plan-meta">
+                                <span class="plan-duration">⏱️ 4周</span>
+                                <span class="plan-type">有氧</span>
+                            </div>
+                        </div>
+                        <span class="status-badge status-inactive">未开始</span>
+                    </div>
+                    <div class="plan-description">从初学者到进阶跑者的跑步训练计划，逐步提升跑步距离和配速，适合想要开始跑步的新手。</div>
+                    <div class="plan-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text">已完成 0/4 周</div>
+                    </div>
+                    <div class="plan-actions">
+                        <button class="action-btn start-btn" onclick="startPlan(3)">开始训练</button>
+                        <button class="action-btn edit-btn" onclick="editPlan(3)">编辑计划</button>
+                        <button class="action-btn delete-btn" onclick="deletePlan(3)">删除计划</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = 'PlanDetail.html';
+        }
+
+        function createPlan() {
+            window.location.href = 'CreatePlan.html';
+        }
+
+        function startPlan(planId) {
+            window.location.href = 'StartPlan.html?id=' + planId;
+        }
+
+        function editPlan(planId) {
+            window.location.href = 'EditPlan.html?id=' + planId;
+        }
+
+        function deletePlan(planId) {
+            if (confirm('确定要删除这个计划吗？')) {
+                window.location.href = 'DeletePlan.html?id=' + planId;
+            }
+        }
+
+        async function loadUserInfo() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+
+            try {
+                const response = await window.getUserInfo(userSession.userID);
+                
+                if (response && response.code === 200) {
+                    const user = response.data || {};
+                    const userName = user.userName || '用户';
+                    document.getElementById('userNameDisplay').textContent = userName;
+                    document.getElementById('userAvatar').textContent = userName.charAt(0);
+                }
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUserInfo);
+    </script>
+</body>
+</html>

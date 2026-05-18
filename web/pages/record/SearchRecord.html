@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打卡记录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        
+        .header {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+        
+        .site-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .main-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: white;
+        }
+        
+        .back-button {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #ecf0f1;
+        }
+        
+        /* 统计信息 */
+        .stats-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3498db;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        /* 打卡记录列表 */
+        .records-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .records-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            padding: 15px 0;
+            border-bottom: 2px solid #ecf0f1;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .record-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid #ecf0f1;
+            transition: all 0.3s ease;
+        }
+        
+        .record-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .record-date {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .record-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        
+        .data-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .data-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .data-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .page-btn {
+            padding: 8px 15px;
+            border: 2px solid #ecf0f1;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .page-btn:hover:not(.active) {
+            background: #ecf0f1;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部栏 -->
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">悦动</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name">用户123</div>
+            <div class="user-avatar">用</div>
+        </div>
+    </div>
+
+    <!-- 主要内容 -->
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">打卡记录</h1>
+            <button class="back-button" onclick="goBack()">返回</button>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-number" id="totalDays">0</span>
+                <span class="stat-label">总打卡天数</span>
+            </div>
+        </div>
+
+        <!-- 打卡记录列表 -->
+        <div class="records-container">
+            <div class="records-header">
+                <div>打卡日期</div>
+                <div>运动数据</div>
+            </div>
+            
+            <!-- 记录列表容器 -->
+            <div id="recordsList">
+                <!-- 数据将从数据库加载到这里 -->
+            </div>
+        </div>
+
+        <!-- 分页 -->
+        <div class="pagination">
+            <button class="page-btn">上一页</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">下一页</button>
+        </div>
+    </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = 'total.html';
+        }
+
+        function loadCheckinRecords() {
+            const recordsList = document.getElementById('recordsList');
+            const totalDays = document.getElementById('totalDays');
+            
+            totalDays.textContent = '32';
+
+            const mockRecords = [
+                { date: '2024-01-15', type: '跑步', duration: '30分钟', calories: '350', steps: '5200' },
+                { date: '2024-01-14', type: '力量训练', duration: '45分钟', calories: '420', steps: '2100' },
+                { date: '2024-01-13', type: '游泳', duration: '60分钟', calories: '580', steps: '0' },
+                { date: '2024-01-12', type: '瑜伽', duration: '40分钟', calories: '280', steps: '800' },
+                { date: '2024-01-11', type: '跑步', duration: '25分钟', calories: '290', steps: '4500' },
+                { date: '2024-01-10', type: '骑行', duration: '45分钟', calories: '400', steps: '0' },
+                { date: '2024-01-09', type: '力量训练', duration: '50分钟', calories: '480', steps: '1800' },
+                { date: '2024-01-08', type: '跑步', duration: '35分钟', calories: '400', steps: '6300' }
+            ];
+
+            recordsList.innerHTML = mockRecords.map(record => `
+                <div class="record-item">
+                    <div class="record-date">${record.date}</div>
+                    <div class="record-data">
+                        <div class="data-item">
+                            <span class="data-label">运动类型</span>
+                            <span class="data-value">${record.type}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">运动时长</span>
+                            <span class="data-value">${record.duration}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">消耗热量</span>
+                            <span class="data-value">${record.calories} kcal</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">步数</span>
+                            <span class="data-value">${record.steps}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadUserInfo() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+
+            try {
+                const response = await window.getUserInfo(userSession.userID);
+                
+                if (response && response.code === 200) {
+                    const user = response.data || {};
+                    const userName = user.userName || '用户';
+                    document.querySelector('.user-name').textContent = userName;
+                    document.querySelector('.user-avatar').textContent = userName.charAt(0);
+                }
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserInfo();
+            loadCheckinRecords();
+        });
+    </script>
+</body>
+</html>

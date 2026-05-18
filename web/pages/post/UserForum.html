@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运动论坛</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
+        .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; }
+        .site-title { font-size: 24px; font-weight: 600; color: #2c3e50; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .user-name { font-weight: 600; }
+        .main-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 28px; color: white; }
+        .back-button, .new-post-btn { padding: 12px 25px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .back-button { background: white; color: #2c3e50; }
+        .back-button:hover { background: #ecf0f1; }
+        .new-post-btn { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
+        .new-post-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4); }
+        .forum-section { background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); overflow: hidden; }
+        .forum-header { padding: 20px 25px; background: #f8f9fa; border-bottom: 1px solid #ecf0f1; }
+        .forum-header h3 { color: #2c3e50; font-size: 18px; }
+        .posts-list { padding: 20px; }
+        .post-card { padding: 20px; border-bottom: 1px solid #ecf0f1; transition: all 0.3s ease; cursor: pointer; }
+        .post-card:hover { background: #fafafa; }
+        .post-card:last-child { border-bottom: none; }
+        .post-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .post-title { font-size: 20px; font-weight: 600; color: #2c3e50; margin-bottom: 8px; }
+        .post-meta { display: flex; align-items: center; gap: 15px; color: #7f8c8d; font-size: 14px; }
+        .author-info { display: flex; align-items: center; gap: 8px; }
+        .author-avatar { width: 32px; height: 32px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; }
+        .post-content { color: #555; line-height: 1.6; margin-bottom: 12px; }
+        .post-footer { display: flex; align-items: center; gap: 20px; color: #7f8c8d; font-size: 14px; }
+        .post-footer span { display: flex; align-items: center; gap: 5px; }
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; padding: 20px; }
+        .page-btn { padding: 8px 16px; border: 2px solid #ecf0f1; background: white; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; }
+        .page-btn:hover { border-color: #3498db; color: #3498db; }
+        .page-btn.active { background: #3498db; color: white; border-color: #3498db; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: 12px; padding: 30px; width: 90%; max-width: 500px; }
+        .modal-title { font-size: 22px; font-weight: 600; color: #2c3e50; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #2c3e50; }
+        .form-input, .form-textarea { width: 100%; padding: 12px 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; }
+        .form-textarea { resize: vertical; min-height: 150px; }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: #3498db; }
+        .modal-buttons { display: flex; gap: 15px; justify-content: flex-end; margin-top: 25px; }
+        .cancel-btn, .submit-btn { padding: 10px 25px; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .cancel-btn { background: #95a5a6; color: white; }
+        .cancel-btn:hover { background: #7f8c8d; }
+        .submit-btn { background: #3498db; color: white; }
+        .submit-btn:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <img src="../user/images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">跃动</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">运动论坛</h1>
+            <div style="display: flex; gap: 15px;">
+                <button class="back-button" onclick="goBack()">返回控制台</button>
+                <button class="new-post-btn" onclick="goToAddPost()">发表帖子</button>
+            </div>
+        </div>
+
+        <div class="forum-section">
+            <div class="forum-header">
+                <h3>热门帖子</h3>
+            </div>
+            <div class="posts-list" id="postsList">
+                <div class="post-card" onclick="openPostDetail(this)">
+                    <div class="post-header">
+                        <div>
+                            <div class="post-title">分享我的健身打卡第一天</div>
+                            <div class="post-meta">
+                                <div class="author-info">
+                                    <div class="author-avatar">张</div>
+                                    <span>健身达人</span>
+                                </div>
+                                <span>2024-01-15 10:30</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">今天开始我的健身之旅！第一天做了30分钟有氧运动和20分钟力量训练，感觉还不错。希望能够坚持下去，大家一起加油！💪</div>
+                    <div class="post-footer">
+                        <span>👍 128</span>
+                        <span>💬 32</span>
+                        <span>👁️ 512</span>
+                    </div>
+                </div>
+
+                <div class="post-card" onclick="openPostDetail(this)">
+                    <div class="post-header">
+                        <div>
+                            <div class="post-title">一周训练计划分享</div>
+                            <div class="post-meta">
+                                <div class="author-info">
+                                    <div class="author-avatar">李</div>
+                                    <span>运动爱好者</span>
+                                </div>
+                                <span>2024-01-14 15:45</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">分享一下我的一周训练计划：周一胸肩、周二背、周三腿、周四休息、周五手臂、周六有氧、周日休息。大家觉得怎么样？</div>
+                    <div class="post-footer">
+                        <span>👍 256</span>
+                        <span>💬 64</span>
+                        <span>👁️ 890</span>
+                    </div>
+                </div>
+
+                <div class="post-card" onclick="openPostDetail(this)">
+                    <div class="post-header">
+                        <div>
+                            <div class="post-title">跑步打卡第100天！</div>
+                            <div class="post-meta">
+                                <div class="author-info">
+                                    <div class="author-avatar">王</div>
+                                    <span>跑者小王</span>
+                                </div>
+                                <span>2024-01-13 08:00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">今天是我跑步打卡的第100天！从最初的3公里气喘吁吁，到现在轻松跑完10公里，感谢自己的坚持。希望更多人加入跑步的行列！</div>
+                    <div class="post-footer">
+                        <span>👍 512</span>
+                        <span>💬 128</span>
+                        <span>👁️ 2048</span>
+                    </div>
+                </div>
+
+                <div class="post-card" onclick="openPostDetail(this)">
+                    <div class="post-header">
+                        <div>
+                            <div class="post-title">减脂期间的饮食分享</div>
+                            <div class="post-meta">
+                                <div class="author-info">
+                                    <div class="author-avatar">陈</div>
+                                    <span>健康生活</span>
+                                </div>
+                                <span>2024-01-12 20:30</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">减脂期间的饮食真的很重要！分享我的减脂餐搭配：早餐鸡蛋+燕麦，午餐鸡胸肉+糙米+蔬菜，晚餐鱼虾+沙拉。少油少盐，坚持就是胜利！</div>
+                    <div class="post-footer">
+                        <span>👍 384</span>
+                        <span>💬 86</span>
+                        <span>👁️ 1256</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <button class="page-btn">上一页</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn">5</button>
+                <button class="page-btn">下一页</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = '../user/index.html';
+        }
+
+        function goToAddPost() {
+            window.location.href = 'addpost.html';
+        }
+
+        function openPostDetail(postCard) {
+            alert('查看帖子详情功能开发中...');
+        }
+
+        async function loadUserInfo() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+
+            try {
+                const response = await window.getUserInfo(userSession.userID);
+                
+                if (response && response.code === 200) {
+                    const user = response.data || {};
+                    const userName = user.userName || '用户';
+                    document.getElementById('userNameDisplay').textContent = userName;
+                    document.getElementById('userAvatar').textContent = userName.charAt(0);
+                }
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUserInfo);
+    </script>
+</body>
+</html>

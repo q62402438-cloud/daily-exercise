@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户控制台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        
+        .header {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+        
+        .site-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .user-name {
+            font-weight: 600;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .welcome-title {
+            font-size: 32px;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-subtitle {
+            color: #bdc3c7;
+            font-size: 16px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .feature-desc {
+            color: #7f8c8d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .profile-card {
+            border-top: 4px solid #3498db;
+        }
+        
+        .view-profile-card {
+            border-top: 4px solid #2980b9;
+        }
+        
+        .training-card {
+            border-top: 4px solid #27ae60;
+        }
+        
+        .forum-card {
+            border-top: 4px solid #f39c12;
+        }
+        
+        .daily-card {
+            border-top: 4px solid #9b59b6;
+        }
+        
+        .checkin-history-card {
+            border-top: 4px solid #e67e22;
+        }
+        
+        .account-card {
+            border-top: 4px solid #34495e;
+        }
+        
+        .daily-status {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .status-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .status-desc {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+        
+        .checkin-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checkin-btn:hover {
+            background: #219a52;
+        }
+        
+        .checkin-btn.checked {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">悦动</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name" id="userNameDisplay">加载中...</div>
+            <div class="user-avatar" id="userAvatar">?</div>
+        </div>
+    </div>
+
+    <div id="content" class="loading">
+        加载中...
+    </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function viewProfile() {
+            window.location.href = 'getUserInfo.html';
+        }
+        
+        function editProfile() {
+            window.location.href = 'changeUserInfo.html';
+        }
+        
+        function createTrainingPlan() {
+            window.location.href = '../plan/PlanDetail.html';
+        }
+        
+        function enterForum() {
+            window.location.href = '../post/UserForum.html';
+        }
+        
+        function viewCheckinHistory() {
+            window.location.href = '../record/total.html';
+        }
+        
+        function deleteAccount() {
+            if (confirm('确定要注销账户吗？此操作不可撤销！')) {
+                window.location.href = 'cancelUser.html';
+            }
+        }
+        
+        function dailyCheckin() {
+            alert('打卡成功！');
+            document.getElementById('checkinBtn').classList.add('checked');
+            document.getElementById('checkinBtn').innerHTML = '已打卡';
+            document.getElementById('checkinBtn').onclick = null;
+        }
+
+        async function loadUserInfo() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = 'signin.html';
+                return;
+            }
+
+            try {
+                const response = await window.getUserInfo(userSession.userID);
+                
+                if (!response || response.code !== 200) {
+                    document.getElementById('content').innerHTML = '<p style="color: white; text-align: center;">获取用户信息失败</p>';
+                    return;
+                }
+
+                const user = response.data || {};
+                const userName = user.userName || '用户';
+                
+                document.getElementById('userNameDisplay').textContent = '欢迎，' + userName;
+                document.getElementById('userAvatar').textContent = userName.charAt(0);
+
+                const contentHtml = `
+                    <div class="main-container">
+                        <div class="welcome-section">
+                            <h1 class="welcome-title">用户控制台</h1>
+                            <p class="welcome-subtitle">管理您的个人资料和运动计划</p>
+                        </div>
+
+                        <div class="features-grid">
+                            <button class="feature-card view-profile-card" onclick="viewProfile()">
+                                <div class="feature-icon">📋</div>
+                                <div class="feature-title">查看个人信息</div>
+                                <div class="feature-desc">查看您的完整个人资料和账户信息</div>
+                            </button>
+
+                            <button class="feature-card profile-card" onclick="editProfile()">
+                                <div class="feature-icon">👤</div>
+                                <div class="feature-title">修改个人信息</div>
+                                <div class="feature-desc">更新您的个人资料、联系信息和偏好设置</div>
+                            </button>
+
+                            <button class="feature-card training-card" onclick="createTrainingPlan()">
+                                <div class="feature-icon">📝</div>
+                                <div class="feature-title">有关训练计划</div>
+                                <div class="feature-desc">个性化的运动和健身计划</div>
+                            </button>
+
+                            <button class="feature-card forum-card" onclick="enterForum()">
+                                <div class="feature-icon">💬</div>
+                                <div class="feature-title">进入论坛</div>
+                                <div class="feature-desc">参与社区讨论，分享运动经验</div>
+                            </button>
+
+                            <button class="feature-card checkin-history-card" onclick="viewCheckinHistory()">
+                                <div class="feature-icon">📊</div>
+                                <div class="feature-title">有关打卡</div>
+                                <div class="feature-desc">查看您的打卡记录和运动统计</div>
+                            </button>
+
+                            <button class="feature-card account-card" onclick="deleteAccount()">
+                                <div class="feature-icon">🚫</div>
+                                <div class="feature-title">注销账户</div>
+                                <div class="feature-desc">永久删除您的账户和相关数据</div>
+                            </button>
+                        </div>
+
+                        <div class="daily-status">
+                            <div class="status-title">今日打卡状态</div>
+                            <div class="status-desc">完成今日运动目标，记录您的进步</div>
+                            <button class="checkin-btn" id="checkinBtn" onclick="dailyCheckin()">立即打卡</button>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('content').innerHTML = contentHtml;
+
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+                document.getElementById('content').innerHTML = '<p class="loading">加载失败，请检查服务器连接</p>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUserInfo);
+    </script>
+</body>
+</html>

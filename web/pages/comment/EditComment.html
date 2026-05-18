@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑评论</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
+        .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; }
+        .site-title { font-size: 24px; font-weight: 600; color: #2c3e50; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #27ae60; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .user-name { font-weight: 600; }
+        .main-container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .form-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .form-title { font-size: 28px; margin-bottom: 30px; text-align: center; color: #2c3e50; }
+        .comment-info { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+        .comment-meta { color: #7f8c8d; margin-bottom: 10px; }
+        .original-content { background: white; padding: 15px; border-radius: 6px; border-left: 3px solid #3498db; }
+        .form-group { margin-bottom: 25px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+        .form-textarea { width: 100%; padding: 12px 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; height: 120px; resize: vertical; }
+        .submit-button { background: #3498db; color: white; border: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">跃动社区</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name">用户</div>
+            <div class="user-avatar">用</div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="form-container">
+            <h2 class="form-title">编辑评论</h2>
+            
+            <div class="comment-info">
+                <div class="comment-meta">评论ID: COMMENT001 | 帖子: 健身打卡第一天 | 发布时间: 2024-01-15 11:00:00</div>
+                <div class="original-content">
+                    <strong>原内容:</strong> 这个计划很不错，我也在坚持锻炼！
+                </div>
+            </div>
+
+            <form>
+                <div class="form-group">
+                    <label class="form-label">评论内容</label>
+                    <textarea class="form-textarea">这个计划很不错，我也在坚持锻炼！希望能长期坚持。</textarea>
+                </div>
+                <button type="submit" class="submit-button">保存修改</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

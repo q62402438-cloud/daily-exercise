@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理收藏</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
+        .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; }
+        .site-title { font-size: 24px; font-weight: 600; color: #2c3e50; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #27ae60; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .user-name { font-weight: 600; }
+        .main-container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .favorites-section { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .section-title { font-size: 24px; margin-bottom: 20px; color: #2c3e50; }
+        .search-form { display: flex; gap: 15px; margin-bottom: 30px; }
+        .search-input { flex: 1; padding: 12px 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; }
+        .search-button { background: #3498db; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; }
+        .favorites-list { display: grid; gap: 20px; }
+        .favorite-item { border: 1px solid #ecf0f1; border-radius: 8px; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .topic-info { flex: 1; }
+        .topic-title { font-size: 18px; font-weight: 600; margin-bottom: 5px; color: #2c3e50; }
+        .topic-meta { color: #7f8c8d; font-size: 14px; margin-bottom: 10px; }
+        .topic-content { color: #34495e; line-height: 1.5; }
+        .favorite-actions { display: flex; gap: 10px; }
+        .view-btn, .unfavorite-btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .view-btn { background: #3498db; color: white; }
+        .unfavorite-btn { background: #e74c3c; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">跃动社区</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name">用户</div>
+            <div class="user-avatar">用</div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="favorites-section">
+            <h2 class="section-title">我的收藏</h2>
+            
+            <form class="search-form">
+                <input type="text" class="search-input" placeholder="搜索收藏的帖子...">
+                <button type="submit" class="search-button">搜索</button>
+            </form>
+
+            <div class="favorites-list">
+                <div class="favorite-item">
+                    <div class="topic-info">
+                        <div class="topic-title">健身打卡第一天</div>
+                        <div class="topic-meta">帖子ID: TOPIC001 | 作者: user123 | 收藏时间: 2024-01-15</div>
+                        <div class="topic-content">今天完成了30分钟的有氧运动，感觉很好！明天继续坚持。</div>
+                    </div>
+                    <div class="favorite-actions">
+                        <button class="view-btn">查看</button>
+                        <button class="unfavorite-btn">取消收藏</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

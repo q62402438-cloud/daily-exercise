@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 32px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(44, 62, 80, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #3498db;
+            padding: 2px;
+            background: white;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
+        }
+        
+        .login-title {
+            text-align: center;
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 32px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+            color: #2c3e50;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .input-field::placeholder {
+            color: #95a5a6;
+        }
+        
+        .input-hint {
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            padding: 4px 12px;
+            font-size: 12px;
+            color: white;
+            border-radius: 6px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
+        }
+        
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            background: linear-gradient(135deg, #2980b9, #2471a3);
+        }
+        
+        .login-button:active {
+            transform: translateY(0);
+        }
+        
+        .login-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .register-hint {
+            text-align: center;
+            color: #7f8c8d;
+            margin-top: 24px;
+            font-size: 14px;
+        }
+        
+        .register-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 6px;
+            transition: color 0.3s;
+        }
+        
+        .register-link:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        
+        .decoration {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(52, 152, 219, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+        
+        .decoration-1 {
+            top: 10%;
+            left: 10%;
+        }
+        
+        .decoration-2 {
+            bottom: 10%;
+            right: 10%;
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 32px 24px;
+                margin: 20px;
+            }
+            .login-title {
+                font-size: 24px;
+            }
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+    <script src="/web/assets/js/router.js"></script>
+    <script src="/web/assets/js/api.js"></script>
+</head>
+<body>
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+    
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="/web/assets/images/logo.png" alt="系统Logo" class="logo">
+        </div>
+        
+        <h1 class="login-title">用户登录</h1>
+        
+        <div class="input-group">
+            <div class="input-hint">用户名</div>
+            <input type="text" class="input-field" id="usernameInput" placeholder="请输入您的用户名">
+        </div>
+        
+        <div class="input-group">
+            <div class="input-hint">密码</div>
+            <input type="password" class="input-field" id="passwordInput" placeholder="请输入您的密码">
+        </div>
+        
+        <button class="login-button" id="loginButton">登录</button>
+        
+        <div class="register-hint">
+            还没有账号？
+            <a href="javascript:go('user_register')" class="register-link">立即注册</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginButton = document.getElementById('loginButton');
+            const usernameInput = document.getElementById('usernameInput');
+            const passwordInput = document.getElementById('passwordInput');
+            
+            loginButton.addEventListener('click', async function() {
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+                
+                if (!username) {
+                    alert('请输入用户名');
+                    usernameInput.focus();
+                    return;
+                }
+                if (!password) {
+                    alert('请输入密码');
+                    passwordInput.focus();
+                    return;
+                }
+                
+                loginButton.textContent = '登录中...';
+                loginButton.disabled = true;
+                
+                try {
+                    const data = await request('/user/login', {
+                        method: 'POST',
+                        body: JSON.stringify({ username: username, password: password })
+                    });
+                    
+                    if (data.code === 200) {
+                        localStorage.setItem('userID', data.userID);
+                        localStorage.setItem('role', data.role || 'admin');
+                        alert('登录成功');
+                        go('admin_home');
+                    } else {
+                        alert(data.msg || '登录失败');
+                        loginButton.textContent = '登录';
+                        loginButton.disabled = false;
+                    }
+                } catch (err) {
+                    alert('登录失败：' + err.message);
+                    loginButton.textContent = '登录';
+                    loginButton.disabled = false;
+                }
+            });
+            
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    loginButton.click();
+                }
+            });
+            
+            const inputs = document.querySelectorAll('.input-field');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

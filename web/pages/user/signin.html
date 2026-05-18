@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 32px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(44, 62, 80, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #3498db;
+            padding: 2px;
+            background: white;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
+        }
+        
+        .login-title {
+            text-align: center;
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 32px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+            color: #2c3e50;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .input-field::placeholder {
+            color: #95a5a6;
+        }
+        
+        .input-hint {
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            padding: 4px 12px;
+            font-size: 12px;
+            color: white;
+            border-radius: 6px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
+        }
+        
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            background: linear-gradient(135deg, #2980b9, #2471a3);
+        }
+        
+        .login-button:active {
+            transform: translateY(0);
+        }
+        
+        .login-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .admin-login-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 16px rgba(231, 76, 60, 0.3);
+        }
+        
+        .admin-login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+            background: linear-gradient(135deg, #c0392b, #a93226);
+        }
+        
+        .admin-login-button:active {
+            transform: translateY(0);
+        }
+        
+        .admin-login-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .button-divider {
+            text-align: center;
+            margin: 16px 0;
+            color: #bdc3c7;
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .button-divider::before,
+        .button-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 35%;
+            height: 1px;
+            background: #ecf0f1;
+        }
+        
+        .button-divider::before {
+            left: 0;
+        }
+        
+        .button-divider::after {
+            right: 0;
+        }
+        
+        .register-hint {
+            text-align: center;
+            color: #7f8c8d;
+            margin-top: 24px;
+            font-size: 14px;
+        }
+        
+        .register-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 6px;
+            transition: color 0.3s;
+        }
+        
+        .register-link:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        
+        .forget-password-link {
+            text-align: right;
+            margin-top: 12px;
+        }
+        
+        .forget-password-link a {
+            color: #7f8c8d;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .forget-password-link a:hover {
+            color: #3498db;
+            text-decoration: underline;
+        }
+        
+        .decoration {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(52, 152, 219, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+        
+        .decoration-1 {
+            top: 10%;
+            left: 10%;
+        }
+        
+        .decoration-2 {
+            bottom: 10%;
+            right: 10%;
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 32px 24px;
+                margin: 20px;
+            }
+            .login-title {
+                font-size: 24px;
+            }
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+    
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+        </div>
+        
+        <h1 class="login-title">用户登录</h1>
+        
+        <div class="input-group">
+            <div class="input-hint">用户名</div>
+            <input type="text" class="input-field" id="userNameInput" placeholder="请输入您的用户名">
+        </div>
+        
+        <div class="input-group">
+            <div class="input-hint">密码</div>
+            <input type="password" class="input-field" id="userPasswordInput" placeholder="请输入您的密码">
+        </div>
+        
+        <div class="forget-password-link">
+            <a href="forgetPassword.html">忘记密码？</a>
+        </div>
+        
+        <button class="login-button" id="userLoginButton">用户登录</button>
+        
+        <div class="button-divider">或</div>
+        
+        <button class="admin-login-button" id="adminLoginButton">管理员登录</button>
+        
+        <div class="register-hint">
+            还没有账号？
+            <a href="signupOrdinaryUser.html" class="register-link">立即注册</a>
+        </div>
+    </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userLoginButton = document.getElementById('userLoginButton');
+            const adminLoginButton = document.getElementById('adminLoginButton');
+            const userNameInput = document.getElementById('userNameInput');
+            const userPasswordInput = document.getElementById('userPasswordInput');
+            
+            async function doLogin(userType) {
+                const userName = userNameInput.value.trim();
+                const userPassword = userPasswordInput.value.trim();
+                
+                if (!userName) {
+                    alert('请输入用户名');
+                    userNameInput.focus();
+                    return;
+                }
+                if (!userPassword) {
+                    alert('请输入密码');
+                    userPasswordInput.focus();
+                    return;
+                }
+                
+                userLoginButton.textContent = '登录中...';
+                userLoginButton.disabled = true;
+                adminLoginButton.textContent = '登录中...';
+                adminLoginButton.disabled = true;
+                
+                try {
+                    const response = await window.login(userName, userPassword, userType);
+                    
+                    if (!response) {
+                        alert('服务器未响应，请检查服务器是否启动');
+                        resetButtons();
+                        return;
+                    }
+                    
+                    if (response.code === 200) {
+                        if (response.data && response.data.userID) {
+                            setUserSession(response.data.userID, userName, userType);
+                            alert(userType === 0 ? '管理员登录成功！' : '登录成功！');
+                            if (userType === 0) {
+                                window.location.href = '../admin/index.html';
+                            } else {
+                                window.location.href = 'index.html';
+                            }
+                        } else {
+                            alert('登录成功，但未返回用户信息');
+                            if (userType === 0) {
+                                window.location.href = '../admin/index.html';
+                            } else {
+                                window.location.href = 'index.html';
+                            }
+                        }
+                    } else {
+                        alert(response.msg || (userType === 0 ? '管理员登录失败，请检查用户名和密码' : '登录失败，请检查用户名和密码'));
+                        resetButtons();
+                    }
+                } catch (error) {
+                    console.error('登录错误:', error);
+                    alert('登录失败：服务器连接异常，请检查服务器是否启动在 8082 端口');
+                    resetButtons();
+                }
+            }
+            
+            function resetButtons() {
+                userLoginButton.textContent = '用户登录';
+                userLoginButton.disabled = false;
+                adminLoginButton.textContent = '管理员登录';
+                adminLoginButton.disabled = false;
+            }
+            
+            userLoginButton.addEventListener('click', function() {
+                doLogin(1);
+            });
+            
+            adminLoginButton.addEventListener('click', function() {
+                doLogin(0);
+            });
+            
+            userPasswordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    userLoginButton.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+        
+        .site-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .register-container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(44, 62, 80, 0.2);
+            width: 100%;
+            max-width: 420px;
+            margin-top: 80px;
+        }
+        
+        .register-title {
+            text-align: center;
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .register-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .register-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #2471a3);
+            transform: translateY(-2px);
+        }
+        
+        .register-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .reset-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .reset-btn:hover {
+            background: #7f8c8d;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+        }
+        
+        .login-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">跃动</div>
+        </div>
+    </div>
+
+    <div class="register-container">
+        <h1 class="register-title">用户注册</h1>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label class="form-label">手机号 *</label>
+                <input type="tel" class="form-input" id="phoneNumber" placeholder="请输入手机号" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">密码 *</label>
+                <input type="password" class="form-input" id="userPassword" placeholder="请设置密码" required>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" class="reset-btn" onclick="resetForm()">重置</button>
+                <button type="button" class="register-btn" id="registerBtn" onclick="handleRegister()">注册</button>
+            </div>
+        </form>
+        
+        <div class="login-link">
+            已有账号？<a href="signin.html">立即登录</a>
+        </div>
+    </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        async function handleRegister() {
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const userPassword = document.getElementById('userPassword').value;
+            const registerBtn = document.getElementById('registerBtn');
+
+            if (!phoneNumber) {
+                alert('请输入手机号');
+                return;
+            }
+            
+            if (!/^1[3-9]\d{9}$/.test(phoneNumber)) {
+                alert('请输入有效的手机号');
+                return;
+            }
+
+            if (!userPassword) {
+                alert('请输入密码');
+                return;
+            }
+
+            registerBtn.textContent = '注册中...';
+            registerBtn.disabled = true;
+
+            try {
+                const response = await window.register({
+                    userName: 'user_' + phoneNumber.slice(-8),
+                    phoneNumber: phoneNumber,
+                    userPassword: userPassword
+                });
+
+                console.log('服务器响应:', JSON.stringify(response));
+
+                if (!response) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    registerBtn.textContent = '注册';
+                    registerBtn.disabled = false;
+                    return;
+                }
+
+                if (response.code === 200) {
+                    const userId = response.data?.userID || response.data?.userId || response.data?.id;
+                    alert('注册成功！用户ID：' + (userId || '未知'));
+                    window.location.href = 'signin.html';
+                } else {
+                    alert(response.msg || '注册失败，请重试');
+                    registerBtn.textContent = '注册';
+                    registerBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('注册错误:', error);
+                alert('注册失败：服务器连接异常，请检查服务器是否启动在 8082 端口');
+                registerBtn.textContent = '注册';
+                registerBtn.disabled = false;
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('registerForm').reset();
+        }
+    </script>
+</body>
+</html>

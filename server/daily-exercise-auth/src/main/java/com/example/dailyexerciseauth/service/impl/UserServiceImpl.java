@@ -24,17 +24,28 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         
+        String input = user.getUserName();
+        if (input == null || input.isEmpty()) {
+            input = user.getPhoneNumber();
+        }
+        
+        if (isPhoneNumber(input)) {
+            user.setPhoneNumber(input);
+        }
+        
         Integer userType = user.getUserType();
         
-        if (userType == 0) {
-            // userType = 0 → 管理员登录
-            return userMapper.loginAdmin(user);
-        } else if (userType == 1) {
-            // userType = 1 → 普通用户登录
+        if (userType == null || userType == 1) {
             return userMapper.loginOrdinaryUser(user);
+        } else if (userType == 0) {
+            return userMapper.loginAdmin(user);
         }
         
         return null;
+    }
+    
+    private boolean isPhoneNumber(String input) {
+        return input != null && input.matches("^1[3-9]\\d{9}$");
     }
 
     @Override
@@ -69,7 +80,11 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("用户ID不能为空");
         }
 
-        int userUpdated = userMapper.updateUserPassword(user);
+        int userUpdated = 0;
+        // 只有当用户提供了新密码时才更新密码
+        if (user.getUserPassword() != null && !user.getUserPassword().isEmpty()) {
+            userUpdated = userMapper.updateUserPassword(user);
+        }
         
         int ordinaryUserUpdated = userMapper.updateOrdinaryUser(user);
         

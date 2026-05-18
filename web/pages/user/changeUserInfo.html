@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修改个人信息</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+        
+        .site-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .edit-container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(44, 62, 80, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .page-title {
+            text-align: center;
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #f8f9fa;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+        }
+        
+        .form-input:read-only {
+            background: #f5f5f5;
+            color: #7f8c8d;
+            cursor: default;
+            border-color: #e0e0e0;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #f8f9fa;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .save-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .save-btn:hover {
+            background: #2980b9;
+        }
+        
+        .save-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .cancel-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .cancel-btn:hover {
+            background: #7f8c8d;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .readonly-hint {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 4px;
+        }
+        
+        .unit-suffix {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">跃动</div>
+        </div>
+    </div>
+
+    <div id="content" class="loading">
+        加载中...
+    </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        let currentUserId = null;
+
+        function goBack() {
+            window.location.href = 'getUserInfo.html';
+        }
+
+        function calculateAge(birthdayStr) {
+            if (!birthdayStr) return '';
+            try {
+                const birthday = new Date(birthdayStr);
+                const today = new Date();
+                let age = today.getFullYear() - birthday.getFullYear();
+                const monthDiff = today.getMonth() - birthday.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthday.getDate())) {
+                    age--;
+                }
+                return age >= 0 ? age : '';
+            } catch {
+                return '';
+            }
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const date = new Date(dateStr);
+                return date.toISOString().split('T')[0];
+            } catch {
+                return dateStr || '';
+            }
+        }
+
+        function handleBirthdayChange() {
+            const birthdayInput = document.getElementById('birthday');
+            const ageInput = document.getElementById('age');
+            ageInput.value = calculateAge(birthdayInput.value);
+        }
+
+        async function saveChanges() {
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.textContent = '保存中...';
+            saveBtn.disabled = true;
+
+            try {
+                const userData = {
+                    userID: currentUserId,
+                    userName: document.getElementById('userName').value.trim(),
+                    phoneNumber: document.getElementById('phoneNumber').value.trim(),
+                    userMailbox: document.getElementById('email').value.trim(),
+                    gender: document.getElementById('gender').value,
+                    birthday: document.getElementById('birthday').value,
+                    age: document.getElementById('age').value,
+                    weight: document.getElementById('weight').value
+                };
+
+                const response = await window.updateUserInfo(userData);
+
+                if (response && response.code === 200) {
+                    alert('修改成功！');
+                    window.location.href = 'getUserInfo.html';
+                } else {
+                    alert(response?.msg || '修改失败，请重试');
+                    saveBtn.textContent = '保存';
+                    saveBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('保存失败:', error);
+                alert('保存失败：服务器连接异常');
+                saveBtn.textContent = '保存';
+                saveBtn.disabled = false;
+            }
+        }
+
+        async function loadUserInfo() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = 'signin.html';
+                return;
+            }
+
+            currentUserId = userSession.userID;
+
+            try {
+                const response = await window.getUserInfo(currentUserId);
+                
+                if (!response || response.code !== 200) {
+                    document.getElementById('content').innerHTML = '<p class="loading">获取用户信息失败</p>';
+                    return;
+                }
+
+                const user = response.data || {};
+                
+                const birthdayVal = formatDate(user.birthday);
+
+                const formHtml = `
+                    <div class="edit-container">
+                        <h1 class="page-title">修改个人信息</h1>
+                        
+                        <form id="editForm">
+                            <div class="form-group">
+                                <label class="form-label">用户ID</label>
+                                <input type="text" class="form-input" id="userID" value="${user.userID || user.userId || user.id || ''}" readonly>
+                                <div class="readonly-hint">* 用户ID不可修改</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">用户名</label>
+                                <input type="text" class="form-input" id="userName" value="${user.userName || ''}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">手机号</label>
+                                <input type="tel" class="form-input" id="phoneNumber" value="${user.phoneNumber || ''}" readonly>
+                                <div class="readonly-hint">* 手机号不可修改</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">邮箱</label>
+                                <input type="email" class="form-input" id="email" value="${user.userMailbox || ''}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">性别</label>
+                                <select class="form-select" id="gender">
+                                    <option value="男" ${user.gender === '男' ? 'selected' : ''}>男</option>
+                                    <option value="女" ${user.gender === '女' ? 'selected' : ''}>女</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">生日</label>
+                                <input type="date" class="form-input" id="birthday" value="${birthdayVal}" onchange="handleBirthdayChange()">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">年龄</label>
+                                <input type="number" class="form-input" id="age" value="${calculateAge(user.birthday)}" readonly>
+                                <div class="readonly-hint">* 年龄根据生日自动计算</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">体重</label>
+                                <div style="display: flex; align-items: center;">
+                                    <input type="number" class="form-input" id="weight" value="${user.weight || ''}" min="1" max="300" step="0.1" style="flex: 1;">
+                                    <span class="unit-suffix">kg</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">注册时间</label>
+                                <input type="text" class="form-input" id="registerTime" value="${formatDate(user.registerTime || user.registrationTime)}" readonly>
+                                <div class="readonly-hint">* 注册时间不可修改</div>
+                            </div>
+                            
+                            <div class="button-group">
+                                <button type="button" class="cancel-btn" onclick="goBack()">取消</button>
+                                <button type="button" class="save-btn" id="saveBtn" onclick="saveChanges()">保存</button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+
+                document.getElementById('content').innerHTML = formHtml;
+
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+                document.getElementById('content').innerHTML = '<p class="loading">加载用户信息失败，请检查服务器连接</p>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUserInfo);
+    </script>
+</body>
+</html>

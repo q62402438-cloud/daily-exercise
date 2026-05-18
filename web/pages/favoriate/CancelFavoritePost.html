@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>取消收藏</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
+        .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; }
+        .site-title { font-size: 24px; font-weight: 600; color: #2c3e50; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #27ae60; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .user-name { font-weight: 600; }
+        .main-container { max-width: 600px; margin: 30px auto; padding: 0 20px; }
+        .confirm-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center; }
+        .warning-icon { font-size: 64px; color: #e74c3c; margin-bottom: 20px; }
+        .confirm-title { font-size: 24px; margin-bottom: 20px; color: #2c3e50; }
+        .topic-preview { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: left; }
+        .topic-title { font-size: 18px; font-weight: 600; margin-bottom: 10px; color: #2c3e50; }
+        .topic-meta { color: #7f8c8d; font-size: 14px; margin-bottom: 10px; }
+        .topic-content { color: #34495e; line-height: 1.6; }
+        .confirm-message { color: #7f8c8d; margin-bottom: 30px; line-height: 1.6; }
+        .action-buttons { display: flex; gap: 15px; justify-content: center; }
+        .confirm-btn, .cancel-btn { padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .confirm-btn { background: #e74c3c; color: white; }
+        .cancel-btn { background: #95a5a6; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">跃动社区</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name">用户</div>
+            <div class="user-avatar">用</div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="confirm-container">
+            <div class="warning-icon">⭐</div>
+            <h2 class="confirm-title">取消收藏</h2>
+            
+            <div class="topic-preview">
+                <div class="topic-title">健身打卡第一天</div>
+                <div class="topic-meta">帖子ID: TOPIC001 | 作者: user123 | 收藏时间: 2024-01-15</div>
+                <div class="topic-content">今天完成了30分钟的有氧运动，感觉很好！明天继续坚持。</div>
+            </div>
+
+            <div class="confirm-message">
+                您确定要取消收藏此帖子吗？<br>
+                取消后将从您的收藏列表中移除
+            </div>
+            <div class="action-buttons">
+                <button class="confirm-btn">确认取消</button>
+                <button class="cancel-btn">保留收藏</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
