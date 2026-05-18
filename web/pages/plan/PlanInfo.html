@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>训练计划详情 - 悦动</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
+        .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; }
+        .site-title { font-size: 24px; font-weight: 600; color: #2c3e50; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .main-container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 28px; color: white; }
+        .back-button { background: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; color: #2c3e50; }
+        .detail-container { background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); overflow: hidden; }
+        .plan-header { padding: 30px; border-bottom: 1px solid #ecf0f1; }
+        .plan-title { font-size: 28px; margin-bottom: 15px; color: #2c3e50; }
+        .plan-meta { display: flex; gap: 20px; flex-wrap: wrap; }
+        .meta-item { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: #f8f9fa; border-radius: 6px; }
+        .meta-label { color: #7f8c8d; }
+        .meta-value { font-weight: 600; }
+        .status-badge { padding: 6px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; }
+        .status-active { background: #27ae60; color: white; }
+        .status-inactive { background: #95a5a6; color: white; }
+        .status-completed { background: #3498db; color: white; }
+        .plan-content { padding: 30px; }
+        .content-section { margin-bottom: 30px; }
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #2c3e50; }
+        .section-content { color: #555; line-height: 1.8; }
+        .plan-progress { padding: 20px 30px; background: #f8f9fa; }
+        .progress-bar { height: 12px; background: #ecf0f1; border-radius: 6px; overflow: hidden; margin-bottom: 10px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #3498db, #27ae60); border-radius: 6px; }
+        .progress-info { display: flex; justify-content: space-between; color: #7f8c8d; }
+        .action-bar { padding: 20px 30px; border-top: 1px solid #ecf0f1; display: flex; gap: 15px; }
+        .action-btn { padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 16px; }
+        .favorite-btn { background: #f39c12; color: white; }
+        .favorite-btn:hover { background: #e67e22; }
+        .favorite-btn.active { background: #e67e22; }
+        .start-btn { background: #27ae60; color: white; }
+        .edit-btn { background: #f39c12; color: white; }
+        .delete-btn { background: #e74c3c; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">悦动</div>
+        </div>
+        <div class="user-info">
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">训练计划详情</h1>
+            <button class="back-button" onclick="goBack()">返回</button>
+        </div>
+
+        <div class="detail-container">
+            <div class="plan-header">
+                <h2 class="plan-title" id="planTitle">减脂训练计划</h2>
+                <div class="plan-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">运动类型:</span>
+                        <span class="meta-value" id="planType">减脂</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">训练时长:</span>
+                        <span class="meta-value" id="planDuration">8周</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">每日时长:</span>
+                        <span class="meta-value" id="planDailyDuration">45分钟</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-content">
+                <div class="content-section">
+                    <h3 class="section-title">计划描述</h3>
+                    <div class="section-content" id="planDescription">科学的减脂训练方案，结合有氧运动和力量训练，帮助您在8周内达到理想体重。每周训练5天，休息2天。</div>
+                </div>
+
+                <div class="content-section">
+                    <h3 class="section-title">训练内容</h3>
+                    <div class="section-content" id="planContent">周一：慢跑30分钟 + 力量训练15分钟（胸部、肩部）
+周二：游泳45分钟
+周三：休息
+周四：慢跑30分钟 + 力量训练15分钟（背部、腿部）
+周五：骑行45分钟
+周六：慢跑30分钟 + 核心训练15分钟
+周日：休息</div>
+                </div>
+
+                <div class="content-section">
+                    <h3 class="section-title">时间安排</h3>
+                    <div class="section-content" id="planSchedule">开始日期：2024-01-01<br>结束日期：2024-02-26</div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="action-btn favorite-btn" id="favoriteBtn" onclick="toggleFavorite()">
+                    <span>⭐</span>
+                    <span id="favoriteBtnText">收藏计划</span>
+                </button>
+                <button class="action-btn start-btn" onclick="startPlan()">开始训练</button>
+                <button class="action-btn edit-btn" onclick="editPlan()">编辑计划</button>
+                <button class="action-btn delete-btn" onclick="deletePlan()">删除计划</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        const plansData = {
+            '1': {
+                id: '1',
+                title: '减脂训练计划',
+                type: '减脂',
+                duration: '8周',
+                dailyDuration: '45分钟',
+                description: '科学的减脂训练方案，结合有氧运动和力量训练，帮助您在8周内达到理想体重。每周训练5天，休息2天。',
+                content: '周一：慢跑30分钟 + 力量训练15分钟（胸部、肩部）\n周二：游泳45分钟\n周三：休息\n周四：慢跑30分钟 + 力量训练15分钟（背部、腿部）\n周五：骑行45分钟\n周六：慢跑30分钟 + 核心训练15分钟\n周日：休息',
+                schedule: '开始日期：2024-01-01<br>结束日期：2024-02-26'
+            },
+            '2': {
+                id: '2',
+                title: '增肌训练计划',
+                type: '增肌',
+                duration: '12周',
+                dailyDuration: '60分钟',
+                description: '针对全身肌群的增肌训练计划，分为胸、背、腿、肩、手臂五个训练日，每组动作完成3-4组，每组8-12次。',
+                content: '周一：胸部训练（卧推、飞鸟、俯卧撑）\n周二：背部训练（引体向上、划船、硬拉）\n周三：腿部训练（深蹲、弓步、提踵）\n周四：休息\n周五：肩部训练（推举、侧平举、俯身飞鸟）\n周六：手臂训练（弯举、臂屈伸、锤式弯举）\n周日：休息',
+                schedule: '开始日期：2023-10-01<br>结束日期：2023-12-21'
+            },
+            '3': {
+                id: '3',
+                title: '跑步训练计划',
+                type: '有氧',
+                duration: '4周',
+                dailyDuration: '30分钟',
+                description: '从初学者到进阶跑者的跑步训练计划，逐步提升跑步距离和配速，适合想要开始跑步的新手。',
+                content: '第1周：每天慢跑15分钟，快走15分钟\n第2周：每天慢跑20分钟，快走10分钟\n第3周：每天慢跑25分钟，快走5分钟\n第4周：每天慢跑30分钟',
+                schedule: '开始日期：未设定<br>结束日期：未设定'
+            }
+        };
+
+        let currentPlan = null;
+
+        function goBack() {
+            const referrer = document.referrer;
+            if (referrer.includes('MyPlans.html')) {
+                window.location.href = 'MyPlans.html';
+            } else {
+                window.location.href = 'PlanDetail.html';
+            }
+        }
+
+        function startPlan() {
+            window.location.href = `StartPlan.html?id=${currentPlan.id}`;
+        }
+
+        function editPlan() {
+            window.location.href = `EditPlan.html?id=${currentPlan.id}`;
+        }
+
+        function toggleFavorite() {
+            const favoriteBtn = document.getElementById('favoriteBtn');
+            const favoriteBtnText = document.getElementById('favoriteBtnText');
+            
+            if (favoriteBtn.classList.contains('active')) {
+                favoriteBtn.classList.remove('active');
+                favoriteBtnText.textContent = '收藏计划';
+                alert('已取消收藏');
+            } else {
+                favoriteBtn.classList.add('active');
+                favoriteBtnText.textContent = '已收藏';
+                alert('收藏成功！');
+            }
+        }
+
+        function deletePlan() {
+            if (confirm('确定要删除这个计划吗？')) {
+                alert('计划已删除');
+                goBack();
+            }
+        }
+
+        function loadPlanDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const planId = urlParams.get('id') || '1';
+            
+            currentPlan = plansData[planId] || plansData['1'];
+            
+            document.getElementById('planTitle').textContent = currentPlan.title;
+            document.getElementById('planType').textContent = currentPlan.type;
+            document.getElementById('planDuration').textContent = currentPlan.duration;
+            document.getElementById('planDailyDuration').textContent = currentPlan.dailyDuration;
+            document.getElementById('planDescription').textContent = currentPlan.description;
+            document.getElementById('planContent').textContent = currentPlan.content;
+            document.getElementById('planSchedule').innerHTML = currentPlan.schedule;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSession = getUserSession();
+            if (userSession.userName) {
+                document.getElementById('userNameDisplay').textContent = userSession.userName;
+                document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
+            }
+            
+            loadPlanDetail();
+        });
+    </script>
+</body>
+</html>

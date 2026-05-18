@@ -98,7 +98,6 @@
             background: #ecf0f1;
         }
         
-        /* 收藏管理容器 */
         .favorites-container {
             background: white;
             border-radius: 12px;
@@ -216,7 +215,6 @@
             background: #c0392b;
         }
         
-        /* 空状态 */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -234,7 +232,6 @@
             margin-bottom: 10px;
         }
         
-        /* 取消收藏确认 */
         .unfavorite-modal {
             display: none;
             position: fixed;
@@ -300,7 +297,6 @@
             background: #c0392b;
         }
         
-        /* 响应式设计 */
         @media (max-width: 768px) {
             .favorite-item {
                 flex-direction: column;
@@ -319,40 +315,35 @@
     </style>
 </head>
 <body>
-    <!-- 顶部栏 -->
     <div class="header">
         <div class="logo-section">
             <img src="images/logo.png" alt="系统Logo" class="logo">
             <div class="site-title">悦动</div>
         </div>
         <div class="user-info">
-            <div class="user-name">用户123</div>
-            <div class="user-avatar">用</div>
+            <div class="user-name" id="userNameDisplay">用户123</div>
+            <div class="user-avatar" id="userAvatar">用</div>
         </div>
     </div>
 
-    <!-- 主要内容 -->
     <div class="main-container">
         <div class="page-header">
             <h1 class="page-title">收藏管理</h1>
-            <button class="back-button">返回控制台</button>
+            <button class="back-button" onclick="goBack()">返回控制台</button>
         </div>
 
-        <!-- 收藏管理内容 -->
         <div class="favorites-container">
             <div class="favorites-header">
                 <h2 class="favorites-title">我的收藏</h2>
                 <div class="manage-actions">
-                    <button class="action-btn btn-remove">批量取消收藏</button>
+                    <button class="action-btn btn-remove" onclick="batchRemove()">批量取消收藏</button>
                 </div>
             </div>
             
-            <div class="favorites-list">
-                <!-- 收藏项会在这里动态生成 -->
+            <div class="favorites-list" id="favoritesList">
             </div>
             
-            <!-- 空状态 -->
-            <div class="empty-state">
+            <div class="empty-state" id="emptyState">
                 <div class="empty-icon">⭐</div>
                 <div class="empty-text">暂无收藏内容</div>
                 <div>您还没有收藏任何训练计划</div>
@@ -360,21 +351,104 @@
         </div>
     </div>
 
-    <!-- 取消收藏确认弹窗 -->
     <div class="unfavorite-modal" id="unfavoriteModal">
         <div class="modal-content">
             <div class="modal-icon">⚠️</div>
             <h3 class="modal-title">取消收藏</h3>
             <p class="modal-text">确定要取消收藏这个训练计划吗？</p>
             <div class="modal-actions">
-                <button class="btn action-btn btn-cancel">取消</button>
-                <button class="btn action-btn btn-confirm">确定取消</button>
+                <button class="action-btn btn-cancel" onclick="closeModal()">取消</button>
+                <button class="action-btn btn-confirm" onclick="confirmUnfavorite()">确定取消</button>
             </div>
         </div>
     </div>
 
+    <script src="../../asserts/js/api.js"></script>
     <script>
-        // 页面功能将在后续实现
+        let currentPlanID = null;
+        
+        function goBack() {
+            window.location.href = '../user/index.html';
+        }
+        
+        function closeModal() {
+            document.getElementById('unfavoriteModal').style.display = 'none';
+            currentPlanID = null;
+        }
+        
+        function confirmUnfavorite() {
+            const favoritesList = document.getElementById('favoritesList');
+            const item = document.querySelector(`[data-plan-id="${currentPlanID}"]`);
+            if (item) {
+                item.remove();
+            }
+            
+            if (favoritesList.children.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+            }
+            
+            closeModal();
+            alert('已取消收藏');
+        }
+        
+        function showUnfavoriteModal(planID) {
+            currentPlanID = planID;
+            document.getElementById('unfavoriteModal').style.display = 'flex';
+        }
+        
+        function viewPlan(planID) {
+            window.location.href = `../plan/PlanDetail.html?id=${planID}`;
+        }
+        
+        function batchRemove() {
+            if (confirm('确定要取消所有收藏吗？')) {
+                document.getElementById('favoritesList').innerHTML = '';
+                document.getElementById('emptyState').style.display = 'block';
+                alert('已清空所有收藏');
+            }
+        }
+        
+        function renderFavorites() {
+            const mockData = [
+                { id: 'PLAN001', name: '减脂训练计划', type: '减脂 · 中级 · 45分钟' },
+                { id: 'PLAN002', name: '增肌入门计划', type: '增肌 · 初级 · 60分钟' },
+                { id: 'PLAN003', name: '瑜伽放松计划', type: '瑜伽 · 初级 · 30分钟' },
+                { id: 'PLAN004', name: 'HIIT高强度训练', type: '综合 · 高级 · 25分钟' }
+            ];
+            
+            const favoritesList = document.getElementById('favoritesList');
+            
+            if (mockData.length > 0) {
+                document.getElementById('emptyState').style.display = 'none';
+                
+                mockData.forEach(item => {
+                    const favoriteItem = document.createElement('div');
+                    favoriteItem.className = 'favorite-item';
+                    favoriteItem.dataset.planId = item.id;
+                    favoriteItem.innerHTML = `
+                        <div class="item-info">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-type">${item.type}</div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="icon-btn btn-view" onclick="viewPlan('${item.id}')" title="查看计划">👁</button>
+                            <button class="icon-btn btn-unfavorite" onclick="showUnfavoriteModal('${item.id}')" title="取消收藏">✕</button>
+                        </div>
+                    `;
+                    favoritesList.appendChild(favoriteItem);
+                });
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSession = getUserSession();
+            if (userSession.userName) {
+                document.getElementById('userNameDisplay').textContent = userSession.userName;
+                document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
+            }
+            
+            renderFavorites();
+        });
     </script>
 </body>
 </html>

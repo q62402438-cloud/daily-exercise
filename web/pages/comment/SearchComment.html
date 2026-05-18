@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>查询评论</title>
+    <title>搜索评论</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
@@ -15,20 +15,21 @@
         .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #27ae60; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
         .user-name { font-weight: 600; }
         .main-container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
-        .search-section { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        .search-form { display: flex; gap: 15px; }
+        .search-section { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .section-title { font-size: 24px; margin-bottom: 20px; color: #2c3e50; }
+        .search-form { display: flex; gap: 15px; margin-bottom: 30px; }
         .search-input { flex: 1; padding: 12px 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; }
         .search-button { background: #3498db; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; }
-        .results-section { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .results-title { font-size: 24px; margin-bottom: 20px; color: #2c3e50; }
-        .comment-item { border: 1px solid #ecf0f1; border-radius: 8px; padding: 20px; margin-bottom: 15px; }
-        .comment-header { display: flex; justify-content: between; align-items: center; margin-bottom: 10px; }
+        .search-button:hover { background: #2980b9; }
+        .comments-list { display: grid; gap: 20px; }
+        .comment-item { border: 1px solid #ecf0f1; border-radius: 8px; padding: 20px; }
+        .comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .comment-author { font-weight: 600; color: #2c3e50; }
-        .comment-meta { color: #7f8c8d; font-size: 14px; }
-        .comment-content { color: #34495e; line-height: 1.6; margin-bottom: 10px; }
-        .comment-actions { display: flex; gap: 15px; }
-        .action-btn { background: none; border: none; color: #3498db; cursor: pointer; font-size: 14px; }
-        .reply-item { margin-left: 40px; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #3498db; }
+        .comment-time { color: #7f8c8d; font-size: 14px; }
+        .comment-content { color: #34495e; line-height: 1.6; }
+        .comment-meta { margin-top: 10px; display: flex; gap: 20px; color: #7f8c8d; font-size: 14px; }
+        .view-button { background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        .view-button:hover { background: #2980b9; }
     </style>
 </head>
 <body>
@@ -38,45 +39,70 @@
             <div class="site-title">跃动社区</div>
         </div>
         <div class="user-info">
-            <div class="user-name">用户</div>
-            <div class="user-avatar">用</div>
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
         </div>
     </div>
 
     <div class="main-container">
         <div class="search-section">
-            <form class="search-form">
-                <input type="text" class="search-input" placeholder="搜索评论...">
+            <h2 class="section-title">搜索评论</h2>
+            
+            <form class="search-form" id="searchForm">
+                <input type="text" class="search-input" id="searchKeyword" placeholder="搜索评论内容...">
                 <button type="submit" class="search-button">搜索</button>
             </form>
-        </div>
 
-        <div class="results-section">
-            <h2 class="results-title">评论列表</h2>
-            <div class="comment-item">
-                <div class="comment-header">
-                    <span class="comment-author">用户A</span>
-                    <span class="comment-meta">评论ID: COMMENT001 | 2024-01-15 11:00:00 | 点赞数: 5</span>
+            <div class="comments-list" id="commentsList">
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-author">用户A</span>
+                        <span class="comment-time">2024-01-15 11:00:00</span>
+                    </div>
+                    <div class="comment-content">这个计划很不错，我也在坚持锻炼！希望能长期坚持下去，大家一起加油。</div>
+                    <div class="comment-meta">
+                        <span>所属帖子: 健身打卡第一天</span>
+                        <button class="view-button" onclick="viewComment('COMMENT001')">查看详情</button>
+                    </div>
                 </div>
-                <div class="comment-content">这个计划很不错，我也在坚持锻炼！</div>
-                <div class="comment-actions">
-                    <button class="action-btn">回复</button>
-                    <button class="action-btn">点赞</button>
-                </div>
-                
-                <div class="reply-item">
+                <div class="comment-item">
                     <div class="comment-header">
                         <span class="comment-author">用户B</span>
-                        <span class="comment-meta">回复用户A | 2024-01-15 11:30:00 | 点赞数: 2</span>
+                        <span class="comment-time">2024-01-15 11:30:00</span>
                     </div>
                     <div class="comment-content">一起加油！我们可以互相监督</div>
-                    <div class="comment-actions">
-                        <button class="action-btn">回复</button>
-                        <button class="action-btn">点赞</button>
+                    <div class="comment-meta">
+                        <span>所属帖子: 健身打卡第一天</span>
+                        <button class="view-button" onclick="viewComment('COMMENT002')">查看详情</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function viewComment(commentID) {
+            window.location.href = 'DisplayComment.html?id=' + commentID;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSession = getUserSession();
+            if (userSession.userName) {
+                document.getElementById('userNameDisplay').textContent = userSession.userName;
+                document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
+            }
+            
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const keyword = document.getElementById('searchKeyword').value.trim();
+                if (!keyword) {
+                    alert('请输入搜索关键词');
+                    return;
+                }
+                alert('搜索结果已显示');
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打卡记录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-radius: 12px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+        
+        .site-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .back-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .back-button:hover {
+            background: #2980b9;
+        }
+        
+        .checkin-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        
+        .checkin-title {
+            text-align: center;
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .form-input:disabled {
+            background: #f8f9fa;
+            color: #7f8c8d;
+        }
+        
+        .time-input {
+            padding: 14px 16px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .time-input:hover {
+            border-color: #3498db;
+        }
+        
+        .time-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .duration-display {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 14px 16px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .submit-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #27ae60, #219a52);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .time-modal {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 320px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .modal-title {
+            text-align: center;
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .time-selectors {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .time-select {
+            padding: 12px 16px;
+            font-size: 18px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            min-width: 80px;
+            cursor: pointer;
+        }
+        
+        .time-select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .time-divider {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-btn.cancel {
+            background: #ecf0f1;
+            color: #7f8c8d;
+        }
+        
+        .modal-btn.confirm {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .modal-btn.confirm:hover {
+            opacity: 0.9;
+        }
+        
+        .field-description {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <img src="../user/images/logo.png" alt="系统Logo" class="logo">
+            <div class="site-title">悦动</div>
+        </div>
+        <button class="back-button" onclick="goBack()">返回首页</button>
+    </div>
+
+    <div class="checkin-container">
+        <h1 class="checkin-title">📝 运动打卡记录</h1>
+        
+        <div class="form-group">
+            <label class="form-label">运动日期</label>
+            <input type="text" class="form-input" id="sportsDate" readonly>
+            <div class="field-description">自动获取当天日期</div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">事件ID</label>
+            <input type="text" class="form-input" id="eventID" placeholder="请输入事件ID">
+            <div class="field-description">用于标识本次运动记录</div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">开始时间</label>
+            <input type="text" class="time-input" id="startTime" placeholder="点击选择开始时间" readonly>
+            <div class="field-description">选择运动开始的时间</div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">结束时间</label>
+            <input type="text" class="time-input" id="endTime" placeholder="点击选择结束时间" readonly>
+            <div class="field-description">选择运动结束的时间</div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">运动时长（分钟）</label>
+            <div class="duration-display" id="durationDisplay">0 分钟</div>
+            <div class="field-description">根据开始时间和结束时间自动计算</div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">运动数量</label>
+            <input type="number" class="form-input" id="exerciseAmount" placeholder="请输入运动数量（如：跑步公里数、俯卧撑个数等）">
+            <div class="field-description">记录本次运动的具体数量</div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">消耗卡路里</label>
+            <input type="number" class="form-input" id="calorie" placeholder="请输入消耗的卡路里">
+            <div class="field-description">记录本次运动消耗的热量（千卡）</div>
+        </div>
+        
+        <button class="submit-button" onclick="submitCheckin()">提交打卡</button>
+    </div>
+
+    <div class="modal-overlay" id="timeModal">
+        <div class="time-modal">
+            <h3 class="modal-title" id="modalTitle">选择时间</h3>
+            <div class="time-selectors">
+                <select class="time-select" id="hourSelect">
+                    <option value="">时</option>
+                </select>
+                <span class="time-divider">:</span>
+                <select class="time-select" id="minuteSelect">
+                    <option value="">分</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeTimeModal()">取消</button>
+                <button class="modal-btn confirm" onclick="confirmTime()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        let currentTimeField = null;
+        
+        function goBack() {
+            window.location.href = '../user/index.html';
+        }
+        
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function formatTime(hour, minute) {
+            return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+        }
+        
+        function calculateDuration(start, end) {
+            if (!start || !end) return 0;
+            
+            const [startHour, startMin] = start.split(':').map(Number);
+            const [endHour, endMin] = end.split(':').map(Number);
+            
+            let totalStartMinutes = startHour * 60 + startMin;
+            let totalEndMinutes = endHour * 60 + endMin;
+            
+            if (totalEndMinutes < totalStartMinutes) {
+                totalEndMinutes += 24 * 60;
+            }
+            
+            return totalEndMinutes - totalStartMinutes;
+        }
+        
+        function updateDuration() {
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const durationMinutes = calculateDuration(startTime, endTime);
+            document.getElementById('durationDisplay').textContent = durationMinutes + ' 分钟';
+        }
+        
+        function openTimeModal(fieldId, title) {
+            currentTimeField = fieldId;
+            document.getElementById('modalTitle').textContent = title;
+            
+            const existingValue = document.getElementById(fieldId).value;
+            if (existingValue) {
+                const [hour, minute] = existingValue.split(':').map(Number);
+                document.getElementById('hourSelect').value = hour;
+                document.getElementById('minuteSelect').value = minute;
+            } else {
+                document.getElementById('hourSelect').value = '';
+                document.getElementById('minuteSelect').value = '';
+            }
+            
+            document.getElementById('timeModal').classList.add('show');
+        }
+        
+        function closeTimeModal() {
+            document.getElementById('timeModal').classList.remove('show');
+            currentTimeField = null;
+        }
+        
+        function confirmTime() {
+            const hour = document.getElementById('hourSelect').value;
+            const minute = document.getElementById('minuteSelect').value;
+            
+            if (!hour || !minute) {
+                alert('请选择完整的时间');
+                return;
+            }
+            
+            const selectedTime = formatTime(hour, minute);
+            
+            if (currentTimeField === 'endTime') {
+                const startTime = document.getElementById('startTime').value;
+                if (startTime) {
+                    const [startHour, startMin] = startTime.split(':').map(Number);
+                    const [endHour, endMin] = selectedTime.split(':').map(Number);
+                    
+                    const startTimeMinutes = startHour * 60 + startMin;
+                    const endTimeMinutes = endHour * 60 + endMin;
+                    
+                    if (endTimeMinutes <= startTimeMinutes) {
+                        alert('结束时间不能早于或等于开始时间');
+                        return;
+                    }
+                }
+            }
+            
+            document.getElementById(currentTimeField).value = selectedTime;
+            updateDuration();
+            closeTimeModal();
+        }
+        
+        async function submitCheckin() {
+            const sportsDate = document.getElementById('sportsDate').value;
+            const eventID = document.getElementById('eventID').value.trim();
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const exerciseAmount = document.getElementById('exerciseAmount').value;
+            const calorie = document.getElementById('calorie').value;
+            
+            if (!eventID) {
+                alert('请输入事件ID');
+                return;
+            }
+            if (!startTime) {
+                alert('请选择开始时间');
+                return;
+            }
+            if (!endTime) {
+                alert('请选择结束时间');
+                return;
+            }
+            if (!exerciseAmount) {
+                alert('请输入运动数量');
+                return;
+            }
+            if (!calorie) {
+                alert('请输入消耗卡路里');
+                return;
+            }
+            
+            const durationMinutes = calculateDuration(startTime, endTime);
+            
+            const checkinData = {
+                sportsDate: sportsDate,
+                eventID: eventID,
+                startTime: startTime,
+                endTime: endTime,
+                exerciseDuration: durationMinutes,
+                exerciseAmount: exerciseAmount,
+                calorie: calorie
+            };
+            
+            console.log('打卡数据:', checkinData);
+            
+            alert('打卡成功！\n\n运动日期：' + sportsDate + '\n事件ID：' + eventID + '\n开始时间：' + startTime + '\n结束时间：' + endTime + '\n运动时长：' + durationMinutes + ' 分钟\n运动数量：' + exerciseAmount + '\n消耗卡路里：' + calorie + ' kcal');
+            
+            window.location.href = '../user/index.html';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            document.getElementById('sportsDate').value = formatDate(today);
+            
+            const hourSelect = document.getElementById('hourSelect');
+            const minuteSelect = document.getElementById('minuteSelect');
+            
+            for (let i = 0; i < 24; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = String(i).padStart(2, '0');
+                hourSelect.appendChild(option);
+            }
+            
+            for (let i = 0; i < 60; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = String(i).padStart(2, '0');
+                minuteSelect.appendChild(option);
+            }
+            
+            document.getElementById('startTime').addEventListener('click', function() {
+                openTimeModal('startTime', '选择开始时间');
+            });
+            
+            document.getElementById('endTime').addEventListener('click', function() {
+                openTimeModal('endTime', '选择结束时间');
+            });
+            
+            document.getElementById('hourSelect').addEventListener('change', function() {
+                const hour = this.value;
+                if (hour && !document.getElementById('minuteSelect').value) {
+                    document.getElementById('minuteSelect').value = '0';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

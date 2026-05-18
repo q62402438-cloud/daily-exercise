@@ -23,8 +23,12 @@
         .form-group { margin-bottom: 25px; }
         .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
         .form-textarea { width: 100%; padding: 12px 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; height: 120px; resize: vertical; }
+        .form-textarea:focus { outline: none; border-color: #3498db; }
         .reply-info { background: #e8f4fd; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #3498db; }
         .submit-button { background: #3498db; color: white; border: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+        .submit-button:hover { background: #2980b9; }
+        .cancel-button { background: #ecf0f1; color: #2c3e50; border: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 15px; }
+        .cancel-button:hover { background: #bdc3c7; }
     </style>
 </head>
 <body>
@@ -34,8 +38,8 @@
             <div class="site-title">跃动社区</div>
         </div>
         <div class="user-info">
-            <div class="user-name">用户</div>
-            <div class="user-avatar">用</div>
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
         </div>
     </div>
 
@@ -48,18 +52,51 @@
                 <div class="topic-meta">帖子ID: TOPIC001 | 作者: user123</div>
             </div>
 
-            <div class="reply-info">
+            <div class="reply-info" id="replyInfo" style="display: none;">
                 回复给: 用户A (评论ID: COMMENT001)
             </div>
 
-            <form>
+            <form id="commentForm">
                 <div class="form-group">
                     <label class="form-label">评论内容</label>
-                    <textarea class="form-textarea" placeholder="请输入评论内容..."></textarea>
+                    <textarea class="form-textarea" id="commentContent" placeholder="请输入评论内容..."></textarea>
                 </div>
                 <button type="submit" class="submit-button">发布评论</button>
+                <button type="button" class="cancel-button" onclick="goBack()">取消</button>
             </form>
         </div>
     </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = '../post/UserForum.html';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSession = getUserSession();
+            if (userSession.userName) {
+                document.getElementById('userNameDisplay').textContent = userSession.userName;
+                document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
+            }
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const replyTo = urlParams.get('replyTo');
+            if (replyTo) {
+                document.getElementById('replyInfo').style.display = 'block';
+            }
+            
+            document.getElementById('commentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const content = document.getElementById('commentContent').value.trim();
+                if (!content) {
+                    alert('请输入评论内容');
+                    return;
+                }
+                alert('评论发布成功！');
+                window.location.href = '../post/UserForum.html';
+            });
+        });
+    </script>
 </body>
 </html>

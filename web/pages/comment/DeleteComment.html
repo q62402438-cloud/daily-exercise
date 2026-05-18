@@ -19,7 +19,6 @@
         .warning-icon { font-size: 64px; color: #e74c3c; margin-bottom: 20px; }
         .confirm-title { font-size: 24px; margin-bottom: 20px; color: #2c3e50; }
         .comment-preview { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: left; }
-        .comment-meta { color: #7f8c8d; font-size: 14px; margin-bottom: 10px; }
         .comment-content { color: #34495e; line-height: 1.6; }
         .confirm-message { color: #7f8c8d; margin-bottom: 30px; line-height: 1.6; }
         .action-buttons { display: flex; gap: 15px; justify-content: center; }
@@ -35,31 +34,49 @@
             <div class="site-title">跃动社区</div>
         </div>
         <div class="user-info">
-            <div class="user-name">用户</div>
-            <div class="user-avatar">用</div>
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
         </div>
     </div>
 
     <div class="main-container">
         <div class="confirm-container">
-            <div class="warning-icon">⚠️</div>
-            <h2 class="confirm-title">确认删除评论</h2>
+            <div class="warning-icon">🗑️</div>
+            <h2 class="confirm-title">删除评论</h2>
             
             <div class="comment-preview">
-                <div class="comment-meta">评论ID: COMMENT001 | 帖子: 健身打卡第一天</div>
                 <div class="comment-content">这个计划很不错，我也在坚持锻炼！希望能长期坚持下去，大家一起加油。</div>
             </div>
 
             <div class="confirm-message">
-                您即将删除此评论<br>
-                删除后，该评论的所有回复也将被删除<br>
-                此操作不可撤销，请确认是否继续？
+                您确定要删除这条评论吗？<br>
+                删除后将无法恢复
             </div>
             <div class="action-buttons">
-                <button class="confirm-btn">确认删除</button>
-                <button class="cancel-btn">取消</button>
+                <button class="confirm-btn" onclick="confirmDelete()">确认删除</button>
+                <button class="cancel-btn" onclick="goBack()">取消</button>
             </div>
         </div>
     </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = 'DisplayComment.html';
+        }
+        
+        function confirmDelete() {
+            alert('评论已删除');
+            window.location.href = '../post/UserForum.html';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSession = getUserSession();
+            if (userSession.userName) {
+                document.getElementById('userNameDisplay').textContent = userSession.userName;
+                document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
+            }
+        });
+    </script>
 </body>
 </html>

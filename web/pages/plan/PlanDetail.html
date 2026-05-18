@@ -5,227 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>训练计划管理</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            min-height: 100vh;
-            color: #2c3e50;
-        }
-        
-        .header {
-            background: white;
-            padding: 15px 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #3498db;
-        }
-        
-        .site-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #3498db;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-        
-        .main-container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-        
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-        
-        .page-title {
-            font-size: 28px;
-            color: white;
-        }
-        
-        .back-button {
-            background: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            color: #2c3e50;
-            transition: all 0.3s ease;
-        }
-        
-        .back-button:hover {
-            background: #ecf0f1;
-        }
-        
-        /* 功能按钮布局 */
-        .plan-features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-        
-        .feature-card {
-            background: white;
-            padding: 35px 25px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .feature-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-        
-        .feature-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        
-        .feature-desc {
-            color: #7f8c8d;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        /* 按钮颜色区分 */
-        .my-plans-card {
-            border-top: 4px solid #3498db;
-        }
-        
-        .create-plan-card {
-            border-top: 4px solid #27ae60;
-        }
-        
-        .edit-plan-card {
-            border-top: 4px solid #f39c12;
-        }
-        
-        .delete-plan-card {
-            border-top: 4px solid #e74c3c;
-        }
-        
-        .start-plan-card {
-            border-top: 4px solid #9b59b6;
-        }
-        
-        /* 计划列表 */
-        .plans-container {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .plans-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        
-        .plans-list {
-            display: grid;
-            gap: 15px;
-        }
-        
-        .plan-item {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr auto;
-            gap: 20px;
-            padding: 20px;
-            border: 2px solid #ecf0f1;
-            border-radius: 8px;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-        
-        .plan-item:hover {
-            border-color: #3498db;
-            background: #f8f9fa;
-        }
-        
-        .plan-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .plan-duration {
-            color: #7f8c8d;
-        }
-        
-        .plan-status {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .status-active {
-            background: #27ae60;
-            color: white;
-        }
-        
-        .status-inactive {
-            background: #95a5a6;
-            color: white;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
+        .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; }
+        .site-title { font-size: 24px; font-weight: 600; color: #2c3e50; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .main-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .page-title { font-size: 28px; color: white; }
+        .back-button { background: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; color: #2c3e50; }
+        .plan-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .feature-card { background: white; padding: 35px 25px; border-radius: 12px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer; border: none; }
+        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .feature-icon { font-size: 48px; margin-bottom: 20px; }
+        .feature-title { font-size: 18px; font-weight: 600; margin-bottom: 10px; color: #2c3e50; }
+        .feature-desc { color: #7f8c8d; font-size: 14px; line-height: 1.5; }
+        .my-plans-card { border-top: 4px solid #3498db; }
+        .create-plan-card { border-top: 4px solid #27ae60; }
+        .start-plan-card { border-top: 4px solid #9b59b6; }
+        .plans-container { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .plans-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .plans-title { font-size: 20px; font-weight: 600; color: #2c3e50; }
+        .search-box { display: flex; gap: 10px; }
+        .search-input { padding: 10px 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 14px; width: 250px; }
+        .search-input:focus { outline: none; border-color: #3498db; }
+        .search-btn { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .plans-list { display: grid; gap: 15px; }
+        .plan-item { display: grid; grid-template-columns: 2fr 1fr auto; gap: 20px; padding: 20px; border: 2px solid #ecf0f1; border-radius: 8px; align-items: center; transition: all 0.3s ease; }
+        .plan-item:hover { border-color: #3498db; background: #f8f9fa; }
+        .plan-name { font-weight: 600; color: #2c3e50; cursor: pointer; }
+        .plan-name:hover { color: #3498db; text-decoration: underline; }
+        .plan-type { padding: 4px 12px; background: #3498db; color: white; border-radius: 12px; font-size: 12px; text-align: center; }
+        .view-btn { padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .view-btn:hover { background: #2980b9; }
+        .empty-state { text-align: center; padding: 40px; color: #7f8c8d; }
     </style>
 </head>
 <body>
-    <!-- 顶部栏 -->
     <div class="header">
         <div class="logo-section">
             <img src="images/logo.png" alt="系统Logo" class="logo">
@@ -237,79 +56,114 @@
         </div>
     </div>
 
-    <!-- 主要内容 -->
     <div class="main-container">
         <div class="page-header">
             <h1 class="page-title">训练计划管理</h1>
             <button class="back-button" onclick="goBack()">返回控制台</button>
         </div>
 
-        <!-- 功能按钮 -->
         <div class="plan-features">
-            <!-- 我的计划 -->
             <button class="feature-card my-plans-card" onclick="viewMyPlans()">
                 <div class="feature-icon">📋</div>
                 <div class="feature-title">我的计划</div>
                 <div class="feature-desc">查看您创建的所有训练计划</div>
             </button>
-
-            <!-- 创建计划 -->
             <button class="feature-card create-plan-card" onclick="createPlan()">
                 <div class="feature-icon">➕</div>
                 <div class="feature-title">创建计划</div>
                 <div class="feature-desc">制定新的个性化训练计划</div>
             </button>
-
-            <!-- 开始计划 -->
             <button class="feature-card start-plan-card" onclick="startPlan()">
                 <div class="feature-icon">🏃‍♂️</div>
                 <div class="feature-title">开始计划</div>
                 <div class="feature-desc">立即开始执行选定的训练计划</div>
             </button>
         </div>
+
+        <div class="plans-container">
+            <div class="plans-header">
+                <div class="plans-title">训练计划列表</div>
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索训练计划...">
+                    <button class="search-btn" onclick="searchPlans()">搜索</button>
+                </div>
+            </div>
+            
+            <div class="plans-list" id="plansList">
+            </div>
+        </div>
     </div>
 
     <script src="../../asserts/js/api.js"></script>
     <script>
+        const plansData = [
+            { id: '1', name: '减脂训练计划', type: '减脂' },
+            { id: '2', name: '增肌训练计划', type: '增肌' },
+            { id: '3', name: '跑步训练计划', type: '有氧' },
+            { id: '4', name: '瑜伽放松计划', type: '瑜伽' },
+            { id: '5', name: 'HIIT高强度训练', type: '综合' }
+        ];
+
         function goBack() {
             window.location.href = '../user/index.html';
         }
-        
+
         function viewMyPlans() {
             window.location.href = 'MyPlans.html';
         }
-        
+
         function createPlan() {
             window.location.href = 'CreatePlan.html';
         }
-        
+
         function startPlan() {
             window.location.href = 'StartPlan.html';
         }
 
-        async function loadUserInfo() {
-            const userSession = getUserSession();
-            if (!userSession.userID) {
-                alert('请先登录');
-                window.location.href = '../user/signin.html';
+        function viewPlanDetail(planId) {
+            window.location.href = `PlanInfo.html?id=${planId}`;
+        }
+
+        function searchPlans() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            renderPlans(keyword);
+        }
+
+        function renderPlans(keyword = '') {
+            const plansList = document.getElementById('plansList');
+            const filteredPlans = plansData.filter(plan => 
+                plan.name.toLowerCase().includes(keyword) || 
+                plan.type.toLowerCase().includes(keyword)
+            );
+
+            if (filteredPlans.length === 0) {
+                plansList.innerHTML = `
+                    <div class="empty-state">
+                        <div>🔍</div>
+                        <div>未找到匹配的训练计划</div>
+                    </div>
+                `;
                 return;
             }
 
-            try {
-                const response = await window.getUserInfo(userSession.userID);
-                
-                if (response && response.code === 200) {
-                    const user = response.data || {};
-                    const userName = user.userName || '用户';
-                    document.querySelector('.user-name').textContent = userName;
-                    document.querySelector('.user-avatar').textContent = userName.charAt(0);
-                }
-            } catch (error) {
-                console.error('加载用户信息失败:', error);
-            }
+            plansList.innerHTML = filteredPlans.map(plan => `
+                <div class="plan-item">
+                    <div class="plan-name" onclick="viewPlanDetail('${plan.id}')">${plan.name}</div>
+                    <div class="plan-type">${plan.type}</div>
+                    <button class="view-btn" onclick="viewPlanDetail('${plan.id}')">查看详情</button>
+                </div>
+            `).join('');
         }
 
-        document.addEventListener('DOMContentLoaded', loadUserInfo);
+        document.addEventListener('DOMContentLoaded', function() {
+            renderPlans();
+            
+            document.getElementById('searchInput').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    searchPlans();
+                }
+            });
+        });
     </script>
 </body>
 </html>

@@ -331,7 +331,11 @@
     <script src="../../asserts/js/api.js"></script>
     <script>
         function goBack() {
-            window.location.href = 'MyPlans.html';
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'MyPlans.html';
+            }
         }
         
         function showSelectedPlan() {

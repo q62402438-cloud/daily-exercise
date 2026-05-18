@@ -43,6 +43,8 @@
         .progress-text { margin-top: 5px; font-size: 14px; color: #7f8c8d; }
         .plan-actions { display: flex; gap: 10px; }
         .action-btn { padding: 8px 18px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .detail-btn { background: #3498db; color: white; }
+        .detail-btn:hover { background: #2980b9; }
         .start-btn { background: #27ae60; color: white; }
         .start-btn:hover { background: #2ecc71; }
         .edit-btn { background: #f39c12; color: white; }
@@ -106,6 +108,7 @@
                         <div class="progress-text">已完成 5/8 周</div>
                     </div>
                     <div class="plan-actions">
+                        <button class="action-btn detail-btn" onclick="viewPlanDetail(1)">查看详情</button>
                         <button class="action-btn start-btn" onclick="startPlan(1)">继续训练</button>
                         <button class="action-btn edit-btn" onclick="editPlan(1)">编辑计划</button>
                         <button class="action-btn delete-btn" onclick="deletePlan(1)">删除计划</button>
@@ -131,10 +134,12 @@
                         <div class="progress-text">已完成 12/12 周</div>
                     </div>
                     <div class="plan-actions">
+                        <button class="action-btn detail-btn" onclick="viewPlanDetail(2)">查看详情</button>
                         <button class="action-btn start-btn" onclick="startPlan(2)">重新开始</button>
                         <button class="action-btn edit-btn" onclick="editPlan(2)">编辑计划</button>
                         <button class="action-btn delete-btn" onclick="deletePlan(2)">删除计划</button>
                     </div>
+
                 </div>
 
                 <div class="plan-card">
@@ -156,6 +161,7 @@
                         <div class="progress-text">已完成 0/4 周</div>
                     </div>
                     <div class="plan-actions">
+                        <button class="action-btn detail-btn" onclick="viewPlanDetail(3)">查看详情</button>
                         <button class="action-btn start-btn" onclick="startPlan(3)">开始训练</button>
                         <button class="action-btn edit-btn" onclick="editPlan(3)">编辑计划</button>
                         <button class="action-btn delete-btn" onclick="deletePlan(3)">删除计划</button>
@@ -173,6 +179,10 @@
 
         function createPlan() {
             window.location.href = 'CreatePlan.html';
+        }
+
+        function viewPlanDetail(planId) {
+            window.location.href = 'PlanInfo.html?id=' + planId;
         }
 
         function startPlan(planId) {

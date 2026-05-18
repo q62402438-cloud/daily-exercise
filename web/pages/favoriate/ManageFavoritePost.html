@@ -3,33 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理收藏</title>
+    <title>收藏帖子管理 - 悦动</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; }
         .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         .logo-section { display: flex; align-items: center; gap: 15px; }
         .logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; }
         .site-title { font-size: 24px; font-weight: 600; color: #2c3e50; }
         .user-info { display: flex; align-items: center; gap: 15px; }
         .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #27ae60; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
-        .user-name { font-weight: 600; }
         .main-container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
-        .favorites-section { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .section-title { font-size: 24px; margin-bottom: 20px; color: #2c3e50; }
-        .search-form { display: flex; gap: 15px; margin-bottom: 30px; }
-        .search-input { flex: 1; padding: 12px 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; }
-        .search-button { background: #3498db; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; }
-        .favorites-list { display: grid; gap: 20px; }
-        .favorite-item { border: 1px solid #ecf0f1; border-radius: 8px; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .topic-info { flex: 1; }
-        .topic-title { font-size: 18px; font-weight: 600; margin-bottom: 5px; color: #2c3e50; }
-        .topic-meta { color: #7f8c8d; font-size: 14px; margin-bottom: 10px; }
-        .topic-content { color: #34495e; line-height: 1.5; }
-        .favorite-actions { display: flex; gap: 10px; }
-        .view-btn, .unfavorite-btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
-        .view-btn { background: #3498db; color: white; }
-        .unfavorite-btn { background: #e74c3c; color: white; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .page-title { font-size: 28px; color: white; }
+        .back-button { background: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; color: #2c3e50; }
+        .back-button:hover { background: #ecf0f1; }
+        .favorites-container { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .favorites-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #ecf0f1; }
+        .favorites-title { font-size: 22px; font-weight: 600; color: #2c3e50; }
+        .action-btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .btn-remove { background: #e74c3c; color: white; }
+        .favorites-grid { display: grid; gap: 20px; }
+        .favorite-card { border: 2px solid #ecf0f1; border-radius: 10px; overflow: hidden; transition: all 0.3s; }
+        .favorite-card:hover { border-color: #3498db; }
+        .card-image { height: 150px; background: linear-gradient(135deg, #3498db, #2980b9); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; }
+        .card-content { padding: 20px; }
+        .card-title { font-weight: 600; font-size: 18px; margin-bottom: 10px; color: #2c3e50; }
+        .card-meta { color: #7f8c8d; font-size: 14px; margin-bottom: 15px; }
+        .card-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .tag { background: #e8f4fd; color: #3498db; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+        .card-actions { display: flex; gap: 10px; }
+        .icon-btn { width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-view { background: #3498db; color: white; }
+        .btn-unfavorite { background: #e74c3c; color: white; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #7f8c8d; }
+        .empty-icon { font-size: 64px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -39,34 +47,106 @@
             <div class="site-title">跃动社区</div>
         </div>
         <div class="user-info">
-            <div class="user-name">用户</div>
-            <div class="user-avatar">用</div>
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
         </div>
     </div>
 
     <div class="main-container">
-        <div class="favorites-section">
-            <h2 class="section-title">我的收藏</h2>
-            
-            <form class="search-form">
-                <input type="text" class="search-input" placeholder="搜索收藏的帖子...">
-                <button type="submit" class="search-button">搜索</button>
-            </form>
+        <div class="page-header">
+            <h1 class="page-title">我的收藏帖子</h1>
+            <button class="back-button" onclick="goBack()">返回社区</button>
+        </div>
 
-            <div class="favorites-list">
-                <div class="favorite-item">
-                    <div class="topic-info">
-                        <div class="topic-title">健身打卡第一天</div>
-                        <div class="topic-meta">帖子ID: TOPIC001 | 作者: user123 | 收藏时间: 2024-01-15</div>
-                        <div class="topic-content">今天完成了30分钟的有氧运动，感觉很好！明天继续坚持。</div>
-                    </div>
-                    <div class="favorite-actions">
-                        <button class="view-btn">查看</button>
-                        <button class="unfavorite-btn">取消收藏</button>
-                    </div>
-                </div>
+        <div class="favorites-container">
+            <div class="favorites-header">
+                <h2 class="favorites-title">收藏的帖子</h2>
+                <button class="action-btn btn-remove" onclick="batchRemove()">清空所有收藏</button>
+            </div>
+            
+            <div class="favorites-grid" id="favoritesGrid">
+            </div>
+            
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">📌</div>
+                <div class="empty-text">暂无收藏帖子</div>
+                <div>您还没有收藏任何社区帖子</div>
             </div>
         </div>
     </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = '../post/UserForum.html';
+        }
+        
+        function batchRemove() {
+            if (confirm('确定要清空所有收藏帖子吗？')) {
+                document.getElementById('favoritesGrid').innerHTML = '';
+                document.getElementById('emptyState').style.display = 'block';
+                alert('已清空所有收藏帖子');
+            }
+        }
+        
+        function viewPost(postID) {
+            window.location.href = `../post/PostDetail.html?id=${postID}`;
+        }
+        
+        function unfavoritePost(postID) {
+            if (confirm('确定要取消收藏这篇帖子吗？')) {
+                const card = document.querySelector(`[data-post-id="${postID}"]`);
+                if (card) card.remove();
+                
+                if (document.getElementById('favoritesGrid').children.length === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                }
+                alert('已取消收藏');
+            }
+        }
+        
+        function renderFavorites() {
+            const mockData = [
+                { id: 'POST001', title: '健身打卡第一天', author: '运动达人', time: '2024-01-15', tags: ['健身', '打卡', '日常'] },
+                { id: 'POST002', title: '分享我的减脂心得', author: '减脂小白', time: '2024-01-14', tags: ['减脂', '心得', '分享'] },
+                { id: 'POST003', title: '瑜伽入门教程', author: '瑜伽爱好者', time: '2024-01-13', tags: ['瑜伽', '入门', '教程'] },
+                { id: 'POST004', title: '跑步5公里打卡', author: '跑者小王', time: '2024-01-12', tags: ['跑步', '打卡', '运动'] }
+            ];
+            
+            const grid = document.getElementById('favoritesGrid');
+            
+            if (mockData.length > 0) {
+                document.getElementById('emptyState').style.display = 'none';
+                
+                mockData.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'favorite-card';
+                    card.dataset.postId = item.id;
+                    card.innerHTML = `
+                        <div class="card-image">📝</div>
+                        <div class="card-content">
+                            <div class="card-title">${item.title}</div>
+                            <div class="card-meta">作者: ${item.author} | ${item.time}</div>
+                            <div class="card-tags">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+                            <div class="card-actions">
+                                <button class="icon-btn btn-view" onclick="viewPost('${item.id}')" title="查看帖子">👁</button>
+                                <button class="icon-btn btn-unfavorite" onclick="unfavoritePost('${item.id}')" title="取消收藏">✕</button>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSession = getUserSession();
+            if (userSession.userName) {
+                document.getElementById('userNameDisplay').textContent = userSession.userName;
+                document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
+            }
+            renderFavorites();
+        });
+    </script>
 </body>
 </html>

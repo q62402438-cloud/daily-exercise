@@ -17,13 +17,14 @@
         .main-container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
         .form-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
         .form-title { font-size: 28px; margin-bottom: 30px; text-align: center; color: #2c3e50; }
-        .comment-info { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
-        .comment-meta { color: #7f8c8d; margin-bottom: 10px; }
-        .original-content { background: white; padding: 15px; border-radius: 6px; border-left: 3px solid #3498db; }
         .form-group { margin-bottom: 25px; }
         .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
-        .form-textarea { width: 100%; padding: 12px 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; height: 120px; resize: vertical; }
+        .form-textarea { width: 100%; padding: 12px 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; height: 150px; resize: vertical; }
+        .form-textarea:focus { outline: none; border-color: #3498db; }
         .submit-button { background: #3498db; color: white; border: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+        .submit-button:hover { background: #2980b9; }
+        .cancel-button { background: #ecf0f1; color: #2c3e50; border: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 15px; }
+        .cancel-button:hover { background: #bdc3c7; }
     </style>
 </head>
 <body>
@@ -33,8 +34,8 @@
             <div class="site-title">跃动社区</div>
         </div>
         <div class="user-info">
-            <div class="user-name">用户</div>
-            <div class="user-avatar">用</div>
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
         </div>
     </div>
 
@@ -42,21 +43,41 @@
         <div class="form-container">
             <h2 class="form-title">编辑评论</h2>
             
-            <div class="comment-info">
-                <div class="comment-meta">评论ID: COMMENT001 | 帖子: 健身打卡第一天 | 发布时间: 2024-01-15 11:00:00</div>
-                <div class="original-content">
-                    <strong>原内容:</strong> 这个计划很不错，我也在坚持锻炼！
-                </div>
-            </div>
-
-            <form>
+            <form id="editForm">
                 <div class="form-group">
                     <label class="form-label">评论内容</label>
-                    <textarea class="form-textarea">这个计划很不错，我也在坚持锻炼！希望能长期坚持。</textarea>
+                    <textarea class="form-textarea" id="commentContent">这个计划很不错，我也在坚持锻炼！希望能长期坚持下去，大家一起加油。</textarea>
                 </div>
                 <button type="submit" class="submit-button">保存修改</button>
+                <button type="button" class="cancel-button" onclick="goBack()">取消</button>
             </form>
         </div>
     </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = 'DisplayComment.html';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSession = getUserSession();
+            if (userSession.userName) {
+                document.getElementById('userNameDisplay').textContent = userSession.userName;
+                document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
+            }
+            
+            document.getElementById('editForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const content = document.getElementById('commentContent').value.trim();
+                if (!content) {
+                    alert('请输入评论内容');
+                    return;
+                }
+                alert('评论已更新！');
+                window.location.href = 'DisplayComment.html';
+            });
+        });
+    </script>
 </body>
 </html>

@@ -53,20 +53,24 @@
             gap: 15px;
         }
         
-        .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #3498db;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-        
         .user-name {
             font-weight: 600;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
         }
         
         .main-container {
@@ -155,10 +159,6 @@
             border-top: 4px solid #e67e22;
         }
         
-        .account-card {
-            border-top: 4px solid #34495e;
-        }
-        
         .daily-status {
             background: white;
             border-radius: 12px;
@@ -215,7 +215,7 @@
         </div>
         <div class="user-info">
             <div class="user-name" id="userNameDisplay">加载中...</div>
-            <div class="user-avatar" id="userAvatar">?</div>
+            <button class="logout-btn" id="logoutBtn">退出登录</button>
         </div>
     </div>
 
@@ -245,18 +245,23 @@
             window.location.href = '../record/total.html';
         }
         
-        function deleteAccount() {
-            if (confirm('确定要注销账户吗？此操作不可撤销！')) {
-                window.location.href = 'cancelUser.html';
-            }
-        }
-        
         function dailyCheckin() {
-            alert('打卡成功！');
-            document.getElementById('checkinBtn').classList.add('checked');
-            document.getElementById('checkinBtn').innerHTML = '已打卡';
-            document.getElementById('checkinBtn').onclick = null;
+            window.location.href = '../record/checkin.html';
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('确定要退出登录吗？')) {
+                    localStorage.removeItem('userID');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userType');
+                    window.location.href = 'signin.html';
+                }
+            });
+
+            loadUserInfo();
+        });
 
         async function loadUserInfo() {
             const userSession = getUserSession();
@@ -278,7 +283,6 @@
                 const userName = user.userName || '用户';
                 
                 document.getElementById('userNameDisplay').textContent = '欢迎，' + userName;
-                document.getElementById('userAvatar').textContent = userName.charAt(0);
 
                 const contentHtml = `
                     <div class="main-container">
@@ -317,12 +321,6 @@
                                 <div class="feature-title">有关打卡</div>
                                 <div class="feature-desc">查看您的打卡记录和运动统计</div>
                             </button>
-
-                            <button class="feature-card account-card" onclick="deleteAccount()">
-                                <div class="feature-icon">🚫</div>
-                                <div class="feature-title">注销账户</div>
-                                <div class="feature-desc">永久删除您的账户和相关数据</div>
-                            </button>
                         </div>
 
                         <div class="daily-status">
@@ -340,8 +338,6 @@
                 document.getElementById('content').innerHTML = '<p class="loading">加载失败，请检查服务器连接</p>';
             }
         }
-
-        document.addEventListener('DOMContentLoaded', loadUserInfo);
     </script>
 </body>
 </html>

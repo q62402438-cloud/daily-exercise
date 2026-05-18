@@ -98,7 +98,6 @@
             background: #ecf0f1;
         }
         
-        /* 取消收藏容器 */
         .unfavorite-container {
             background: white;
             border-radius: 12px;
@@ -132,6 +131,7 @@
             padding: 20px;
             margin-bottom: 30px;
             border-left: 4px solid #e74c3c;
+            text-align: left;
         }
         
         .item-name {
@@ -182,7 +182,6 @@
             background: #c0392b;
         }
         
-        /* 响应式设计 */
         @media (max-width: 768px) {
             .unfavorite-actions {
                 flex-direction: column;
@@ -195,45 +194,58 @@
     </style>
 </head>
 <body>
-    <!-- 顶部栏 -->
     <div class="header">
         <div class="logo-section">
             <img src="images/logo.png" alt="系统Logo" class="logo">
             <div class="site-title">悦动</div>
         </div>
         <div class="user-info">
-            <div class="user-name">用户123</div>
-            <div class="user-avatar">用</div>
+            <div class="user-name" id="userNameDisplay">用户123</div>
+            <div class="user-avatar" id="userAvatar">用</div>
         </div>
     </div>
 
-    <!-- 主要内容 -->
     <div class="main-container">
         <div class="page-header">
             <h1 class="page-title">取消收藏</h1>
-            <button class="back-button">返回收藏管理</button>
+            <button class="back-button" onclick="goBack()">返回收藏管理</button>
         </div>
 
-        <!-- 取消收藏内容 -->
         <div class="unfavorite-container">
             <div class="warning-icon">⚠️</div>
             <h2 class="unfavorite-title">取消收藏</h2>
             <p class="unfavorite-description">您确定要取消收藏这个训练计划吗？取消后将从您的收藏列表中移除。</p>
             
             <div class="selected-item">
-                <div class="item-name">训练计划名称</div>
-                <div class="item-details">运动类型 · 强度 · 时长</div>
+                <div class="item-name">减脂训练计划</div>
+                <div class="item-details">运动类型：减脂 · 强度：中级 · 时长：45分钟</div>
             </div>
             
             <div class="unfavorite-actions">
-                <button class="btn btn-cancel">取消操作</button>
-                <button class="btn btn-confirm">确认取消收藏</button>
+                <button class="btn btn-cancel" onclick="goBack()">取消操作</button>
+                <button class="btn btn-confirm" onclick="confirmCancel()">确认取消收藏</button>
             </div>
         </div>
     </div>
 
+    <script src="../../asserts/js/api.js"></script>
     <script>
-        // 页面功能将在后续实现
+        function goBack() {
+            window.location.href = 'ManageCollect.html';
+        }
+        
+        function confirmCancel() {
+            alert('已成功取消收藏');
+            window.location.href = 'ManageCollect.html';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSession = getUserSession();
+            if (userSession.userName) {
+                document.getElementById('userNameDisplay').textContent = userSession.userName;
+                document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
+            }
+        });
     </script>
 </body>
 </html>

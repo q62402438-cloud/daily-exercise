@@ -24,12 +24,16 @@
         .stats-info { display: flex; gap: 20px; margin: 20px 0; }
         .stat-item { color: #7f8c8d; }
         .replies-section { margin-top: 30px; }
+        .replies-section h3 { margin-bottom: 20px; color: #2c3e50; }
         .reply-item { padding: 15px; margin-bottom: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db; }
         .action-buttons { margin-top: 30px; display: flex; gap: 15px; }
         .action-button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
         .edit-btn { background: #3498db; color: white; }
         .delete-btn { background: #e74c3c; color: white; }
         .like-btn { background: #27ae60; color: white; }
+        .back-btn { background: #95a5a6; color: white; }
+        .reply-btn { background: #f39c12; color: white; }
+        .like-count { margin-left: 5px; }
     </style>
 </head>
 <body>
@@ -39,8 +43,8 @@
             <div class="site-title">跃动社区</div>
         </div>
         <div class="user-info">
-            <div class="user-name">用户</div>
-            <div class="user-avatar">用</div>
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
         </div>
     </div>
 
@@ -59,7 +63,7 @@
                     这个计划很不错，我也在坚持锻炼！希望能长期坚持下去，大家一起加油。
                 </div>
                 <div class="stats-info">
-                    <div class="stat-item">点赞数: 5</div>
+                    <div class="stat-item">点赞数: <span id="likeCount">5</span></div>
                     <div class="stat-item">回复数: 2</div>
                 </div>
             </div>
@@ -77,11 +81,52 @@
             </div>
 
             <div class="action-buttons">
-                <button class="action-button edit-btn">编辑评论</button>
-                <button class="action-button delete-btn">删除评论</button>
-                <button class="action-button like-btn">点赞 (5)</button>
+                <button class="action-button back-btn" onclick="goBack()">返回帖子</button>
+                <button class="action-button reply-btn" onclick="goToReply()">回复评论</button>
+                <button class="action-button like-btn" onclick="likeComment()">点赞 (<span id="likeBtnCount">5</span>)</button>
+                <button class="action-button edit-btn" onclick="editComment()">编辑评论</button>
+                <button class="action-button delete-btn" onclick="deleteComment()">删除评论</button>
             </div>
         </div>
     </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = '../post/UserForum.html';
+        }
+        
+        function goToReply() {
+            window.location.href = 'AddComment.html?replyTo=COMMENT001&postID=TOPIC001';
+        }
+        
+        function likeComment() {
+            const likeCount = document.getElementById('likeCount');
+            const likeBtnCount = document.getElementById('likeBtnCount');
+            let count = parseInt(likeCount.textContent) + 1;
+            likeCount.textContent = count;
+            likeBtnCount.textContent = count;
+            alert('点赞成功');
+        }
+        
+        function editComment() {
+            window.location.href = 'EditComment.html?id=COMMENT001';
+        }
+        
+        function deleteComment() {
+            if (confirm('确定要删除这条评论吗？')) {
+                alert('评论已删除');
+                window.location.href = '../post/UserForum.html';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSession = getUserSession();
+            if (userSession.userName) {
+                document.getElementById('userNameDisplay').textContent = userSession.userName;
+                document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
+            }
+        });
+    </script>
 </body>
 </html>

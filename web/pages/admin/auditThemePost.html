@@ -53,16 +53,20 @@
             gap: 15px;
         }
         
-        .admin-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #3498db;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .logout-btn {
+            background: #e74c3c;
             color: white;
-            font-weight: bold;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
         }
         
         .main-container {
@@ -156,7 +160,6 @@
             font-weight: 600;
         }
 
-        /* 分页样式 */
         .pagination {
             display: flex;
             justify-content: center;
@@ -170,17 +173,12 @@
             background: white;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
         
         .page-btn.active {
             background: #3498db;
             color: white;
             border-color: #3498db;
-        }
-        
-        .page-btn:hover:not(.active) {
-            background: #ecf0f1;
         }
     </style>
 </head>
@@ -191,8 +189,7 @@
             <div class="site-title">运动社区管理系统</div>
         </div>
         <div class="admin-info">
-            <div class="admin-name">管理员</div>
-            <div class="admin-avatar">管</div>
+            <button class="logout-btn" id="logoutBtn">退出登录</button>
         </div>
     </div>
 
@@ -216,7 +213,6 @@
             </div>
         </div>
 
-        <!-- 分页 -->
         <div class="pagination">
             <button class="page-btn">上一页</button>
             <button class="page-btn active">1</button>
@@ -226,18 +222,41 @@
         </div>
     </div>
 
+    <script src="../asserts/js/api.js"></script>
     <script>
         function goBack() {
-            console.log('返回首页');
+            window.location.href = 'index.html';
         }
         
         function approvePost() {
-            console.log('通过帖子');
+            if (confirm('确定要通过这个主题帖吗？')) {
+                alert('帖子已通过审核！');
+            }
         }
         
         function rejectPost() {
-            console.log('打回帖子');
+            if (confirm('确定要打回这个主题帖吗？')) {
+                alert('帖子已打回！');
+            }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('确定要退出登录吗？')) {
+                    localStorage.removeItem('userID');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userType');
+                    window.location.href = '../user/signin.html';
+                }
+            });
+
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+            }
+        });
     </script>
 </body>
 </html>
