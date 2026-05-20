@@ -70,6 +70,13 @@
         }
 
         async function submitPost() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+            
             const title = document.getElementById('postTitle').value.trim();
             const content = document.getElementById('postContent').value.trim();
             const submitBtn = document.getElementById('submitBtn');
@@ -86,11 +93,35 @@
             submitBtn.textContent = '发表中...';
             submitBtn.disabled = true;
 
+            const now = new Date();
+            const publishTime = now.toISOString().slice(0, 19).replace('T', ' ');
+
             try {
-                alert('帖子发表成功！');
-                window.location.href = 'UserForum.html';
+                const response = await window.addPost({
+                    authorID: userSession.userID,
+                    title: title,
+                    content: content,
+                    publishTime: publishTime
+                });
+                
+                if (!response) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    submitBtn.textContent = '发表帖子';
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                if (response.code === 200) {
+                    alert('帖子发表成功！等待审核通过后即可显示');
+                    window.location.href = 'UserForum.html';
+                } else {
+                    alert(response.msg || '发表失败，请重试');
+                    submitBtn.textContent = '发表帖子';
+                    submitBtn.disabled = false;
+                }
             } catch (error) {
-                alert('发表失败：' + error.message);
+                console.error('发表错误:', error);
+                alert('发表失败：服务器连接异常，请检查服务器是否启动在 8082 端口');
                 submitBtn.textContent = '发表帖子';
                 submitBtn.disabled = false;
             }

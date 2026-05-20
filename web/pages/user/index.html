@@ -159,6 +159,10 @@
             border-top: 4px solid #e67e22;
         }
         
+        .favorite-card {
+            border-top: 4px solid #e74c3c;
+        }
+        
         .daily-status {
             background: white;
             border-radius: 12px;
@@ -248,6 +252,10 @@
         function dailyCheckin() {
             window.location.href = '../record/checkin.html';
         }
+        
+        function viewFavorites() {
+            window.location.href = '../collect/ManageCollect.html';
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             const logoutBtn = document.getElementById('logoutBtn');
@@ -262,6 +270,50 @@
 
             loadUserInfo();
         });
+
+        async function loadTodayPlans(userID) {
+            try {
+                const response = await window.getTrainingPlansByUser(userID);
+                
+                if (!response || response.code !== 200) {
+                    document.getElementById('todayPlansList').innerHTML = '加载计划失败';
+                    return;
+                }
+
+                const plans = response.data || [];
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+                
+                const todayPlans = plans.filter(plan => {
+                    if (!plan.startTime || !plan.endTime) return false;
+                    const startTime = plan.startTime.split(' ')[0] || plan.startTime.split('T')[0];
+                    const endTime = plan.endTime.split(' ')[0] || plan.endTime.split('T')[0];
+                    return todayStr >= startTime && todayStr <= endTime;
+                });
+
+                if (todayPlans.length === 0) {
+                    document.getElementById('todayPlansList').innerHTML = '暂无今日计划';
+                    return;
+                }
+
+                let plansHtml = '<ul style="list-style: none; padding: 0; margin: 0;">';
+                todayPlans.forEach(plan => {
+                    plansHtml += `
+                        <li style="padding: 8px 12px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 500;">${plan.planName || '未命名计划'}</span>
+                            <span style="font-size: 14px; color: #3498db;">${plan.sportName || '运动'}</span>
+                        </li>
+                    `;
+                });
+                plansHtml += '</ul>';
+                
+                document.getElementById('todayPlansList').innerHTML = plansHtml;
+                
+            } catch (error) {
+                console.error('加载今日计划失败:', error);
+                document.getElementById('todayPlansList').innerHTML = '加载计划失败';
+            }
+        }
 
         async function loadUserInfo() {
             const userSession = getUserSession();
@@ -321,17 +373,29 @@
                                 <div class="feature-title">有关打卡</div>
                                 <div class="feature-desc">查看您的打卡记录和运动统计</div>
                             </button>
+
+                            <button class="feature-card favorite-card" onclick="viewFavorites()">
+                                <div class="feature-icon">⭐</div>
+                                <div class="feature-title">我的收藏</div>
+                                <div class="feature-desc">查看您收藏的训练计划和帖子</div>
+                            </button>
                         </div>
 
                         <div class="daily-status">
                             <div class="status-title">今日打卡状态</div>
                             <div class="status-desc">完成今日运动目标，记录您的进步</div>
                             <button class="checkin-btn" id="checkinBtn" onclick="dailyCheckin()">立即打卡</button>
+                            
+                            <div id="todayPlans" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ecf0f1;">
+                                <div style="font-weight: 600; color: #2c3e50; margin-bottom: 10px;">📅 今日训练计划</div>
+                                <div id="todayPlansList" style="color: #7f8c8d;">加载中...</div>
+                            </div>
                         </div>
                     </div>
                 `;
 
                 document.getElementById('content').innerHTML = contentHtml;
+                loadTodayPlans(userSession.userID);
 
             } catch (error) {
                 console.error('加载用户信息失败:', error);

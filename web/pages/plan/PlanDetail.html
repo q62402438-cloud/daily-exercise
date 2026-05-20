@@ -51,8 +51,8 @@
             <div class="site-title">悦动</div>
         </div>
         <div class="user-info">
-            <div class="user-name">用户123</div>
-            <div class="user-avatar">用</div>
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
         </div>
     </div>
 
@@ -96,13 +96,7 @@
 
     <script src="../../asserts/js/api.js"></script>
     <script>
-        const plansData = [
-            { id: '1', name: '减脂训练计划', type: '减脂' },
-            { id: '2', name: '增肌训练计划', type: '增肌' },
-            { id: '3', name: '跑步训练计划', type: '有氧' },
-            { id: '4', name: '瑜伽放松计划', type: '瑜伽' },
-            { id: '5', name: 'HIIT高强度训练', type: '综合' }
-        ];
+        let allPlans = [];
 
         function goBack() {
             window.location.href = '../user/index.html';
@@ -131,9 +125,9 @@
 
         function renderPlans(keyword = '') {
             const plansList = document.getElementById('plansList');
-            const filteredPlans = plansData.filter(plan => 
-                plan.name.toLowerCase().includes(keyword) || 
-                plan.type.toLowerCase().includes(keyword)
+            const filteredPlans = allPlans.filter(plan => 
+                (plan.planName && plan.planName.toLowerCase().includes(keyword)) || 
+                (plan.sportName && plan.sportName.toLowerCase().includes(keyword))
             );
 
             if (filteredPlans.length === 0) {
@@ -148,15 +142,54 @@
 
             plansList.innerHTML = filteredPlans.map(plan => `
                 <div class="plan-item">
-                    <div class="plan-name" onclick="viewPlanDetail('${plan.id}')">${plan.name}</div>
-                    <div class="plan-type">${plan.type}</div>
-                    <button class="view-btn" onclick="viewPlanDetail('${plan.id}')">查看详情</button>
+                    <div class="plan-name" onclick="viewPlanDetail('${plan.planID || plan.id}')">${plan.planName || '未命名计划'}</div>
+                    <div class="plan-type">${plan.sportName || '其他'}</div>
+                    <div style="font-size: 12px; color: #7f8c8d; margin-top: 4px;">👤 ${plan.userName || '未知作者'}</div>
+                    <button class="view-btn" onclick="viewPlanDetail('${plan.planID || plan.id}')">查看详情</button>
                 </div>
             `).join('');
         }
 
+        async function loadPlans() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+            
+            const response = await window.getPublishedTrainingPlans();
+            
+            if (response && response.code === 200 && response.data) {
+                allPlans = response.data;
+                renderPlans();
+            } else {
+                allPlans = [];
+                renderPlans();
+            }
+        }
+
+        async function loadUserInfo() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+
+            const response = await window.getUserInfo(userSession.userID);
+            
+            if (response && response.code === 200) {
+                const user = response.data || {};
+                const userName = user.userName || '用户';
+                document.getElementById('userNameDisplay').textContent = userName;
+                document.getElementById('userAvatar').textContent = userName.charAt(0);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            renderPlans();
+            loadUserInfo();
+            loadPlans();
             
             document.getElementById('searchInput').addEventListener('keyup', function(e) {
                 if (e.key === 'Enter') {

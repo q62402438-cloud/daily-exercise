@@ -215,6 +215,22 @@
             background: #c0392b;
         }
         
+        .favorite-item.deleted {
+            opacity: 0.6;
+            background: #f5f5f5;
+        }
+        
+        .favorite-item.deleted .item-name {
+            color: #999;
+            text-decoration: line-through;
+        }
+        
+        .icon-btn:disabled {
+            background: #ccc !important;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -271,6 +287,40 @@
             color: #7f8c8d;
             margin-bottom: 25px;
             line-height: 1.5;
+        }
+        
+        .close-detail-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .close-detail-btn:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .detail-info {
+            line-height: 1.8;
+            margin-top: 15px;
+            text-align: left;
+        }
+        
+        .detail-content {
+            margin-top: 10px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
         }
         
         .modal-actions {
@@ -363,9 +413,20 @@
         </div>
     </div>
 
+    <div class="unfavorite-modal" id="detailModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="close-detail-btn" onclick="closeDetailModal()">✕</button>
+            <div id="detailModalContent"></div>
+            <div class="modal-actions" style="margin-top: 20px;">
+                <button class="action-btn btn-cancel" onclick="closeDetailModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../../asserts/js/api.js"></script>
     <script>
-        let currentPlanID = null;
+        let currentFavoriteID = null;
+        let currentTargetID = null;
         
         function goBack() {
             window.location.href = '../user/index.html';
@@ -373,70 +434,251 @@
         
         function closeModal() {
             document.getElementById('unfavoriteModal').style.display = 'none';
-            currentPlanID = null;
+            currentFavoriteID = null;
+            currentTargetID = null;
         }
         
-        function confirmUnfavorite() {
-            const favoritesList = document.getElementById('favoritesList');
-            const item = document.querySelector(`[data-plan-id="${currentPlanID}"]`);
-            if (item) {
-                item.remove();
+        async function confirmUnfavorite() {
+            if (!currentFavoriteID) {
+                closeModal();
+                return;
             }
             
-            if (favoritesList.children.length === 0) {
-                document.getElementById('emptyState').style.display = 'block';
+            try {
+                const response = await window.deleteFavorite(currentFavoriteID);
+                
+                if (!response) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    return;
+                }
+                
+                if (response.code === 200) {
+                    const favoritesList = document.getElementById('favoritesList');
+                    const item = document.querySelector(`[data-favorite-id="${currentFavoriteID}"]`);
+                    if (item) {
+                        item.remove();
+                    }
+                    
+                    if (favoritesList.children.length === 0) {
+                        document.getElementById('emptyState').style.display = 'block';
+                    }
+                    
+                    closeModal();
+                    alert('已取消收藏');
+                } else {
+                    alert(response.msg || '取消收藏失败，请重试');
+                    closeModal();
+                }
+            } catch (error) {
+                console.error('取消收藏错误:', error);
+                alert('取消收藏失败：服务器连接异常');
+                closeModal();
             }
-            
-            closeModal();
-            alert('已取消收藏');
         }
         
-        function showUnfavoriteModal(planID) {
-            currentPlanID = planID;
+        function showUnfavoriteModal(favoriteID, targetID) {
+            currentFavoriteID = favoriteID;
+            currentTargetID = targetID;
             document.getElementById('unfavoriteModal').style.display = 'flex';
         }
         
-        function viewPlan(planID) {
-            window.location.href = `../plan/PlanDetail.html?id=${planID}`;
-        }
-        
-        function batchRemove() {
-            if (confirm('确定要取消所有收藏吗？')) {
-                document.getElementById('favoritesList').innerHTML = '';
-                document.getElementById('emptyState').style.display = 'block';
-                alert('已清空所有收藏');
+        async function viewDetail(targetID, targetType) {
+            try {
+                let detailData = null;
+                console.log('开始获取详情:', {targetID, targetType});
+                
+                if (targetType === 1 || targetType === 'plan') {
+                    console.log('调用 getTrainingPlanById, planID:', targetID);
+                    const response = await window.getTrainingPlanById(targetID);
+                    console.log('getTrainingPlanById 响应:', response);
+                    
+                    if (response) {
+                        if (response.code === 200) {
+                            if (response.data) {
+                                detailData = response.data;
+                                detailData.typeName = '训练计划';
+                            } else {
+                                console.error('响应数据为空:', response);
+                            }
+                        } else {
+                            console.error('响应码错误:', response.code, response.msg);
+                        }
+                    } else {
+                        console.error('响应为空');
+                    }
+                } else if (targetType === 2 || targetType === 'post') {
+                    console.log('调用 getPostById, postID:', targetID);
+                    const response = await window.getPostById(targetID);
+                    console.log('getPostById 响应:', response);
+                    
+                    if (response) {
+                        if (response.code === 200) {
+                            if (response.data) {
+                                detailData = response.data;
+                                detailData.typeName = '社区帖子';
+                            } else {
+                                console.error('响应数据为空:', response);
+                            }
+                        } else {
+                            console.error('响应码错误:', response.code, response.msg);
+                        }
+                    } else {
+                        console.error('响应为空');
+                    }
+                }
+                
+                if (detailData) {
+                    showDetailModal(detailData);
+                } else {
+                    alert('获取详情失败，请打开浏览器控制台查看具体错误信息');
+                }
+            } catch (error) {
+                console.error('获取详情失败:', error);
+                alert('获取详情失败：服务器连接异常\n' + error.message);
             }
         }
         
-        function renderFavorites() {
-            const mockData = [
-                { id: 'PLAN001', name: '减脂训练计划', type: '减脂 · 中级 · 45分钟' },
-                { id: 'PLAN002', name: '增肌入门计划', type: '增肌 · 初级 · 60分钟' },
-                { id: 'PLAN003', name: '瑜伽放松计划', type: '瑜伽 · 初级 · 30分钟' },
-                { id: 'PLAN004', name: 'HIIT高强度训练', type: '综合 · 高级 · 25分钟' }
-            ];
+        function showDetailModal(data) {
+            const modalContent = document.getElementById('detailModalContent');
+            
+            if (data.typeName === '训练计划') {
+                modalContent.innerHTML = `
+                    <h3 class="modal-title">${data.planName || '未命名计划'}</h3>
+                    <div class="detail-info">
+                        <div><strong>类型:</strong> ${data.typeName}</div>
+                        <div><strong>运动项目:</strong> ${data.sportName || '未设置'}</div>
+                        <div><strong>每日目标:</strong> ${data.exerciseAmount || 0} 分钟</div>
+                        <div><strong>开始时间:</strong> ${data.startTime ? data.startTime.split(' ')[0] : '未设置'}</div>
+                        <div><strong>结束时间:</strong> ${data.endTime ? data.endTime.split(' ')[0] : '未设置'}</div>
+                        <div><strong>计划内容:</strong></div>
+                        <div class="detail-content">${data.detail || '暂无内容'}</div>
+                    </div>
+                `;
+            } else if (data.typeName === '社区帖子') {
+                modalContent.innerHTML = `
+                    <h3 class="modal-title">${data.title || '无标题'}</h3>
+                    <div class="detail-info">
+                        <div><strong>类型:</strong> ${data.typeName}</div>
+                        <div><strong>作者ID:</strong> ${data.authorID || '未知'}</div>
+                        <div><strong>发布时间:</strong> ${data.publishTime || '未知'}</div>
+                        <div><strong>内容:</strong></div>
+                        <div class="detail-content">${data.content || '无内容'}</div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('detailModal').style.display = 'flex';
+        }
+        
+        function closeDetailModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+        
+        async function batchRemove() {
+            if (!confirm('确定要取消所有收藏吗？')) {
+                return;
+            }
             
             const favoritesList = document.getElementById('favoritesList');
+            const items = favoritesList.querySelectorAll('.favorite-item');
             
-            if (mockData.length > 0) {
-                document.getElementById('emptyState').style.display = 'none';
+            try {
+                for (const item of items) {
+                    const favoriteID = item.dataset.favoriteId;
+                    await window.deleteFavorite(favoriteID);
+                }
                 
-                mockData.forEach(item => {
-                    const favoriteItem = document.createElement('div');
-                    favoriteItem.className = 'favorite-item';
-                    favoriteItem.dataset.planId = item.id;
-                    favoriteItem.innerHTML = `
-                        <div class="item-info">
-                            <div class="item-name">${item.name}</div>
-                            <div class="item-type">${item.type}</div>
-                        </div>
-                        <div class="item-actions">
-                            <button class="icon-btn btn-view" onclick="viewPlan('${item.id}')" title="查看计划">👁</button>
-                            <button class="icon-btn btn-unfavorite" onclick="showUnfavoriteModal('${item.id}')" title="取消收藏">✕</button>
-                        </div>
-                    `;
-                    favoritesList.appendChild(favoriteItem);
-                });
+                favoritesList.innerHTML = '';
+                document.getElementById('emptyState').style.display = 'block';
+                alert('已清空所有收藏');
+            } catch (error) {
+                console.error('批量删除错误:', error);
+                alert('批量删除失败：服务器连接异常');
+            }
+        }
+        
+        async function loadFavorites() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+            
+            try {
+                const response = await window.getFavoritesByUser(userSession.userID);
+                
+                if (!response) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    return;
+                }
+                
+                const favoritesList = document.getElementById('favoritesList');
+                favoritesList.innerHTML = '';
+                
+                if (response.code === 200 && response.data && response.data.length > 0) {
+                    document.getElementById('emptyState').style.display = 'none';
+                    
+                    for (const item of response.data) {
+                        let title = '未知';
+                        let typeName = '其他';
+                        let targetExists = true;
+                        
+                        if (item.targetType === 1 || item.targetType === 'plan') {
+                            typeName = '训练计划';
+                            try {
+                                const planResponse = await window.getTrainingPlanById(item.targetID);
+                                if (planResponse && planResponse.code === 200 && planResponse.data) {
+                                    title = planResponse.data.planName || '未命名计划';
+                                } else {
+                                    title = '原目标已删除';
+                                    targetExists = false;
+                                }
+                            } catch (e) {
+                                console.error('获取计划信息失败', e);
+                                title = '原目标已删除';
+                                targetExists = false;
+                            }
+                        } else if (item.targetType === 2 || item.targetType === 'post') {
+                            typeName = '社区帖子';
+                            try {
+                                const postResponse = await window.getPostById(item.targetID);
+                                if (postResponse && postResponse.code === 200 && postResponse.data) {
+                                    title = postResponse.data.title || '无标题帖子';
+                                } else {
+                                    title = '原目标已删除';
+                                    targetExists = false;
+                                }
+                            } catch (e) {
+                                console.error('获取帖子信息失败', e);
+                                title = '原目标已删除';
+                                targetExists = false;
+                            }
+                        }
+                        
+                        const favoriteItem = document.createElement('div');
+                        favoriteItem.className = 'favorite-item' + (targetExists ? '' : ' deleted');
+                        favoriteItem.dataset.favoriteId = item.favoriteID;
+                        favoriteItem.dataset.targetId = item.targetID;
+                        favoriteItem.dataset.targetType = item.targetType;
+                        favoriteItem.innerHTML = `
+                            <div class="item-info">
+                                <div class="item-name">${title}</div>
+                                <div class="item-type">${typeName}${!targetExists ? ' (已删除)' : ''}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="icon-btn btn-view" ${!targetExists ? 'disabled title="目标已删除"' : `onclick="viewDetail(${item.targetID}, ${item.targetType})" title="查看"`}>👁</button>
+                                <button class="icon-btn btn-unfavorite" onclick="showUnfavoriteModal('${item.favoriteID}', '${item.targetID}')" title="取消收藏">✕</button>
+                            </div>
+                        `;
+                        favoritesList.appendChild(favoriteItem);
+                    }
+                } else {
+                    document.getElementById('emptyState').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('加载收藏失败:', error);
+                alert('加载收藏失败：服务器连接异常');
             }
         }
         
@@ -447,7 +689,7 @@
                 document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
             }
             
-            renderFavorites();
+            loadFavorites();
         });
     </script>
 </body>

@@ -234,9 +234,33 @@
             window.location.href = 'ManageCollect.html';
         }
         
-        function confirmCancel() {
-            alert('已成功取消收藏');
-            window.location.href = 'ManageCollect.html';
+        async function confirmCancel() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const favoriteID = urlParams.get('id');
+            
+            if (!favoriteID) {
+                alert('收藏ID不存在');
+                return;
+            }
+            
+            try {
+                const response = await window.deleteFavorite(favoriteID);
+                
+                if (!response) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    return;
+                }
+                
+                if (response.code === 200) {
+                    alert('已成功取消收藏');
+                    window.location.href = 'ManageCollect.html';
+                } else {
+                    alert(response.msg || '取消收藏失败，请重试');
+                }
+            } catch (error) {
+                console.error('取消收藏错误:', error);
+                alert('取消收藏失败：服务器连接异常');
+            }
         }
         
         document.addEventListener('DOMContentLoaded', function() {

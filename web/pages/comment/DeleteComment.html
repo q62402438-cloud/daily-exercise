@@ -61,13 +61,61 @@
 
     <script src="../../asserts/js/api.js"></script>
     <script>
+        let commentID = '';
+        
         function goBack() {
             window.location.href = 'DisplayComment.html';
         }
         
-        function confirmDelete() {
-            alert('评论已删除');
-            window.location.href = '../post/UserForum.html';
+        async function confirmDelete() {
+            const urlParams = new URLSearchParams(window.location.search);
+            commentID = urlParams.get('id');
+            
+            if (!commentID) {
+                alert('评论ID不存在');
+                return;
+            }
+            
+            if (!confirm('您确定要删除这条评论吗？删除后将无法恢复')) {
+                return;
+            }
+            
+            try {
+                const response = await window.deleteComment(commentID);
+                
+                if (!response) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    return;
+                }
+                
+                if (response.code === 200) {
+                    alert('评论已删除');
+                    window.location.href = '../post/UserForum.html';
+                } else {
+                    alert(response.msg || '删除失败，请重试');
+                }
+            } catch (error) {
+                console.error('删除评论错误:', error);
+                alert('删除失败：服务器连接异常');
+            }
+        }
+        
+        async function loadComment() {
+            const urlParams = new URLSearchParams(window.location.search);
+            commentID = urlParams.get('id');
+            
+            if (!commentID) {
+                return;
+            }
+            
+            try {
+                const response = await window.getCommentById(commentID);
+                if (response && response.code === 200 && response.data) {
+                    document.querySelector('.comment-content').textContent = response.data.content || '';
+                }
+            } catch (error) {
+                console.error('加载评论失败:', error);
+            }
         }
         
         document.addEventListener('DOMContentLoaded', function() {
@@ -76,6 +124,8 @@
                 document.getElementById('userNameDisplay').textContent = userSession.userName;
                 document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
             }
+            
+            loadComment();
         });
     </script>
 </body>

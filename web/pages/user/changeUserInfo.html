@@ -194,7 +194,7 @@
         let currentUserId = null;
 
         function goBack() {
-            window.location.href = 'getUserInfo.html';
+            window.location.href = 'index.html';
         }
 
         function calculateAge(birthdayStr) {
@@ -250,7 +250,7 @@
 
                 if (response && response.code === 200) {
                     alert('修改成功！');
-                    window.location.href = 'getUserInfo.html';
+                    window.location.href = 'index.html';
                 } else {
                     alert(response?.msg || '修改失败，请重试');
                     saveBtn.textContent = '保存';

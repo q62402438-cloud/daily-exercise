@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8082/api/auth';
+const API_BASE_URL = 'http://localhost:8082/api';
 
 async function request(url, options = {}) {
     const defaultOptions = {
@@ -18,11 +18,21 @@ async function request(url, options = {}) {
         
         if (!response.ok) {
             console.error(`HTTP错误: ${response.status} ${response.statusText}`);
-            return { code: 500, msg: `HTTP错误: ${response.status}` };
+            return { code: response.status, msg: `HTTP错误: ${response.status} ${response.statusText}` };
         }
         
-        const data = await response.json();
-        return data;
+        const text = await response.text();
+        if (!text) {
+            return { code: 200, msg: '操作成功' };
+        }
+        
+        try {
+            const data = JSON.parse(text);
+            return data;
+        } catch (jsonError) {
+            console.warn('响应不是JSON格式:', text);
+            return { code: 200, msg: '操作成功', data: text };
+        }
     } catch (error) {
         console.error('API请求错误:', error);
         console.error('请求地址:', `${API_BASE_URL}${url}`);
@@ -31,7 +41,7 @@ async function request(url, options = {}) {
 }
 
 async function login(userName, userPassword, userType = 1) {
-    return request('/login', {
+    return request('/auth/login', {
         method: 'POST',
         body: {
             userName: userName,
@@ -42,7 +52,7 @@ async function login(userName, userPassword, userType = 1) {
 }
 
 async function register(userData) {
-    return request('/register', {
+    return request('/auth/register', {
         method: 'POST',
         body: {
             userName: userData.userName,
@@ -79,7 +89,7 @@ async function updateUserInfo(userData) {
 }
 
 async function verifyPhone(phoneNumber) {
-    return request('/verifyPhone', {
+    return request('/auth/verifyPhone', {
         method: 'POST',
         body: {
             phoneNumber: phoneNumber
@@ -88,7 +98,7 @@ async function verifyPhone(phoneNumber) {
 }
 
 async function sendCode(phoneNumber) {
-    return request('/sendCode', {
+    return request('/auth/sendCode', {
         method: 'POST',
         body: {
             phoneNumber: phoneNumber
@@ -97,7 +107,7 @@ async function sendCode(phoneNumber) {
 }
 
 async function verifyCode(phoneNumber, code) {
-    return request('/verifyCode', {
+    return request('/auth/verifyCode', {
         method: 'POST',
         body: {
             phoneNumber: phoneNumber,
@@ -107,12 +117,339 @@ async function verifyCode(phoneNumber, code) {
 }
 
 async function resetPassword(phoneNumber, verifyCode, userPassword) {
-    return request('/resetPassword', {
+    return request('/auth/resetPassword', {
         method: 'POST',
         body: {
             phoneNumber: phoneNumber,
             userPassword: userPassword,
             verifyCode: verifyCode
+        }
+    });
+}
+
+async function getAllSportsEvents() {
+    return request('/sportsEvent/list', {
+        method: 'GET'
+    });
+}
+
+async function getSportsEventById(eventID) {
+    return request('/sportsEvent/get', {
+        method: 'POST',
+        body: {
+            eventID: eventID
+        }
+    });
+}
+
+async function addExerciseRecord(recordData) {
+    return request('/exerciseRecord/add', {
+        method: 'POST',
+        body: {
+            userID: recordData.userID,
+            sportsDate: recordData.sportsDate,
+            eventID: recordData.eventID,
+            startTime: recordData.startTime,
+            endTime: recordData.endTime,
+            exerciseDuration: recordData.exerciseDuration,
+            exerciseAmount: recordData.exerciseAmount,
+            calorie: recordData.calorie,
+            recordType: recordData.recordType
+        }
+    });
+}
+
+async function getExerciseRecordsByUser(userID) {
+    return request('/exerciseRecord/listByUser', {
+        method: 'POST',
+        body: {
+            userID: userID
+        }
+    });
+}
+
+async function getExerciseRecordsByDateRange(userID, startDate, endDate) {
+    return request('/exerciseRecord/listByDateRange', {
+        method: 'POST',
+        body: {
+            userID: userID,
+            startDate: startDate,
+            endDate: endDate
+        }
+    });
+}
+
+async function getExerciseRecordById(recordID) {
+    return request('/exerciseRecord/get', {
+        method: 'POST',
+        body: {
+            recordID: recordID
+        }
+    });
+}
+
+async function deleteExerciseRecord(recordID) {
+    return request('/exerciseRecord/delete', {
+        method: 'POST',
+        body: {
+            recordID: recordID
+        }
+    });
+}
+
+async function createTrainingPlan(planData) {
+    return request('/trainingPlan/create', {
+        method: 'POST',
+        body: {
+            planName: planData.planName,
+            userID: planData.userID,
+            planType: planData.planType,
+            startTime: planData.startTime,
+            endTime: planData.endTime,
+            sportName: planData.sportName,
+            exerciseAmount: planData.exerciseAmount,
+            percentage: planData.percentage || 0,
+            detail: planData.detail || ''
+        }
+    });
+}
+
+async function getTrainingPlansByUser(userID) {
+    return request('/trainingPlan/listByUser', {
+        method: 'POST',
+        body: {
+            userID: userID
+        }
+    });
+}
+
+async function getPublishedTrainingPlans() {
+    return request('/trainingPlan/listPublished', {
+        method: 'POST',
+        body: {}
+    });
+}
+
+async function getTrainingPlanById(planID) {
+    return request('/trainingPlan/get', {
+        method: 'POST',
+        body: {
+            planID: planID
+        }
+    });
+}
+
+async function updateTrainingPlan(planData) {
+    return request('/trainingPlan/update', {
+        method: 'POST',
+        body: {
+            planID: planData.planID,
+            planName: planData.planName,
+            planType: planData.planType,
+            startTime: planData.startTime,
+            endTime: planData.endTime,
+            sportName: planData.sportName,
+            exerciseAmount: planData.exerciseAmount,
+            percentage: planData.percentage,
+            detail: planData.detail || ''
+        }
+    });
+}
+
+async function deleteTrainingPlan(planID) {
+    return request('/trainingPlan/delete', {
+        method: 'POST',
+        body: {
+            planID: planID
+        }
+    });
+}
+
+async function completeTrainingPlan(planID) {
+    return request('/trainingPlan/complete', {
+        method: 'POST',
+        body: {
+            planID: planID
+        }
+    });
+}
+
+async function addPost(postData) {
+    return request('/post/create', {
+        method: 'POST',
+        body: {
+            authorID: postData.authorID,
+            title: postData.title,
+            content: postData.content,
+            publishTime: postData.publishTime
+        }
+    });
+}
+
+async function getPosts(page, pageSize) {
+    return request('/post/list', {
+        method: 'POST',
+        body: {
+            page: page,
+            pageSize: pageSize
+        }
+    });
+}
+
+async function getPostById(postID) {
+    return request('/post/get', {
+        method: 'POST',
+        body: {
+            postID: postID
+        }
+    });
+}
+
+async function updatePost(postData) {
+    return request('/post/update', {
+        method: 'POST',
+        body: {
+            postID: postData.postID,
+            title: postData.title,
+            content: postData.content,
+            auditState: postData.auditState
+        }
+    });
+}
+
+async function deletePost(postID) {
+    return request('/post/delete', {
+        method: 'POST',
+        body: {
+            postID: postID
+        }
+    });
+}
+
+async function auditPost(postID, auditState) {
+    return request('/post/audit', {
+        method: 'POST',
+        body: {
+            postID: postID,
+            auditState: auditState
+        }
+    });
+}
+
+async function getCommentsByPost(postID) {
+    return request('/comment/listByPost', {
+        method: 'POST',
+        body: {
+            postID: postID
+        }
+    });
+}
+
+async function addComment(commentData) {
+    return request('/comment/add', {
+        method: 'POST',
+        body: {
+            postID: commentData.postID,
+            userID: commentData.userID,
+            content: commentData.content
+        }
+    });
+}
+
+async function getPendingPosts() {
+    return request('/post/pending', {
+        method: 'GET'
+    });
+}
+
+async function getPendingTrainingPlans() {
+    return request('/trainingPlan/getPending', {
+        method: 'GET'
+    });
+}
+
+async function auditTrainingPlan(planID, auditState) {
+    const url = auditState === 1 ? '/trainingPlan/auditPass' : '/trainingPlan/auditReject';
+    return request(url, {
+        method: 'POST',
+        body: {
+            planID: planID
+        }
+    });
+}
+
+async function getPostsByAuthor(authorID) {
+    return request(`/post/author/${authorID}`, {
+        method: 'GET'
+    });
+}
+
+async function getCommentById(commentID) {
+    return request('/comment/get', {
+        method: 'POST',
+        body: {
+            commentID: commentID
+        }
+    });
+}
+
+async function updateComment(commentData) {
+    return request('/comment/update', {
+        method: 'POST',
+        body: {
+            commentID: commentData.commentID,
+            content: commentData.content
+        }
+    });
+}
+
+async function deleteComment(commentID) {
+    return request('/comment/delete', {
+        method: 'POST',
+        body: {
+            commentID: commentID
+        }
+    });
+}
+
+async function addFavorite(favoriteData) {
+    return request('/favorite/add', {
+        method: 'POST',
+        body: {
+            userID: favoriteData.userID,
+            targetID: favoriteData.targetID,
+            targetType: favoriteData.targetType,
+            linkUrl: favoriteData.linkUrl,
+            favoriteTime: favoriteData.favoriteTime
+        }
+    });
+}
+
+async function getFavoritesByUser(userID) {
+    return request('/favorite/listByUser', {
+        method: 'POST',
+        body: {
+            userID: userID
+        }
+    });
+}
+
+async function deleteFavorite(favoriteID) {
+    return request('/favorite/delete', {
+        method: 'POST',
+        body: {
+            favoriteID: favoriteID
+        }
+    });
+}
+
+async function checkFavorite(userID, targetID, targetType) {
+    return request('/favorite/check', {
+        method: 'POST',
+        body: {
+            userID: userID,
+            targetID: targetID,
+            targetType: targetType
         }
     });
 }
@@ -153,3 +490,60 @@ window.setUserSession = setUserSession;
 window.getUserSession = getUserSession;
 window.clearUserSession = clearUserSession;
 window.isLoggedIn = isLoggedIn;
+
+window.getAllSportsEvents = getAllSportsEvents;
+window.getSportsEventById = getSportsEventById;
+
+window.addExerciseRecord = addExerciseRecord;
+window.getExerciseRecordsByUser = getExerciseRecordsByUser;
+window.getExerciseRecordsByDateRange = getExerciseRecordsByDateRange;
+window.getExerciseRecordById = getExerciseRecordById;
+window.deleteExerciseRecord = deleteExerciseRecord;
+
+window.createTrainingPlan = createTrainingPlan;
+window.getTrainingPlansByUser = getTrainingPlansByUser;
+window.getPlansByUserId = getTrainingPlansByUser;
+window.getTrainingPlanById = getTrainingPlanById;
+window.updateTrainingPlan = updateTrainingPlan;
+window.deleteTrainingPlan = deleteTrainingPlan;
+window.completeTrainingPlan = completeTrainingPlan;
+
+window.addPost = addPost;
+window.getPosts = getPosts;
+window.getPostById = getPostById;
+window.getPostsByAuthor = getPostsByAuthor;
+window.updatePost = updatePost;
+window.deletePost = deletePost;
+window.auditPost = auditPost;
+
+window.addComment = addComment;
+window.getCommentsByPost = getCommentsByPost;
+window.getCommentById = getCommentById;
+window.updateComment = updateComment;
+window.deleteComment = deleteComment;
+
+window.addFavorite = addFavorite;
+window.getFavoritesByUser = getFavoritesByUser;
+window.deleteFavorite = deleteFavorite;
+window.checkFavorite = checkFavorite;
+
+async function auditPlanPass(planID) {
+    return request('/trainingPlan/auditPass', {
+        method: 'POST',
+        body: {
+            planID: planID
+        }
+    });
+}
+
+async function auditPlanReject(planID) {
+    return request('/trainingPlan/auditReject', {
+        method: 'POST',
+        body: {
+            planID: planID
+        }
+    });
+}
+
+window.auditPlanPass = auditPlanPass;
+window.auditPlanReject = auditPlanReject;

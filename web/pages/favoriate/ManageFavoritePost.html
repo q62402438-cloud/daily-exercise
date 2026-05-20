@@ -81,61 +81,116 @@
             window.location.href = '../post/UserForum.html';
         }
         
-        function batchRemove() {
-            if (confirm('确定要清空所有收藏帖子吗？')) {
-                document.getElementById('favoritesGrid').innerHTML = '';
-                document.getElementById('emptyState').style.display = 'block';
-                alert('已清空所有收藏帖子');
+        async function loadFavorites() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
             }
-        }
-        
-        function viewPost(postID) {
-            window.location.href = `../post/PostDetail.html?id=${postID}`;
-        }
-        
-        function unfavoritePost(postID) {
-            if (confirm('确定要取消收藏这篇帖子吗？')) {
-                const card = document.querySelector(`[data-post-id="${postID}"]`);
-                if (card) card.remove();
+            
+            try {
+                const response = await window.getFavoritesByUser(userSession.userID);
                 
-                if (document.getElementById('favoritesGrid').children.length === 0) {
+                if (!response) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    return;
+                }
+                
+                if (response.code === 200 && response.data && response.data.length > 0) {
+                    document.getElementById('emptyState').style.display = 'none';
+                    renderFavorites(response.data);
+                } else {
                     document.getElementById('emptyState').style.display = 'block';
                 }
-                alert('已取消收藏');
+            } catch (error) {
+                console.error('加载收藏失败:', error);
+                alert('加载收藏失败：服务器连接异常');
             }
         }
         
-        function renderFavorites() {
-            const mockData = [
-                { id: 'POST001', title: '健身打卡第一天', author: '运动达人', time: '2024-01-15', tags: ['健身', '打卡', '日常'] },
-                { id: 'POST002', title: '分享我的减脂心得', author: '减脂小白', time: '2024-01-14', tags: ['减脂', '心得', '分享'] },
-                { id: 'POST003', title: '瑜伽入门教程', author: '瑜伽爱好者', time: '2024-01-13', tags: ['瑜伽', '入门', '教程'] },
-                { id: 'POST004', title: '跑步5公里打卡', author: '跑者小王', time: '2024-01-12', tags: ['跑步', '打卡', '运动'] }
-            ];
-            
+        function renderFavorites(data) {
             const grid = document.getElementById('favoritesGrid');
+            grid.innerHTML = '';
             
-            if (mockData.length > 0) {
-                document.getElementById('emptyState').style.display = 'none';
-                
-                mockData.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'favorite-card';
-                    card.dataset.postId = item.id;
-                    card.innerHTML = `
-                        <div class="card-image">📝</div>
-                        <div class="card-content">
-                            <div class="card-title">${item.title}</div>
-                            <div class="card-meta">作者: ${item.author} | ${item.time}</div>
-                            <div class="card-tags">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-                            <div class="card-actions">
-                                <button class="icon-btn btn-view" onclick="viewPost('${item.id}')" title="查看帖子">👁</button>
-                                <button class="icon-btn btn-unfavorite" onclick="unfavoritePost('${item.id}')" title="取消收藏">✕</button>
-                            </div>
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'favorite-card';
+                card.dataset.favoriteId = item.favoriteID;
+                card.dataset.targetId = item.targetID;
+                card.innerHTML = `
+                    <div class="card-image">📝</div>
+                    <div class="card-content">
+                        <div class="card-title">${item.title || '未知帖子'}</div>
+                        <div class="card-meta">收藏时间: ${item.favoriteTime || '-'}</div>
+                        <div class="card-tags">${item.targetType === 'post' ? '<span class="tag">帖子</span>' : '<span class="tag">计划</span>'}</div>
+                        <div class="card-actions">
+                            <button class="icon-btn btn-view" onclick="viewTarget('${item.targetID}', '${item.targetType}')" title="查看">👁</button>
+                            <button class="icon-btn btn-unfavorite" onclick="unfavorite('${item.favoriteID}')" title="取消收藏">✕</button>
                         </div>
-                    `;
-                    grid.appendChild(card);
-                });
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        
+        function viewTarget(targetID, targetType) {
+            if (targetType === 'post') {
+                window.location.href = `../post/PostDetail.html?id=${targetID}`;
+            } else {
+                window.location.href = `../plan/PlanDetail.html?id=${targetID}`;
+            }
+        }
+        
+        async function unfavorite(favoriteID) {
+            if (!confirm('确定要取消收藏吗？')) {
+                return;
+            }
+            
+            try {
+                const response = await window.deleteFavorite(favoriteID);
+                
+                if (!response) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    return;
+                }
+                
+                if (response.code === 200) {
+                    const card = document.querySelector(`[data-favorite-id="${favoriteID}"]`);
+                    if (card) card.remove();
+                    
+                    if (document.getElementById('favoritesGrid').children.length === 0) {
+                        document.getElementById('emptyState').style.display = 'block';
+                    }
+                    alert('已取消收藏');
+                } else {
+                    alert(response.msg || '取消收藏失败，请重试');
+                }
+            } catch (error) {
+                console.error('取消收藏错误:', error);
+                alert('取消收藏失败：服务器连接异常');
+            }
+        }
+        
+        async function batchRemove() {
+            if (!confirm('确定要清空所有收藏吗？')) {
+                return;
+            }
+            
+            const cards = document.querySelectorAll('.favorite-card');
+            const favoriteIDs = Array.from(cards).map(card => card.dataset.favoriteId);
+            
+            try {
+                for (const id of favoriteIDs) {
+                    await window.deleteFavorite(id);
+                }
+                
+                document.getElementById('favoritesGrid').innerHTML = '';
+                document.getElementById('emptyState').style.display = 'block';
+                alert('已清空所有收藏');
+            } catch (error) {
+                console.error('批量删除错误:', error);
+                alert('批量删除失败：服务器连接异常');
             }
         }
         
@@ -145,7 +200,7 @@
                 document.getElementById('userNameDisplay').textContent = userSession.userName;
                 document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
             }
-            renderFavorites();
+            loadFavorites();
         });
     </script>
 </body>

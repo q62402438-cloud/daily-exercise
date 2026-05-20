@@ -3,58 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>编辑主题帖</title>
+    <title>编辑帖子</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
-        .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; padding: 20px; }
+        .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; border-radius: 12px; margin-bottom: 30px; }
         .logo-section { display: flex; align-items: center; gap: 15px; }
         .logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; }
         .site-title { font-size: 24px; font-weight: 600; color: #2c3e50; }
         .user-info { display: flex; align-items: center; gap: 15px; }
-        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #27ae60; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
         .user-name { font-weight: 600; }
-        .main-container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
-        .form-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .form-title { font-size: 28px; margin-bottom: 30px; text-align: center; color: #2c3e50; }
-        .form-group { margin-bottom: 25px; }
-        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+        .post-container { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 8px 32px rgba(44, 62, 80, 0.1); max-width: 800px; margin: 0 auto; }
+        .page-title { text-align: center; font-size: 28px; color: #2c3e50; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #2c3e50; }
         .form-input, .form-textarea { width: 100%; padding: 12px 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; }
-        .form-textarea { height: 200px; resize: vertical; }
-        .submit-button { background: #3498db; color: white; border: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+        .form-textarea { resize: vertical; min-height: 200px; }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: #3498db; }
+        .button-group { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
+        .cancel-btn, .submit-btn { padding: 12px 35px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .cancel-btn { background: #95a5a6; color: white; }
+        .cancel-btn:hover { background: #7f8c8d; }
+        .submit-btn { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4); }
+        .post-id { background: #f8f9fa; color: #7f8c8d; }
+        .loading { text-align: center; padding: 50px; color: #7f8c8d; }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="logo-section">
-            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <img src="../user/images/logo.png" alt="系统Logo" class="logo">
             <div class="site-title">跃动社区</div>
         </div>
         <div class="user-info">
-            <div class="user-name">用户</div>
-            <div class="user-avatar">用</div>
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
         </div>
     </div>
 
-    <div class="main-container">
-        <div class="form-container">
-            <h2 class="form-title">编辑主题帖</h2>
-            <form>
-                <div class="form-group">
-                    <label class="form-label">帖子ID</label>
-                    <input type="text" class="form-input" value="TOPIC001" readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">帖子标题</label>
-                    <input type="text" class="form-input" value="健身打卡第一天">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">帖子内容</label>
-                    <textarea class="form-textarea">今天完成了30分钟的有氧运动，感觉很好！明天继续坚持。</textarea>
-                </div>
-                <button type="submit" class="submit-button">保存修改</button>
-            </form>
-        </div>
+    <div class="post-container">
+        <div id="loading" class="loading">加载中...</div>
+        <form id="editForm" style="display: none;">
+            <h1 class="page-title">编辑帖子</h1>
+            
+            <div class="form-group">
+                <label class="form-label">帖子ID</label>
+                <input type="text" class="form-input post-id" id="postID" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">帖子标题</label>
+                <input type="text" class="form-input" id="postTitle" placeholder="请输入帖子标题">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">帖子内容</label>
+                <textarea class="form-textarea" id="postContent" placeholder="请输入帖子内容"></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" class="cancel-btn" onclick="goBack()">取消</button>
+                <button type="button" class="submit-btn" onclick="savePost()">保存修改</button>
+            </div>
+        </form>
     </div>
+
+    <script src="../../asserts/js/api.js"></script>
+    <script>
+        window.currentPost = null;
+
+        function goBack() {
+            window.location.href = 'UserForum.html';
+        }
+
+        async function loadPost() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const postId = urlParams.get('id');
+                
+                if (!postId) {
+                    alert('帖子ID不能为空');
+                    window.location.href = 'UserForum.html';
+                    return;
+                }
+
+                const response = await window.getPostById(parseInt(postId));
+                
+                if (!response || response.code !== 200) {
+                    alert('帖子不存在或加载失败');
+                    window.location.href = 'UserForum.html';
+                    return;
+                }
+
+                window.currentPost = response.data;
+                
+                document.getElementById('postID').value = window.currentPost.postID;
+                document.getElementById('postTitle').value = window.currentPost.title;
+                document.getElementById('postContent').value = window.currentPost.content;
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('editForm').style.display = 'block';
+            } catch (error) {
+                alert('加载失败: ' + error.message);
+            }
+        }
+
+        async function savePost() {
+            const title = document.getElementById('postTitle').value.trim();
+            const content = document.getElementById('postContent').value.trim();
+
+            if (!title) {
+                alert('请输入帖子标题');
+                return;
+            }
+            if (!content) {
+                alert('请输入帖子内容');
+                return;
+            }
+
+            try {
+                const response = await window.updatePost({
+                    postID: window.currentPost.postID,
+                    title: title,
+                    content: content,
+                    auditState: 0
+                });
+
+                if (response && response.code === 200) {
+                    alert('修改成功，帖子将重新进入审核流程');
+                    window.location.href = 'UserForum.html';
+                } else {
+                    alert('修改失败');
+                }
+            } catch (error) {
+                alert('保存失败: ' + error.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSession = getUserSession();
+            if (userSession.userName) {
+                document.getElementById('userNameDisplay').textContent = userSession.userName;
+                document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
+            }
+            loadPost();
+        });
+    </script>
 </body>
 </html>

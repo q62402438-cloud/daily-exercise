@@ -126,6 +126,7 @@
             background: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
+            white-space: pre-wrap;
         }
         
         .post-meta {
@@ -148,6 +149,11 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .approve-btn:hover {
+            background: #2ecc71;
         }
         
         .reject-btn {
@@ -158,27 +164,24 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .reject-btn:hover {
+            background: #c0392b;
         }
 
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 30px;
-        }
-        
-        .page-btn {
-            padding: 8px 15px;
-            border: 2px solid #ecf0f1;
+        .empty-state {
             background: white;
-            border-radius: 6px;
-            cursor: pointer;
+            border-radius: 12px;
+            padding: 60px;
+            text-align: center;
+            color: #7f8c8d;
         }
         
-        .page-btn.active {
-            background: #3498db;
-            color: white;
-            border-color: #3498db;
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -199,45 +202,122 @@
             <button class="back-button" onclick="goBack()">返回首页</button>
         </div>
 
-        <div class="posts-container">
-            <div class="post-card">
-                <div>
-                    <div class="post-title">帖子标题</div>
-                    <div class="post-content">帖子内容在这里显示，可以直接查看完整的帖子内容，无需点击查看详情。</div>
-                    <div class="post-meta">作者：用户名 • 发布时间：2024-01-18 14:30</div>
-                </div>
-                <div class="review-actions">
-                    <button class="approve-btn" onclick="approvePost()">通过</button>
-                    <button class="reject-btn" onclick="rejectPost()">打回</button>
-                </div>
+        <div class="posts-container" id="postsContainer">
+            <div class="empty-state">
+                <div class="empty-icon">🔄</div>
+                <div>加载中...</div>
             </div>
-        </div>
-
-        <div class="pagination">
-            <button class="page-btn">上一页</button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn">3</button>
-            <button class="page-btn">下一页</button>
         </div>
     </div>
 
-    <script src="../asserts/js/api.js"></script>
+    <script src="../../asserts/js/api.js"></script>
     <script>
         function goBack() {
             window.location.href = 'index.html';
         }
         
-        function approvePost() {
-            if (confirm('确定要通过这个主题帖吗？')) {
-                alert('帖子已通过审核！');
+        async function loadPendingPosts() {
+            try {
+                const response = await window.getPendingPosts();
+                
+                if (!response || response.code !== 200) {
+                    document.getElementById('postsContainer').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <div>加载失败</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const posts = response.data || [];
+                
+                if (posts.length === 0) {
+                    document.getElementById('postsContainer').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">✅</div>
+                            <div>暂无待审核的主题帖</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                renderPosts(posts);
+            } catch (error) {
+                console.error('加载待审核帖子失败:', error);
+                document.getElementById('postsContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <div>加载失败</div>
+                    </div>
+                `;
             }
         }
         
-        function rejectPost() {
-            if (confirm('确定要打回这个主题帖吗？')) {
-                alert('帖子已打回！');
+        function renderPosts(posts) {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = '';
+            
+            posts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="post-title">${post.title}</div>
+                        <div class="post-content">${post.content}</div>
+                        <div class="post-meta">作者ID：${post.authorID} • 发布时间：${formatDateTime(post.publishTime)}</div>
+                    </div>
+                    <div class="review-actions">
+                        <button class="approve-btn" onclick="approvePost(${post.postID})">通过</button>
+                        <button class="reject-btn" onclick="rejectPost(${post.postID})">打回</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        async function approvePost(postID) {
+            if (!confirm('确定要通过这个主题帖吗？')) {
+                return;
             }
+            
+            try {
+                const response = await window.auditPost(postID, 1);
+                if (response && response.code === 200) {
+                    alert('帖子已通过审核！');
+                    loadPendingPosts();
+                } else {
+                    alert('审核失败：' + (response ? response.msg : '未知错误'));
+                }
+            } catch (error) {
+                console.error('审核失败:', error);
+                alert('审核失败：服务器连接异常');
+            }
+        }
+        
+        async function rejectPost(postID) {
+            if (!confirm('确定要打回这个主题帖吗？')) {
+                return;
+            }
+            
+            try {
+                const response = await window.auditPost(postID, 2);
+                if (response && response.code === 200) {
+                    alert('帖子已打回！');
+                    loadPendingPosts();
+                } else {
+                    alert('操作失败：' + (response ? response.msg : '未知错误'));
+                }
+            } catch (error) {
+                console.error('操作失败:', error);
+                alert('操作失败：服务器连接异常');
+            }
+        }
+        
+        function formatDateTime(dateTimeStr) {
+            if (!dateTimeStr) return '';
+            const date = new Date(dateTimeStr);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -255,7 +335,10 @@
             if (!userSession.userID) {
                 alert('请先登录');
                 window.location.href = '../user/signin.html';
+                return;
             }
+            
+            loadPendingPosts();
         });
     </script>
 </body>

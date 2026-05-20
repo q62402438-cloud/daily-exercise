@@ -3,280 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>删除计划 - 悦动</title>
+    <title>删除训练计划 - 悦动</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            min-height: 100vh;
-            color: #2c3e50;
-        }
-        
-        .header {
-            background: white;
-            padding: 15px 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #3498db;
-        }
-        
-        .site-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #3498db;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-        
-        .main-container {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-        
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-        
-        .page-title {
-            font-size: 28px;
-            color: white;
-        }
-        
-        .back-button {
-            background: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            color: #2c3e50;
-            transition: all 0.3s ease;
-        }
-        
-        .back-button:hover {
-            background: #ecf0f1;
-        }
-        
-        /* 删除计划容器 */
-        .delete-container {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        
-        .warning-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            color: #e74c3c;
-        }
-        
-        .delete-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-        
-        .delete-description {
-            color: #7f8c8d;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        
-        .plan-selector {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ecf0f1;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 30px;
-            background-color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .plan-selector:focus {
-            border-color: #3498db;
-            outline: none;
-        }
-        
-        .selected-plan {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-left: 4px solid #e74c3c;
-            text-align: left;
-        }
-        
-        .plan-name {
-            font-weight: 600;
-            font-size: 18px;
-            margin-bottom: 8px;
-            color: #2c3e50;
-        }
-        
-        .plan-details {
-            color: #7f8c8d;
-            font-size: 14px;
-        }
-        
-        .delete-actions {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
-        .btn {
-            padding: 12px 25px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            min-width: 120px;
-        }
-        
-        .btn-cancel {
-            background: #ecf0f1;
-            color: #2c3e50;
-        }
-        
-        .btn-cancel:hover {
-            background: #bdc3c7;
-        }
-        
-        .btn-delete {
-            background: #e74c3c;
-            color: white;
-        }
-        
-        .btn-delete:hover {
-            background: #c0392b;
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .delete-actions {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
+        .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; }
+        .site-title { font-size: 24px; font-weight: 600; color: #2c3e50; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .main-container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 28px; color: white; }
+        .back-button { background: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; color: #2c3e50; }
+        .plan-select-container { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .select-label { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: block; color: #2c3e50; }
+        .plan-selector { width: 100%; padding: 12px 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; background: white; cursor: pointer; }
+        .plan-selector:focus { border-color: #3498db; outline: none; }
+        .selected-plan { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: none; }
+        .selected-plan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .plan-name { font-size: 24px; font-weight: 600; color: #2c3e50; }
+        .warning-icon { color: #e74c3c; font-size: 24px; }
+        .plan-details { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+        .detail-text { color: #555; line-height: 1.6; }
+        .confirm-message { background: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px; padding: 15px; margin-bottom: 25px; color: #856404; }
+        .action-buttons { display: flex; justify-content: flex-end; gap: 15px; }
+        .btn { padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 16px; }
+        .btn-cancel { background: #ecf0f1; color: #2c3e50; }
+        .btn-delete { background: #e74c3c; color: white; }
+        .btn-delete:hover { background: #c0392b; }
+        .btn-cancel:hover { background: #bdc3c7; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
 </head>
 <body>
-    <!-- 顶部栏 -->
     <div class="header">
         <div class="logo-section">
             <img src="images/logo.png" alt="系统Logo" class="logo">
             <div class="site-title">悦动</div>
         </div>
         <div class="user-info">
-            <div class="user-name">用户123</div>
-            <div class="user-avatar">用</div>
+            <div class="user-name" id="userNameDisplay">用户</div>
+            <div class="user-avatar" id="userAvatar">用</div>
         </div>
     </div>
 
-    <!-- 主要内容 -->
     <div class="main-container">
         <div class="page-header">
             <h1 class="page-title">删除训练计划</h1>
-            <button class="back-button" onclick="goBack()">返回计划管理</button>
+            <button class="back-button" onclick="goBack()">返回</button>
         </div>
 
-        <!-- 删除计划内容 -->
-        <div class="delete-container">
-            <div class="warning-icon">⚠️</div>
-            <h2 class="delete-title">删除训练计划</h2>
-            <p class="delete-description">请选择要删除的训练计划。此操作不可撤销，所有相关数据将被永久删除。</p>
-            
+        <div class="plan-select-container">
+            <label class="select-label" for="plan-select">选择要删除的计划</label>
             <select class="plan-selector" id="plan-select" onchange="showSelectedPlan()">
-                <option value="">-- 请选择要删除的计划 --</option>
-                <option value="plan1">减脂燃脂计划</option>
-                <option value="plan2">增肌力量训练</option>
-                <option value="plan3">康复训练计划</option>
-                <option value="plan4">全身塑形计划</option>
-                <option value="plan5">心肺功能提升计划</option>
+                <option value="">-- 请选择训练计划 --</option>
             </select>
-            
-            <div class="selected-plan" id="selected-plan" style="display: none;">
-                <div class="plan-name" id="selected-plan-name">计划名称</div>
-                <div class="plan-details" id="selected-plan-details">计划详情</div>
+        </div>
+
+        <div class="selected-plan" id="selected-plan">
+            <div class="selected-plan-header">
+                <div class="plan-name" id="selected-plan-name"></div>
+                <span class="warning-icon">⚠️</span>
             </div>
             
-            <div class="delete-actions">
+            <div class="plan-details">
+                <div class="detail-text" id="selected-plan-details"></div>
+            </div>
+
+            <div class="confirm-message">
+                <strong>⚠️ 警告：</strong>删除后将无法恢复此训练计划，请谨慎操作！
+            </div>
+
+            <div class="action-buttons">
                 <button class="btn btn-cancel" onclick="cancelDelete()">取消</button>
-                <button class="btn btn-delete" onclick="confirmDelete()" id="delete-btn" disabled>删除计划</button>
+                <button class="btn btn-delete" id="delete-btn" onclick="confirmDelete()">确认删除</button>
             </div>
         </div>
     </div>
 
     <script src="../../asserts/js/api.js"></script>
     <script>
+        let plansData = [];
+        
         function goBack() {
             window.location.href = 'MyPlans.html';
+        }
+        
+        async function loadPlanList() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                return;
+            }
+            
+            const planSelect = document.getElementById('plan-select');
+            const response = await window.getTrainingPlansByUser(userSession.userID);
+            
+            if (response && response.code === 200 && response.data) {
+                plansData = response.data;
+                response.data.forEach(plan => {
+                    const option = document.createElement('option');
+                    option.value = plan.planID || plan.id;
+                    option.textContent = plan.planName || '未命名计划';
+                    planSelect.appendChild(option);
+                });
+            }
         }
         
         function showSelectedPlan() {
             const planSelect = document.getElementById('plan-select');
             const selectedPlanDiv = document.getElementById('selected-plan');
-            const selectedPlanName = document.getElementById('selected-plan-name');
-            const selectedPlanDetails = document.getElementById('selected-plan-details');
             const deleteBtn = document.getElementById('delete-btn');
             
             if (planSelect.value) {
                 selectedPlanDiv.style.display = 'block';
-                const planText = planSelect.options[planSelect.selectedIndex].text;
-                selectedPlanName.textContent = planText;
-                selectedPlanDetails.textContent = `运动类型：减脂运动 | 强度：中级 | 频率：每周3天 | 状态：进行中`;
+                const plan = plansData.find(p => (p.planID || p.id) == planSelect.value);
+                
+                if (plan) {
+                    document.getElementById('selected-plan-name').textContent = plan.planName || '未命名计划';
+                    
+                    const status = plan.percentage === 100 ? '已完成' : plan.percentage > 0 ? '进行中' : '未开始';
+                    document.getElementById('selected-plan-details').textContent = `运动类型：${plan.sportName || '其他'} | 完成度：${plan.percentage || 0}% | 状态：${status}`;
+                }
                 deleteBtn.disabled = false;
             } else {
                 selectedPlanDiv.style.display = 'none';
@@ -288,19 +137,28 @@
             window.location.href = 'MyPlans.html';
         }
         
-        function confirmDelete() {
+        async function confirmDelete() {
             const planSelect = document.getElementById('plan-select');
+            const planId = planSelect.value;
             
-            if (!planSelect.value) {
-                alert('请先选择一个计划');
+            if (!planId) {
+                alert('请先选择要删除的计划');
                 return;
             }
             
             const planName = planSelect.options[planSelect.selectedIndex].text;
             
-            if (confirm(`确定要删除 "${planName}" 吗？此操作不可撤销。`)) {
-                alert(`"${planName}" 已成功删除`);
+            if (!confirm(`确定要删除计划 "${planName}" 吗？此操作不可撤销。`)) {
+                return;
+            }
+            
+            const response = await window.deleteTrainingPlan(planId);
+            
+            if (response && response.code === 200) {
+                alert('计划已成功删除');
                 window.location.href = 'MyPlans.html';
+            } else {
+                alert(response.msg || '删除失败');
             }
         }
 
@@ -312,21 +170,28 @@
                 return;
             }
 
-            try {
-                const response = await window.getUserInfo(userSession.userID);
-                
-                if (response && response.code === 200) {
-                    const user = response.data || {};
-                    const userName = user.userName || '用户';
-                    document.querySelector('.user-name').textContent = userName;
-                    document.querySelector('.user-avatar').textContent = userName.charAt(0);
-                }
-            } catch (error) {
-                console.error('加载用户信息失败:', error);
+            const response = await window.getUserInfo(userSession.userID);
+            
+            if (response && response.code === 200) {
+                const user = response.data || {};
+                const userName = user.userName || '用户';
+                document.getElementById('userNameDisplay').textContent = userName;
+                document.getElementById('userAvatar').textContent = userName.charAt(0);
             }
         }
 
-        document.addEventListener('DOMContentLoaded', loadUserInfo);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserInfo();
+            loadPlanList();
+            const urlParams = new URLSearchParams(window.location.search);
+            const planId = urlParams.get('id');
+            if (planId) {
+                setTimeout(() => {
+                    document.getElementById('plan-select').value = planId;
+                    showSelectedPlan();
+                }, 100);
+            }
+        });
     </script>
 </body>
 </html>

@@ -112,6 +112,28 @@
             color: #7f8c8d;
         }
         
+        .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .form-select:disabled {
+            background: #f8f9fa;
+            color: #7f8c8d;
+            cursor: not-allowed;
+        }
+        
         .time-input {
             padding: 14px 16px;
             border: 2px solid #ecf0f1;
@@ -258,6 +280,10 @@
             color: #95a5a6;
             margin-top: 5px;
         }
+        
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -279,9 +305,17 @@
         </div>
         
         <div class="form-group">
-            <label class="form-label">事件ID</label>
-            <input type="text" class="form-input" id="eventID" placeholder="请输入事件ID">
-            <div class="field-description">用于标识本次运动记录</div>
+            <label class="form-label">运动项目</label>
+            <select class="form-select" id="eventID" onchange="onSportChange()">
+                <option value="">请选择运动项目或训练计划</option>
+            </select>
+            <div class="field-description">选择本次运动的项目类型</div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">用户体重（kg）</label>
+            <input type="number" class="form-input" id="userWeight" placeholder="请输入您的体重" onchange="calculateCalorie()">
+            <div class="field-description">用于计算消耗的卡路里</div>
         </div>
         
         <div class="form-group">
@@ -302,16 +336,26 @@
             <div class="field-description">根据开始时间和结束时间自动计算</div>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" id="exerciseAmountGroup">
             <label class="form-label">运动数量</label>
-            <input type="number" class="form-input" id="exerciseAmount" placeholder="请输入运动数量（如：跑步公里数、俯卧撑个数等）">
-            <div class="field-description">记录本次运动的具体数量</div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="number" class="form-input" id="exerciseAmount" placeholder="请输入运动数量">
+                <select class="form-select" id="exerciseUnit" style="width: auto; min-width: 100px;">
+                    <option value="km">公里</option>
+                    <option value="m">米</option>
+                    <option value="个">个</option>
+                    <option value="次">次</option>
+                    <option value="分钟">分钟</option>
+                    <option value="组">组</option>
+                </select>
+            </div>
+            <div class="field-description">记录本次运动的具体数量和单位</div>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" id="calorieGroup">
             <label class="form-label">消耗卡路里</label>
-            <input type="number" class="form-input" id="calorie" placeholder="请输入消耗的卡路里">
-            <div class="field-description">记录本次运动消耗的热量（千卡）</div>
+            <input type="number" class="form-input" id="calorie" placeholder="根据运动项目、体重和时长自动计算" readonly>
+            <div class="field-description">计算公式：实际消耗 = averageCalorie × 用户体重 ÷ 70 × 运动时长(分钟)</div>
         </div>
         
         <button class="submit-button" onclick="submitCheckin()">提交打卡</button>
@@ -339,6 +383,10 @@
     <script src="../../asserts/js/api.js"></script>
     <script>
         let currentTimeField = null;
+        let sportsEvents = [];
+        let userPlans = [];
+        let currentRecordType = null;
+        let selectedPlanDuration = 0;
         
         function goBack() {
             window.location.href = '../user/index.html';
@@ -376,9 +424,237 @@
             const endTime = document.getElementById('endTime').value;
             const durationMinutes = calculateDuration(startTime, endTime);
             document.getElementById('durationDisplay').textContent = durationMinutes + ' 分钟';
+            calculateCalorie();
+        }
+        
+        function calculateEndTime(startTime, durationMinutes) {
+            if (!startTime) return '';
+            
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const totalMinutes = startHour * 60 + startMin + durationMinutes;
+            
+            const endHour = Math.floor(totalMinutes / 60) % 24;
+            const endMin = totalMinutes % 60;
+            
+            return formatTime(endHour, endMin);
+        }
+        
+        async function loadSportsEvents() {
+            try {
+                const response = await window.getAllSportsEvents();
+                
+                if (!response) {
+                    console.error('服务器未响应');
+                    return;
+                }
+                
+                if (response.code === 200 && response.data && response.data.length > 0) {
+                    sportsEvents = response.data;
+                }
+            } catch (error) {
+                console.error('加载运动项目失败:', error);
+            }
+        }
+        
+        async function loadUserTrainingPlans() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                return;
+            }
+            
+            try {
+                const response = await window.getPlansByUserId(userSession.userID);
+                
+                if (!response) {
+                    console.error('服务器未响应');
+                    return;
+                }
+                
+                if (response.code === 200 && response.data && response.data.length > 0) {
+                    userPlans = response.data.filter(plan => {
+                        const planType = parseInt(plan.planType) || 0;
+                        const statusTen = Math.floor(planType / 10);
+                        return statusTen === 1;
+                    });
+                }
+            } catch (error) {
+                console.error('加载训练计划失败:', error);
+            }
+        }
+        
+        async function populateEventSelect() {
+            const select = document.getElementById('eventID');
+            select.innerHTML = '<option value="">请选择运动项目或训练计划</option>';
+            
+            if (sportsEvents.length > 0) {
+                const groupOption = document.createElement('option');
+                groupOption.disabled = true;
+                groupOption.textContent = '--- 运动项目 ---';
+                select.appendChild(groupOption);
+                
+                sportsEvents.forEach(event => {
+                    const option = document.createElement('option');
+                    option.value = event.eventID || event.EventID;
+                    option.textContent = `${event.sportName} (平均消耗: ${event.averageCalorie} kcal/小时)`;
+                    option.dataset.calorie = event.averageCalorie;
+                    option.dataset.recordType = 'sports_event';
+                    option.dataset.targetId = event.eventID || event.EventID;
+                    option.dataset.duration = 0;
+                    select.appendChild(option);
+                });
+            }
+            
+            if (userPlans.length > 0) {
+                const groupOption = document.createElement('option');
+                groupOption.disabled = true;
+                groupOption.textContent = '--- 训练计划 ---';
+                select.appendChild(groupOption);
+                
+                userPlans.forEach(plan => {
+                    const option = document.createElement('option');
+                    option.value = plan.planID;
+                    option.textContent = `${plan.planName} (每日目标: ${plan.exerciseAmount} 分钟)`;
+                    option.dataset.calorie = 0;
+                    option.dataset.recordType = 'training_plan';
+                    option.dataset.targetId = plan.planID;
+                    option.dataset.duration = plan.exerciseAmount || 30;
+                    option.dataset.planName = plan.planName;
+                    select.appendChild(option);
+                });
+            }
+        }
+        
+        const sportUnitMap = {
+            '慢走': 'km',
+            '快走': 'km',
+            '慢跑': 'km',
+            '跑步': 'km',
+            '游泳': 'm',
+            '骑行': 'km',
+            '跳绳': '个',
+            '瑜伽': '分钟',
+            '力量训练': '组',
+            '俯卧撑': '个',
+            '仰卧起坐': '个',
+            '深蹲': '个',
+            '引体向上': '个',
+            '平板支撑': '分钟',
+            '健身操': '分钟',
+            '篮球': '分钟',
+            '足球': '分钟',
+            '羽毛球': '分钟',
+            '乒乓球': '分钟',
+            '网球': '分钟',
+            '高尔夫': '次',
+            '爬山': '次',
+            '徒步': 'km'
+        };
+        
+        function getDefaultUnit(sportName) {
+            for (const [sport, unit] of Object.entries(sportUnitMap)) {
+                if (sportName.includes(sport)) {
+                    return unit;
+                }
+            }
+            return '次';
+        }
+        
+        function onSportChange() {
+            const eventSelect = document.getElementById('eventID');
+            const unitSelect = document.getElementById('exerciseUnit');
+            const selectedOption = eventSelect.options[eventSelect.selectedIndex];
+            
+            const exerciseAmountGroup = document.getElementById('exerciseAmountGroup');
+            const calorieGroup = document.getElementById('calorieGroup');
+            const endTimeInput = document.getElementById('endTime');
+            
+            if (selectedOption && selectedOption.value) {
+                const recordType = selectedOption.dataset.recordType;
+                const duration = parseInt(selectedOption.dataset.duration) || 0;
+                
+                currentRecordType = recordType;
+                selectedPlanDuration = duration;
+                
+                if (recordType === 'training_plan') {
+                    exerciseAmountGroup.classList.add('hidden');
+                    calorieGroup.classList.add('hidden');
+                    
+                    endTimeInput.style.cursor = 'not-allowed';
+                    endTimeInput.style.backgroundColor = '#f8f9fa';
+                    
+                    const startTime = document.getElementById('startTime').value;
+                    if (startTime && duration > 0) {
+                        const endTime = calculateEndTime(startTime, duration);
+                        document.getElementById('endTime').value = endTime;
+                        updateDuration();
+                    }
+                } else {
+                    exerciseAmountGroup.classList.remove('hidden');
+                    calorieGroup.classList.remove('hidden');
+                    
+                    endTimeInput.style.cursor = 'pointer';
+                    endTimeInput.style.backgroundColor = '';
+                    
+                    const sportName = selectedOption.textContent.split('(')[0].trim();
+                    const defaultUnit = getDefaultUnit(sportName);
+                    
+                    if (defaultUnit) {
+                        unitSelect.value = defaultUnit;
+                        unitSelect.disabled = true;
+                    } else {
+                        unitSelect.disabled = false;
+                    }
+                }
+            } else {
+                currentRecordType = null;
+                selectedPlanDuration = 0;
+                
+                exerciseAmountGroup.classList.remove('hidden');
+                calorieGroup.classList.remove('hidden');
+                
+                endTimeInput.style.cursor = 'pointer';
+                endTimeInput.style.backgroundColor = '';
+                unitSelect.disabled = false;
+            }
+            
+            calculateCalorie();
+        }
+        
+        function calculateCalorie() {
+            if (currentRecordType === 'training_plan') {
+                return;
+            }
+            
+            const eventSelect = document.getElementById('eventID');
+            const userWeight = document.getElementById('userWeight').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            
+            if (!eventSelect.value || !userWeight || !startTime || !endTime) {
+                document.getElementById('calorie').value = '';
+                return;
+            }
+            
+            const selectedOption = eventSelect.options[eventSelect.selectedIndex];
+            const averageCalorie = parseFloat(selectedOption.dataset.calorie);
+            const durationMinutes = calculateDuration(startTime, endTime);
+            const weight = parseFloat(userWeight);
+            
+            if (isNaN(averageCalorie) || isNaN(durationMinutes) || isNaN(weight)) {
+                document.getElementById('calorie').value = '';
+                return;
+            }
+            
+            const calorie = Math.round((averageCalorie * weight / 70) * durationMinutes);
+            document.getElementById('calorie').value = calorie;
         }
         
         function openTimeModal(fieldId, title) {
+            if (fieldId === 'endTime' && currentRecordType === 'training_plan') {
+                alert('训练计划的结束时间由系统自动计算，不可修改');
+                return;
+            }
+            
             currentTimeField = fieldId;
             document.getElementById('modalTitle').textContent = title;
             
@@ -428,11 +704,24 @@
             }
             
             document.getElementById(currentTimeField).value = selectedTime;
+            
+            if (currentTimeField === 'startTime' && currentRecordType === 'training_plan') {
+                const endTime = calculateEndTime(selectedTime, selectedPlanDuration);
+                document.getElementById('endTime').value = endTime;
+            }
+            
             updateDuration();
             closeTimeModal();
         }
         
         async function submitCheckin() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+            
             const sportsDate = document.getElementById('sportsDate').value;
             const eventID = document.getElementById('eventID').value.trim();
             const startTime = document.getElementById('startTime').value;
@@ -441,7 +730,7 @@
             const calorie = document.getElementById('calorie').value;
             
             if (!eventID) {
-                alert('请输入事件ID');
+                alert('请选择运动项目或训练计划');
                 return;
             }
             if (!startTime) {
@@ -452,35 +741,81 @@
                 alert('请选择结束时间');
                 return;
             }
-            if (!exerciseAmount) {
-                alert('请输入运动数量');
-                return;
-            }
-            if (!calorie) {
-                alert('请输入消耗卡路里');
-                return;
+            
+            if (currentRecordType !== 'training_plan') {
+                if (!exerciseAmount) {
+                    alert('请输入运动数量');
+                    return;
+                }
+                if (!calorie) {
+                    alert('请输入消耗卡路里');
+                    return;
+                }
             }
             
             const durationMinutes = calculateDuration(startTime, endTime);
             
+            const startDateTime = sportsDate + ' ' + startTime + ':00';
+            const endDateTime = sportsDate + ' ' + endTime + ':00';
+            
+            const finalEventID = parseInt(eventID);
+            const recordTypeValue = currentRecordType === 'training_plan' ? 1 : 0;
+            
             const checkinData = {
+                userID: userSession.userID,
                 sportsDate: sportsDate,
-                eventID: eventID,
-                startTime: startTime,
-                endTime: endTime,
+                eventID: finalEventID,
+                startTime: startDateTime,
+                endTime: endDateTime,
                 exerciseDuration: durationMinutes,
-                exerciseAmount: exerciseAmount,
-                calorie: calorie
+                exerciseAmount: currentRecordType === 'training_plan' ? durationMinutes : parseInt(exerciseAmount),
+                calorie: parseInt(calorie) || 0,
+                recordType: recordTypeValue
             };
             
             console.log('打卡数据:', checkinData);
             
-            alert('打卡成功！\n\n运动日期：' + sportsDate + '\n事件ID：' + eventID + '\n开始时间：' + startTime + '\n结束时间：' + endTime + '\n运动时长：' + durationMinutes + ' 分钟\n运动数量：' + exerciseAmount + '\n消耗卡路里：' + calorie + ' kcal');
-            
-            window.location.href = '../user/index.html';
+            try {
+                const response = await window.addExerciseRecord(checkinData);
+                
+                if (!response) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    return;
+                }
+                
+                if (response.code === 200) {
+                    alert('打卡成功！\n\n运动日期：' + sportsDate + '\n类型：' + (currentRecordType === 'training_plan' ? '训练计划' : '运动项目') + '\n开始时间：' + startTime + '\n结束时间：' + endTime + '\n运动时长：' + durationMinutes + ' 分钟');
+                    window.location.href = '../user/index.html';
+                } else {
+                    alert(response.msg || '打卡失败，请重试');
+                }
+            } catch (error) {
+                console.error('打卡错误:', error);
+                alert('打卡失败：服务器连接异常，请检查服务器是否启动在 8082 端口');
+            }
         }
         
-        document.addEventListener('DOMContentLoaded', function() {
+        async function loadUserWeight() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                return;
+            }
+            
+            try {
+                const response = await window.getUserInfo(userSession.userID);
+                
+                if (response && response.code === 200 && response.data) {
+                    const user = response.data;
+                    if (user.weight) {
+                        document.getElementById('userWeight').value = user.weight;
+                    }
+                }
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', async function() {
             const today = new Date();
             document.getElementById('sportsDate').value = formatDate(today);
             
@@ -515,6 +850,11 @@
                     document.getElementById('minuteSelect').value = '0';
                 }
             });
+            
+            await loadSportsEvents();
+            await loadUserTrainingPlans();
+            await populateEventSelect();
+            await loadUserWeight();
         });
     </script>
 </body>

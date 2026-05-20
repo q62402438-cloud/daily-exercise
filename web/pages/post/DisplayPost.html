@@ -22,15 +22,10 @@
         .author-info { display: flex; align-items: center; gap: 10px; }
         .author-avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
         .author-name { font-weight: 600; color: #2c3e50; }
-        .post-content { padding: 30px; color: #34495e; line-height: 1.8; font-size: 16px; }
-        .post-tags { padding: 0 30px 20px; display: flex; flex-wrap: wrap; gap: 10px; }
-        .tag { background: #e8f4fd; color: #3498db; padding: 6px 12px; border-radius: 4px; font-size: 14px; }
+        .post-content { padding: 30px; color: #34495e; line-height: 1.8; font-size: 16px; white-space: pre-wrap; }
         .action-bar { padding: 20px 30px; background: #f8f9fa; display: flex; justify-content: space-between; align-items: center; }
         .action-left { display: flex; gap: 20px; }
         .action-btn { display: flex; align-items: center; gap: 5px; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
-        .like-btn { background: white; color: #e74c3c; border: 2px solid #e74c3c; }
-        .like-btn:hover { background: #e74c3c; color: white; }
-        .like-btn.active { background: #e74c3c; color: white; }
         .favorite-btn { background: white; color: #f39c12; border: 2px solid #f39c12; }
         .favorite-btn:hover { background: #f39c12; color: white; }
         .favorite-btn.active { background: #f39c12; color: white; }
@@ -57,19 +52,14 @@
         .comment-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; }
         .comment-author-name { font-weight: 600; }
         .comment-time { color: #7f8c8d; font-size: 14px; }
-        .comment-content { color: #34495e; line-height: 1.6; margin-bottom: 12px; }
-        .comment-actions { display: flex; gap: 15px; }
-        .comment-action { color: #7f8c8d; cursor: pointer; font-size: 14px; }
-        .comment-action:hover { color: #3498db; }
-        .stats-bar { display: flex; gap: 30px; padding: 15px 30px; background: #f8f9fa; border-bottom: 1px solid #ecf0f1; }
-        .stat-item { display: flex; align-items: center; gap: 5px; color: #7f8c8d; }
-        .stat-value { font-weight: 600; color: #2c3e50; }
+        .comment-content { color: #34495e; line-height: 1.6; margin-bottom: 12px; white-space: pre-wrap; }
+        .empty-comments { text-align: center; padding: 40px; color: #7f8c8d; }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="logo-section">
-            <img src="images/logo.png" alt="系统Logo" class="logo">
+            <img src="../user/images/logo.png" alt="系统Logo" class="logo">
             <div class="site-title">跃动社区</div>
         </div>
         <div class="user-info">
@@ -81,52 +71,22 @@
     <div class="main-container">
         <div class="detail-container">
             <div class="post-header">
-                <h1 class="topic-title" id="postTitle">分享我的健身打卡第一天</h1>
+                <h1 class="topic-title" id="postTitle">加载中...</h1>
                 <div class="post-meta">
                     <div class="author-info">
-                        <div class="author-avatar" style="background: #3498db;" id="authorAvatar">张</div>
+                        <div class="author-avatar" style="background: #3498db;" id="authorAvatar">?</div>
                         <div>
-                            <div class="author-name" id="authorName">健身达人</div>
-                            <div style="color: #7f8c8d; font-size: 14px;" id="postTime">2024-01-15 10:30:00</div>
+                            <div class="author-name" id="authorName">加载中...</div>
+                            <div style="color: #7f8c8d; font-size: 14px;" id="postTime">加载中...</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <span>👁️</span>
-                    <span class="stat-value" id="viewCount">512</span>
-                    <span>浏览</span>
-                </div>
-                <div class="stat-item">
-                    <span>👍</span>
-                    <span class="stat-value" id="likeCount">128</span>
-                    <span>点赞</span>
-                </div>
-                <div class="stat-item">
-                    <span>💬</span>
-                    <span class="stat-value" id="commentCount">32</span>
-                    <span>评论</span>
-                </div>
-            </div>
-
-            <div class="post-content" id="postContent">
-                今天开始我的健身之旅！第一天做了30分钟有氧运动和20分钟力量训练，感觉还不错。希望能够坚持下去，大家一起加油！💪
-            </div>
-
-            <div class="post-tags" id="postTags">
-                <span class="tag">健身</span>
-                <span class="tag">打卡</span>
-                <span class="tag">日常</span>
-            </div>
+            <div class="post-content" id="postContent">加载中...</div>
 
             <div class="action-bar">
                 <div class="action-left">
-                    <button class="action-btn like-btn" id="likeBtn" onclick="toggleLike()">
-                        <span>👍</span>
-                        <span id="likeBtnText">点赞</span>
-                    </button>
                     <button class="action-btn favorite-btn" id="favoriteBtn" onclick="toggleFavorite()">
                         <span>⭐</span>
                         <span id="favoriteBtnText">收藏</span>
@@ -134,14 +94,12 @@
                 </div>
                 <div class="action-right">
                     <button class="action-btn back-btn" onclick="goBack()">返回</button>
-                    <button class="action-btn edit-btn" onclick="editPost()">编辑</button>
-                    <button class="action-btn delete-btn" onclick="deletePost()">删除</button>
                 </div>
             </div>
 
             <div class="comments-section">
                 <div class="comments-header">
-                    <h3 class="comments-title">评论 <span class="comments-count" id="commentCountDisplay">(32)</span></h3>
+                    <h3 class="comments-title">评论 <span class="comments-count" id="commentCountDisplay">(0)</span></h3>
                 </div>
 
                 <div class="comment-input">
@@ -150,6 +108,7 @@
                 </div>
 
                 <div class="comments-list" id="commentsList">
+                    <div class="empty-comments">暂无评论</div>
                 </div>
             </div>
         </div>
@@ -157,86 +116,6 @@
 
     <script src="../../asserts/js/api.js"></script>
     <script>
-        const postsData = {
-            'POST001': {
-                id: 'POST001',
-                title: '分享我的健身打卡第一天',
-                author: '健身达人',
-                authorAvatar: '张',
-                authorColor: '#3498db',
-                time: '2024-01-15 10:30:00',
-                content: '今天开始我的健身之旅！第一天做了30分钟有氧运动和20分钟力量训练，感觉还不错。希望能够坚持下去，大家一起加油！💪',
-                tags: ['健身', '打卡', '日常'],
-                views: 512,
-                likes: 128,
-                comments: 32,
-                isLiked: false,
-                isFavorited: false,
-                commentList: [
-                    { id: 'C001', author: '运动爱好者', avatar: '李', content: '加油！坚持就是胜利！', time: '2024-01-15 11:00:00', likes: 25 },
-                    { id: 'C002', author: '新手小白', avatar: '王', content: '请问用的什么训练计划呀？', time: '2024-01-15 11:30:00', likes: 8 },
-                    { id: 'C003', author: '健康生活', avatar: '陈', content: '太棒了，一起加油！', time: '2024-01-15 12:00:00', likes: 15 }
-                ]
-            },
-            'POST002': {
-                id: 'POST002',
-                title: '一周训练计划分享',
-                author: '运动爱好者',
-                authorAvatar: '李',
-                authorColor: '#27ae60',
-                time: '2024-01-14 15:45:00',
-                content: '分享一下我的一周训练计划：周一胸肩、周二背、周三腿、周四休息、周五手臂、周六有氧、周日休息。大家觉得怎么样？欢迎交流！',
-                tags: ['训练计划', '一周安排', '健身'],
-                views: 890,
-                likes: 256,
-                comments: 64,
-                isLiked: false,
-                isFavorited: false,
-                commentList: [
-                    { id: 'C004', author: '健身达人', avatar: '张', content: '安排得很合理！', time: '2024-01-14 16:00:00', likes: 32 },
-                    { id: 'C005', author: '跑者小王', avatar: '王', content: '可以加一天核心训练', time: '2024-01-14 17:00:00', likes: 18 }
-                ]
-            },
-            'POST003': {
-                id: 'POST003',
-                title: '跑步打卡第100天！',
-                author: '跑者小王',
-                authorAvatar: '王',
-                authorColor: '#f39c12',
-                time: '2024-01-13 08:00:00',
-                content: '今天是我跑步打卡的第100天！从最初的3公里气喘吁吁，到现在轻松跑完10公里，感谢自己的坚持。希望更多人加入跑步的行列！',
-                tags: ['跑步', '打卡', '坚持'],
-                views: 2048,
-                likes: 512,
-                comments: 128,
-                isLiked: false,
-                isFavorited: false,
-                commentList: [
-                    { id: 'C006', author: '健身达人', avatar: '张', content: '太厉害了！100天不容易', time: '2024-01-13 08:30:00', likes: 64 },
-                    { id: 'C007', author: '健康生活', avatar: '陈', content: '向你学习！', time: '2024-01-13 09:00:00', likes: 42 }
-                ]
-            },
-            'POST004': {
-                id: 'POST004',
-                title: '减脂期间的饮食分享',
-                author: '健康生活',
-                authorAvatar: '陈',
-                authorColor: '#9b59b6',
-                time: '2024-01-12 20:30:00',
-                content: '减脂期间的饮食真的很重要！分享我的减脂餐搭配：早餐鸡蛋+燕麦，午餐鸡胸肉+糙米+蔬菜，晚餐鱼虾+沙拉。少油少盐，坚持就是胜利！',
-                tags: ['减脂', '饮食', '健康'],
-                views: 1256,
-                likes: 384,
-                comments: 86,
-                isLiked: false,
-                isFavorited: false,
-                commentList: [
-                    { id: 'C008', author: '运动爱好者', avatar: '李', content: '收藏了，很实用！', time: '2024-01-12 21:00:00', likes: 56 },
-                    { id: 'C009', author: '新手小白', avatar: '赵', content: '请问有具体的热量计算吗？', time: '2024-01-12 22:00:00', likes: 23 }
-                ]
-            }
-        };
-
         let currentPost = null;
 
         function goBack() {
@@ -244,136 +123,218 @@
         }
 
         function editPost() {
-            window.location.href = `EditPost.html?id=${currentPost.id}`;
+            window.location.href = `EditPost.html?id=${currentPost.postID}`;
         }
 
-        function deletePost() {
-            if (confirm('确定要删除这篇帖子吗？')) {
-                alert('帖子已删除');
-                window.location.href = 'UserForum.html';
+        async function deletePost() {
+            if (!confirm('确定要删除这篇帖子吗？')) {
+                return;
+            }
+
+            try {
+                const response = await window.deletePost(currentPost.postID);
+                if (response && response.code === 200) {
+                    alert('帖子已删除');
+                    window.location.href = 'UserForum.html';
+                } else {
+                    alert('删除失败：' + (response ? response.msg : '未知错误'));
+                }
+            } catch (error) {
+                console.error('删除帖子错误:', error);
+                alert('删除失败：服务器连接异常');
             }
         }
 
-        function toggleLike() {
-            const likeBtn = document.getElementById('likeBtn');
-            const likeBtnText = document.getElementById('likeBtnText');
-            const likeCount = document.getElementById('likeCount');
-            const commentCountDisplay = document.getElementById('commentCountDisplay');
-            
-            if (currentPost.isLiked) {
-                currentPost.likes--;
-                currentPost.isLiked = false;
-                likeBtn.classList.remove('active');
-                likeBtnText.textContent = '点赞';
-            } else {
-                currentPost.likes++;
-                currentPost.isLiked = true;
-                likeBtn.classList.add('active');
-                likeBtnText.textContent = '已点赞';
+        async function toggleFavorite() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
             }
-            
-            likeCount.textContent = currentPost.likes;
-        }
 
-        function toggleFavorite() {
             const favoriteBtn = document.getElementById('favoriteBtn');
             const favoriteBtnText = document.getElementById('favoriteBtnText');
-            
-            if (currentPost.isFavorited) {
-                currentPost.isFavorited = false;
-                favoriteBtn.classList.remove('active');
-                favoriteBtnText.textContent = '收藏';
-                alert('已取消收藏');
+            const postId = currentPost.postID;
+
+            if (favoriteBtn.classList.contains('active')) {
+                const response = await window.checkFavorite(userSession.userID, postId, 2);
+                if (response && response.code === 200 && response.data && response.data.favoriteID) {
+                    const favoriteID = response.data.favoriteID;
+                    const deleteResponse = await window.deleteFavorite(favoriteID);
+                    if (deleteResponse && deleteResponse.code === 200) {
+                        favoriteBtn.classList.remove('active');
+                        favoriteBtnText.textContent = '收藏';
+                        alert('已取消收藏');
+                    } else {
+                        alert('取消收藏失败');
+                    }
+                } else {
+                    favoriteBtn.classList.remove('active');
+                    favoriteBtnText.textContent = '收藏';
+                }
             } else {
-                currentPost.isFavorited = true;
-                favoriteBtn.classList.add('active');
-                favoriteBtnText.textContent = '已收藏';
-                alert('收藏成功！');
+                const response = await window.addFavorite({
+                    userID: parseInt(userSession.userID),
+                    targetID: parseInt(postId),
+                    targetType: 2,
+                    linkUrl: postId.toString(),
+                    favoriteTime: new Date().toISOString().replace('T', ' ').substring(0, 19)
+                });
+                if (response && response.code === 200) {
+                    favoriteBtn.classList.add('active');
+                    favoriteBtnText.textContent = '已收藏';
+                    alert('收藏成功！');
+                } else {
+                    alert('收藏失败：' + (response ? response.msg : '未知错误'));
+                }
             }
         }
 
-        function submitComment() {
+        async function checkPostFavoriteStatus() {
+            const userSession = getUserSession();
+            if (!userSession.userID) return;
+
+            const postId = currentPost.postID;
+            const response = await window.checkFavorite(userSession.userID, postId, 2);
+            if (response && response.code === 200 && response.data && response.data.favoriteID) {
+                const favoriteBtn = document.getElementById('favoriteBtn');
+                const favoriteBtnText = document.getElementById('favoriteBtnText');
+                favoriteBtn.classList.add('active');
+                favoriteBtnText.textContent = '已收藏';
+            }
+        }
+
+        async function submitComment() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+
             const content = document.getElementById('commentContent').value.trim();
             if (!content) {
                 alert('请输入评论内容');
                 return;
             }
-            
-            alert('评论发表成功！');
-            document.getElementById('commentContent').value = '';
-            
-            currentPost.comments++;
-            document.getElementById('commentCount').textContent = currentPost.comments;
-            document.getElementById('commentCountDisplay').textContent = `(${currentPost.comments})`;
+
+            try {
+                const response = await window.addComment({
+                    postID: currentPost.postID,
+                    userID: parseInt(userSession.userID),
+                    content: content
+                });
+
+                if (response && response.code === 200) {
+                    alert('评论发表成功！');
+                    document.getElementById('commentContent').value = '';
+                    loadComments();
+                } else {
+                    alert('发表失败：' + (response ? response.msg : '未知错误'));
+                }
+            } catch (error) {
+                console.error('发表评论错误:', error);
+                alert('发表失败：服务器连接异常');
+            }
         }
 
-        function renderComments() {
+        async function loadComments() {
+            try {
+                const response = await window.getCommentsByPost(currentPost.postID);
+
+                if (!response || response.code !== 200) {
+                    document.getElementById('commentsList').innerHTML = '<div class="empty-comments">加载评论失败</div>';
+                    return;
+                }
+
+                const comments = response.data || [];
+                document.getElementById('commentCountDisplay').textContent = `(${comments.length})`;
+                renderComments(comments);
+            } catch (error) {
+                console.error('加载评论失败:', error);
+                document.getElementById('commentsList').innerHTML = '<div class="empty-comments">加载评论失败</div>';
+            }
+        }
+
+        function renderComments(comments) {
             const commentsList = document.getElementById('commentsList');
+
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<div class="empty-comments">暂无评论</div>';
+                return;
+            }
+
             commentsList.innerHTML = '';
-            
-            currentPost.commentList.forEach(comment => {
+
+            comments.forEach(comment => {
                 const commentItem = document.createElement('div');
                 commentItem.className = 'comment-item';
+                const commentTime = formatDateTime(comment.publishTime);
+                const avatarChar = comment.userName ? comment.userName.charAt(0) : getAvatarChar(comment.userID);
+                const displayName = comment.userName || '用户' + comment.userID;
+
                 commentItem.innerHTML = `
                     <div class="comment-header">
                         <div class="comment-author-info">
-                            <div class="comment-avatar" style="background: #3498db;">${comment.avatar}</div>
+                            <div class="comment-avatar" style="background: #3498db;">${avatarChar}</div>
                             <div>
-                                <div class="comment-author-name">${comment.author}</div>
-                                <div class="comment-time">${comment.time}</div>
+                                <div class="comment-author-name">${displayName}</div>
+                                <div class="comment-time">${commentTime}</div>
                             </div>
                         </div>
                     </div>
                     <div class="comment-content">${comment.content}</div>
-                    <div class="comment-actions">
-                        <span class="comment-action" onclick="likeComment(this)">👍 ${comment.likes}</span>
-                        <span class="comment-action" onclick="replyComment()">回复</span>
-                    </div>
                 `;
                 commentsList.appendChild(commentItem);
             });
         }
 
-        function likeComment(element) {
-            const currentLikes = parseInt(element.textContent.split(' ')[1]);
-            element.textContent = `👍 ${currentLikes + 1}`;
+        function formatDateTime(dateTimeStr) {
+            if (!dateTimeStr) return '';
+            const date = new Date(dateTimeStr);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
         }
 
-        function replyComment() {
-            alert('回复功能开发中...');
+        function getAvatarChar(userID) {
+            const chars = ['张', '李', '王', '陈', '刘', '赵', '杨', '黄', '周', '吴'];
+            return chars[userID % chars.length];
         }
 
-        function loadPostDetail() {
+        async function loadPostDetail() {
             const urlParams = new URLSearchParams(window.location.search);
-            const postId = urlParams.get('id') || 'POST001';
-            
-            currentPost = postsData[postId] || postsData['POST001'];
-            
-            document.getElementById('postTitle').textContent = currentPost.title;
-            document.getElementById('authorAvatar').textContent = currentPost.authorAvatar;
-            document.getElementById('authorAvatar').style.background = currentPost.authorColor;
-            document.getElementById('authorName').textContent = currentPost.author;
-            document.getElementById('postTime').textContent = currentPost.time;
-            document.getElementById('viewCount').textContent = currentPost.views;
-            document.getElementById('likeCount').textContent = currentPost.likes;
-            document.getElementById('commentCount').textContent = currentPost.comments;
-            document.getElementById('commentCountDisplay').textContent = `(${currentPost.comments})`;
-            document.getElementById('postContent').textContent = currentPost.content;
-            
-            const tagsContainer = document.getElementById('postTags');
-            tagsContainer.innerHTML = currentPost.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
-            
-            if (currentPost.isLiked) {
-                document.getElementById('likeBtn').classList.add('active');
-                document.getElementById('likeBtnText').textContent = '已点赞';
+            const postId = urlParams.get('id');
+
+            if (!postId) {
+                alert('帖子ID不能为空');
+                window.location.href = 'UserForum.html';
+                return;
             }
-            
-            if (currentPost.isFavorited) {
-                document.getElementById('favoriteBtn').classList.add('active');
-                document.getElementById('favoriteBtnText').textContent = '已收藏';
+
+            try {
+                const response = await window.getPostById(postId);
+
+                if (!response || response.code !== 200) {
+                    alert('帖子不存在');
+                    window.location.href = 'UserForum.html';
+                    return;
+                }
+
+                currentPost = response.data;
+
+                document.getElementById('postTitle').textContent = currentPost.title;
+                const authorAvatarChar = currentPost.authorName ? currentPost.authorName.charAt(0) : getAvatarChar(currentPost.authorID);
+                document.getElementById('authorAvatar').textContent = authorAvatarChar;
+                document.getElementById('authorName').textContent = currentPost.authorName || '用户' + currentPost.authorID;
+                document.getElementById('postTime').textContent = formatDateTime(currentPost.publishTime);
+                document.getElementById('postContent').textContent = currentPost.content;
+
+                checkPostFavoriteStatus();
+                loadComments();
+            } catch (error) {
+                console.error('加载帖子详情失败:', error);
+                alert('加载帖子失败');
             }
-            
-            renderComments();
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -382,7 +343,7 @@
                 document.getElementById('userNameDisplay').textContent = userSession.userName;
                 document.getElementById('userAvatar').textContent = userSession.userName.charAt(0);
             }
-            
+
             loadPostDetail();
         });
     </script>

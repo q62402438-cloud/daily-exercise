@@ -184,8 +184,7 @@
             }
         }
     </style>
-    <script src="/web/assets/js/router.js"></script>
-    <script src="/web/assets/js/api.js"></script>
+    <script src="../asserts/js/api.js"></script>
 </head>
 <body>
     <div class="decoration decoration-1"></div>
@@ -241,16 +240,17 @@
                 loginButton.disabled = true;
                 
                 try {
-                    const data = await request('/user/login', {
+                    const data = await request('/auth/login', {
                         method: 'POST',
-                        body: JSON.stringify({ username: username, password: password })
+                        body: { userName: username, userPassword: password, userType: 0 }
                     });
                     
                     if (data.code === 200) {
-                        localStorage.setItem('userID', data.userID);
-                        localStorage.setItem('role', data.role || 'admin');
+                        localStorage.setItem('userID', data.data.userID);
+                        localStorage.setItem('userName', data.data.userName || 'admin');
+                        localStorage.setItem('userType', data.data.userType || '0');
                         alert('登录成功');
-                        go('admin_home');
+                        window.location.href = 'index.html';
                     } else {
                         alert(data.msg || '登录失败');
                         loginButton.textContent = '登录';

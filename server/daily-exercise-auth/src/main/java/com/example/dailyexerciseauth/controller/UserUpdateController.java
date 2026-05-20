@@ -1,5 +1,6 @@
 package com.example.dailyexerciseauth.controller;
 
+import com.example.dailyexerciseauth.common.Result;
 import com.example.dailyexerciseauth.entity.OrdinaryUser;
 import com.example.dailyexerciseauth.entity.User;
 import com.example.dailyexerciseauth.service.SmsService;
@@ -90,58 +91,6 @@ public class UserUpdateController {
             return Result.success("密码重置成功");
         } else {
             return Result.error("密码重置失败，手机号未注册");
-        }
-    }
-
-    static class Result {
-        private int code;
-        private String msg;
-        private Object data;
-
-        public int getCode() {
-            return code;
-        }
-
-        public void setCode(int code) {
-            this.code = code;
-        }
-
-        public String getMsg() {
-            return msg;
-        }
-
-        public void setMsg(String msg) {
-            this.msg = msg;
-        }
-
-        public Object getData() {
-            return data;
-        }
-
-        public void setData(Object data) {
-            this.data = data;
-        }
-
-        public static Result success(Object data) {
-            Result r = new Result();
-            r.code = 200;
-            r.msg = "success";
-            r.data = data;
-            return r;
-        }
-
-        public static Result success(String msg) {
-            Result r = new Result();
-            r.code = 200;
-            r.msg = msg;
-            return r;
-        }
-
-        public static Result error(String msg) {
-            Result r = new Result();
-            r.code = 500;
-            r.msg = msg;
-            return r;
         }
     }
 }

@@ -75,7 +75,7 @@
             <h1 class="page-title">运动论坛</h1>
             <div style="display: flex; gap: 15px;">
                 <button class="back-button" onclick="goBack()">返回控制台</button>
-                <button class="back-button" onclick="goToFavorites()">我的收藏</button>
+                <button class="back-button" onclick="goToMyPosts()">我的帖子</button>
                 <button class="new-post-btn" onclick="goToAddPost()">发表帖子</button>
             </div>
         </div>
@@ -85,89 +85,7 @@
                 <h3>热门帖子</h3>
             </div>
             <div class="posts-list" id="postsList">
-                <div class="post-card" onclick="openPostDetail('POST001')">
-                    <div class="post-header">
-                        <div>
-                            <div class="post-title">分享我的健身打卡第一天</div>
-                            <div class="post-meta">
-                                <div class="author-info">
-                                    <div class="author-avatar">张</div>
-                                    <span>健身达人</span>
-                                </div>
-                                <span>2024-01-15 10:30</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="post-content">今天开始我的健身之旅！第一天做了30分钟有氧运动和20分钟力量训练，感觉还不错。希望能够坚持下去，大家一起加油！💪</div>
-                    <div class="post-footer">
-                        <span>👍 128</span>
-                        <span>💬 32</span>
-                        <span>👁️ 512</span>
-                    </div>
-                </div>
-
-                <div class="post-card" onclick="openPostDetail('POST002')">
-                    <div class="post-header">
-                        <div>
-                            <div class="post-title">一周训练计划分享</div>
-                            <div class="post-meta">
-                                <div class="author-info">
-                                    <div class="author-avatar">李</div>
-                                    <span>运动爱好者</span>
-                                </div>
-                                <span>2024-01-14 15:45</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="post-content">分享一下我的一周训练计划：周一胸肩、周二背、周三腿、周四休息、周五手臂、周六有氧、周日休息。大家觉得怎么样？</div>
-                    <div class="post-footer">
-                        <span>👍 256</span>
-                        <span>💬 64</span>
-                        <span>👁️ 890</span>
-                    </div>
-                </div>
-
-                <div class="post-card" onclick="openPostDetail('POST003')">
-                    <div class="post-header">
-                        <div>
-                            <div class="post-title">跑步打卡第100天！</div>
-                            <div class="post-meta">
-                                <div class="author-info">
-                                    <div class="author-avatar">王</div>
-                                    <span>跑者小王</span>
-                                </div>
-                                <span>2024-01-13 08:00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="post-content">今天是我跑步打卡的第100天！从最初的3公里气喘吁吁，到现在轻松跑完10公里，感谢自己的坚持。希望更多人加入跑步的行列！</div>
-                    <div class="post-footer">
-                        <span>👍 512</span>
-                        <span>💬 128</span>
-                        <span>👁️ 2048</span>
-                    </div>
-                </div>
-
-                <div class="post-card" onclick="openPostDetail('POST004')">
-                    <div class="post-header">
-                        <div>
-                            <div class="post-title">减脂期间的饮食分享</div>
-                            <div class="post-meta">
-                                <div class="author-info">
-                                    <div class="author-avatar">陈</div>
-                                    <span>健康生活</span>
-                                </div>
-                                <span>2024-01-12 20:30</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="post-content">减脂期间的饮食真的很重要！分享我的减脂餐搭配：早餐鸡蛋+燕麦，午餐鸡胸肉+糙米+蔬菜，晚餐鱼虾+沙拉。少油少盐，坚持就是胜利！</div>
-                    <div class="post-footer">
-                        <span>👍 384</span>
-                        <span>💬 86</span>
-                        <span>👁️ 1256</span>
-                    </div>
-                </div>
+                <div style="text-align: center; padding: 40px; color: #7f8c8d;">加载中...</div>
             </div>
 
             <div class="pagination">
@@ -189,15 +107,83 @@
         }
 
         function goToAddPost() {
-            window.location.href = 'addpost.html';
+            window.location.href = 'AddPost.html';
         }
 
-        function goToFavorites() {
-            window.location.href = '../favoriate/ManageFavoritePost.html';
+        function goToMyPosts() {
+            window.location.href = 'MyPosts.html';
         }
 
         function openPostDetail(postID) {
             window.location.href = `DisplayPost.html?id=${postID}`;
+        }
+
+        async function loadPosts() {
+            try {
+                const response = await window.getPosts(1, 10);
+                
+                if (!response) {
+                    document.getElementById('postsList').innerHTML = '<div style="text-align: center; padding: 40px; color: #7f8c8d;">服务器未响应</div>';
+                    return;
+                }
+                
+                if (response.code === 200 && response.data && response.data.length > 0) {
+                    const posts = response.data;
+                    renderPosts(posts);
+                } else {
+                    document.getElementById('postsList').innerHTML = '<div style="text-align: center; padding: 40px; color: #7f8c8d;">暂无帖子</div>';
+                }
+            } catch (error) {
+                console.error('加载帖子失败:', error);
+                document.getElementById('postsList').innerHTML = '<div style="text-align: center; padding: 40px; color: #7f8c8d;">加载失败</div>';
+            }
+        }
+
+        function renderPosts(posts) {
+            const postsList = document.getElementById('postsList');
+            postsList.innerHTML = '';
+            
+            posts.forEach(post => {
+                const publishTime = formatDateTime(post.publishTime);
+                const contentPreview = post.content.length > 150 ? post.content.substring(0, 150) + '...' : post.content;
+                
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                card.onclick = () => openPostDetail(post.postID);
+                const authorAvatarChar = post.authorName ? post.authorName.charAt(0) : getAvatarChar(post.authorID);
+                card.innerHTML = `
+                    <div class="post-header">
+                        <div>
+                            <div class="post-title">${post.title}</div>
+                            <div class="post-meta">
+                                <div class="author-info">
+                                    <div class="author-avatar">${authorAvatarChar}</div>
+                                    <span>${post.authorName || '用户' + post.authorID}</span>
+                                </div>
+                                <span>${publishTime}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">${contentPreview}</div>
+                `;
+                postsList.appendChild(card);
+            });
+        }
+
+        function formatDateTime(dateTimeStr) {
+            if (!dateTimeStr) return '';
+            const date = new Date(dateTimeStr);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        }
+
+        function getAvatarChar(authorID) {
+            const chars = ['张', '李', '王', '陈', '刘', '赵', '杨', '黄', '周', '吴'];
+            return chars[authorID % chars.length];
+        }
+
+        function getAuthorName(authorID) {
+            const names = ['健身达人', '运动爱好者', '跑者小王', '健康生活', '瑜伽教练', '力量训练', '有氧运动', '减脂专家'];
+            return names[authorID % names.length];
         }
 
         async function loadUserInfo() {
@@ -222,7 +208,10 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', loadUserInfo);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserInfo();
+            loadPosts();
+        });
     </script>
 </body>
 </html>

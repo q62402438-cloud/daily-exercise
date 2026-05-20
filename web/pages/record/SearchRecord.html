@@ -134,9 +134,31 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
         
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+        
+        .no-records {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 40px;
+        }
+        
         .records-header {
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: 1fr 2fr auto;
             gap: 20px;
             padding: 15px 0;
             border-bottom: 2px solid #ecf0f1;
@@ -146,11 +168,12 @@
         
         .record-item {
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: 1fr 2fr auto;
             gap: 20px;
             padding: 20px 0;
             border-bottom: 1px solid #ecf0f1;
             transition: all 0.3s ease;
+            align-items: start;
         }
         
         .record-item:hover {
@@ -269,46 +292,177 @@
             window.location.href = 'total.html';
         }
 
-        function loadCheckinRecords() {
+        let sportsEventsMap = {};
+        
+        const sportUnitMap = {
+            '慢走': 'km',
+            '快走': 'km',
+            '慢跑': 'km',
+            '跑步': 'km',
+            '游泳': '米',
+            '骑行': 'km',
+            '跳绳': '个',
+            '瑜伽': '分钟',
+            '力量训练': '组',
+            '俯卧撑': '个',
+            '仰卧起坐': '个',
+            '深蹲': '个',
+            '引体向上': '个',
+            '平板支撑': '分钟',
+            '健身操': '分钟',
+            '篮球': '分钟',
+            '足球': '分钟',
+            '羽毛球': '分钟',
+            '乒乓球': '分钟',
+            '网球': '分钟',
+            '高尔夫': '次',
+            '爬山': '次',
+            '徒步': 'km'
+        };
+        
+        function getUnitBySportName(sportName) {
+            for (const [sport, unit] of Object.entries(sportUnitMap)) {
+                if (sportName.includes(sport)) {
+                    return unit;
+                }
+            }
+            return '';
+        }
+        
+        async function loadSportsEvents() {
+            try {
+                const response = await window.getAllSportsEvents();
+                if (response && response.code === 200 && response.data) {
+                    response.data.forEach(event => {
+                        sportsEventsMap[event.eventID || event.EventID] = event;
+                    });
+                }
+            } catch (error) {
+                console.error('加载运动项目失败:', error);
+            }
+        }
+        
+        function formatDateTime(dateTimeStr) {
+            if (!dateTimeStr) return '';
+            const date = new Date(dateTimeStr);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function formatTime(timeStr) {
+            if (!timeStr) return '';
+            const date = new Date(timeStr);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+        
+        function getSportName(eventID) {
+            const event = sportsEventsMap[eventID];
+            return event ? event.sportName || '未知运动' : '未知运动';
+        }
+        
+        async function deleteRecord(recordID) {
+            if (!confirm('确定要删除这条打卡记录吗？')) {
+                return;
+            }
+            
+            try {
+                const response = await window.deleteExerciseRecord(recordID);
+                if (response && response.code === 200) {
+                    alert('删除成功！');
+                    loadCheckinRecords();
+                } else {
+                    alert('删除失败：' + (response.msg || '未知错误'));
+                }
+            } catch (error) {
+                console.error('删除记录失败:', error);
+                alert('删除失败，请稍后重试');
+            }
+        }
+        
+        async function loadCheckinRecords() {
             const recordsList = document.getElementById('recordsList');
             const totalDays = document.getElementById('totalDays');
+            const userSession = getUserSession();
             
-            totalDays.textContent = '32';
-
-            const mockRecords = [
-                { date: '2024-01-15', type: '跑步', duration: '30分钟', calories: '350', steps: '5200' },
-                { date: '2024-01-14', type: '力量训练', duration: '45分钟', calories: '420', steps: '2100' },
-                { date: '2024-01-13', type: '游泳', duration: '60分钟', calories: '580', steps: '0' },
-                { date: '2024-01-12', type: '瑜伽', duration: '40分钟', calories: '280', steps: '800' },
-                { date: '2024-01-11', type: '跑步', duration: '25分钟', calories: '290', steps: '4500' },
-                { date: '2024-01-10', type: '骑行', duration: '45分钟', calories: '400', steps: '0' },
-                { date: '2024-01-09', type: '力量训练', duration: '50分钟', calories: '480', steps: '1800' },
-                { date: '2024-01-08', type: '跑步', duration: '35分钟', calories: '400', steps: '6300' }
-            ];
-
-            recordsList.innerHTML = mockRecords.map(record => `
-                <div class="record-item">
-                    <div class="record-date">${record.date}</div>
-                    <div class="record-data">
-                        <div class="data-item">
-                            <span class="data-label">运动类型</span>
-                            <span class="data-value">${record.type}</span>
-                        </div>
-                        <div class="data-item">
-                            <span class="data-label">运动时长</span>
-                            <span class="data-value">${record.duration}</span>
-                        </div>
-                        <div class="data-item">
-                            <span class="data-label">消耗热量</span>
-                            <span class="data-value">${record.calories} kcal</span>
-                        </div>
-                        <div class="data-item">
-                            <span class="data-label">步数</span>
-                            <span class="data-value">${record.steps}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+            
+            try {
+                const response = await window.getExerciseRecordsByUser(userSession.userID);
+                
+                if (response && response.code === 200 && response.data) {
+                    const records = response.data;
+                    totalDays.textContent = records.length;
+                    
+                    if (records.length === 0) {
+                        recordsList.innerHTML = '<div class="no-records">暂无打卡记录</div>';
+                        return;
+                    } else {
+                        recordsList.innerHTML = records.map(record => {
+                            const isPlanRecord = record.recordType === 1;
+                            const sportName = isPlanRecord ? (record.planName || record.sportName || '计划打卡') : (record.sportName || getSportName(record.eventID));
+                            const unit = getUnitBySportName(sportName);
+                            const recordDate = record.sportsDate || formatDateTime(record.startTime);
+                            const amountWithUnit = record.exerciseAmount ? record.exerciseAmount + (unit ? ' ' + unit : '') : '-';
+                            
+                            let recordDataHtml = '';
+                            if (isPlanRecord) {
+                                recordDataHtml = `
+                                    <div class="data-item">
+                                        <span class="data-label">计划名称</span>
+                                        <span class="data-value">${sportName}</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span class="data-label">运动时长</span>
+                                        <span class="data-value">${record.exerciseDuration} 分钟</span>
+                                    </div>
+                                `;
+                            } else {
+                                recordDataHtml = `
+                                    <div class="data-item">
+                                        <span class="data-label">运动类型</span>
+                                        <span class="data-value">${sportName}</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span class="data-label">运动时长</span>
+                                        <span class="data-value">${record.exerciseDuration} 分钟</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span class="data-label">消耗热量</span>
+                                        <span class="data-value">${record.calorie} kcal</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span class="data-label">运动数量</span>
+                                        <span class="data-value">${amountWithUnit}</span>
+                                    </div>
+                                `;
+                            }
+                            
+                            return `
+                                <div class="record-item" data-record-id="${record.recordID || record.RecordID}">
+                                    <div class="record-date">${recordDate}</div>
+                                    <div class="record-data">
+                                        ${recordDataHtml}
+                                    </div>
+                                    <button class="delete-btn" onclick="deleteRecord('${record.recordID || record.RecordID}')">删除</button>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                } else {
+                    recordsList.innerHTML = '<div class="no-records">加载失败，请稍后重试</div>';
+                }
+            } catch (error) {
+                console.error('加载打卡记录失败:', error);
+                recordsList.innerHTML = '<div class="no-records">加载失败，请稍后重试</div>';
+            }
         }
 
         async function loadUserInfo() {
@@ -333,9 +487,10 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            loadUserInfo();
-            loadCheckinRecords();
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadUserInfo();
+            await loadSportsEvents();
+            await loadCheckinRecords();
         });
     </script>
 </body>

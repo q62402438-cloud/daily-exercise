@@ -232,6 +232,12 @@
             font-weight: 600;
             color: #2c3e50;
         }
+        
+        .no-results {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 40px;
+        }
     </style>
 </head>
 <body>
@@ -289,14 +295,79 @@
 
     <script src="../../asserts/js/api.js"></script>
     <script>
+        let sportsEventsMap = {};
+        
+        const sportUnitMap = {
+            '慢走': 'km',
+            '快走': 'km',
+            '慢跑': 'km',
+            '跑步': 'km',
+            '游泳': '米',
+            '骑行': 'km',
+            '跳绳': '个',
+            '瑜伽': '分钟',
+            '力量训练': '组',
+            '俯卧撑': '个',
+            '仰卧起坐': '个',
+            '深蹲': '个',
+            '引体向上': '个',
+            '平板支撑': '分钟',
+            '健身操': '分钟',
+            '篮球': '分钟',
+            '足球': '分钟',
+            '羽毛球': '分钟',
+            '乒乓球': '分钟',
+            '网球': '分钟',
+            '高尔夫': '次',
+            '爬山': '次',
+            '徒步': 'km'
+        };
+        
+        function getUnitBySportName(sportName) {
+            for (const [sport, unit] of Object.entries(sportUnitMap)) {
+                if (sportName.includes(sport)) {
+                    return unit;
+                }
+            }
+            return '';
+        }
+        
         function goBack() {
             window.location.href = 'total.html';
         }
+        
+        async function loadSportsEvents() {
+            try {
+                const response = await window.getAllSportsEvents();
+                if (response && response.code === 200 && response.data) {
+                    response.data.forEach(event => {
+                        sportsEventsMap[event.eventID || event.EventID] = event;
+                    });
+                }
+            } catch (error) {
+                console.error('加载运动项目失败:', error);
+            }
+        }
+        
+        function formatDateTime(dateTimeStr) {
+            if (!dateTimeStr) return '';
+            const date = new Date(dateTimeStr);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function getSportName(eventID) {
+            const event = sportsEventsMap[eventID];
+            return event ? event.sportName || '未知运动' : '未知运动';
+        }
 
-        function searchRecords() {
+        async function searchRecords() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             const searchResults = document.getElementById('searchResults');
+            const userSession = getUserSession();
 
             if (!startDate || !endDate) {
                 alert('请选择完整的日期范围');
@@ -307,36 +378,84 @@
                 alert('开始日期不能晚于结束日期');
                 return;
             }
-
-            const mockRecords = [
-                { date: '2024-01-12', type: '瑜伽', duration: '40分钟', calories: '280', steps: '800' },
-                { date: '2024-01-11', type: '跑步', duration: '25分钟', calories: '290', steps: '4500' },
-                { date: '2024-01-10', type: '骑行', duration: '45分钟', calories: '400', steps: '0' }
-            ];
-
-            searchResults.innerHTML = mockRecords.map(record => `
-                <div class="record-item">
-                    <div class="record-date">${record.date}</div>
-                    <div class="record-data">
-                        <div class="data-item">
-                            <span class="data-label">运动类型</span>
-                            <span class="data-value">${record.type}</span>
-                        </div>
-                        <div class="data-item">
-                            <span class="data-label">运动时长</span>
-                            <span class="data-value">${record.duration}</span>
-                        </div>
-                        <div class="data-item">
-                            <span class="data-label">消耗热量</span>
-                            <span class="data-value">${record.calories} kcal</span>
-                        </div>
-                        <div class="data-item">
-                            <span class="data-label">步数</span>
-                            <span class="data-value">${record.steps}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+            
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+            
+            try {
+                const response = await window.getExerciseRecordsByDateRange(
+                    userSession.userID,
+                    startDate,
+                    endDate
+                );
+                
+                if (response && response.code === 200) {
+                    const records = response.data || [];
+                    
+                    if (records.length === 0) {
+                        searchResults.innerHTML = '<div class="no-results">该时间段内没有打卡记录</div>';
+                        return;
+                    }
+                    
+                    searchResults.innerHTML = records.map(record => {
+                        const isPlanRecord = record.recordType === 1;
+                        const sportName = isPlanRecord ? (record.planName || record.sportName || '计划打卡') : (record.sportName || getSportName(record.eventID));
+                        const unit = getUnitBySportName(sportName);
+                        const recordDate = record.sportsDate || formatDateTime(record.startTime);
+                        const amountWithUnit = record.exerciseAmount ? record.exerciseAmount + (unit ? ' ' + unit : '') : '-';
+                        
+                        let recordDataHtml = '';
+                        if (isPlanRecord) {
+                            recordDataHtml = `
+                                <div class="data-item">
+                                    <span class="data-label">计划名称</span>
+                                    <span class="data-value">${sportName}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">运动时长</span>
+                                    <span class="data-value">${record.exerciseDuration} 分钟</span>
+                                </div>
+                            `;
+                        } else {
+                            recordDataHtml = `
+                                <div class="data-item">
+                                    <span class="data-label">运动类型</span>
+                                    <span class="data-value">${sportName}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">运动时长</span>
+                                    <span class="data-value">${record.exerciseDuration} 分钟</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">消耗热量</span>
+                                    <span class="data-value">${record.calorie} kcal</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">运动数量</span>
+                                    <span class="data-value">${amountWithUnit}</span>
+                                </div>
+                            `;
+                        }
+                        
+                        return `
+                            <div class="record-item">
+                                <div class="record-date">${recordDate}</div>
+                                <div class="record-data">
+                                    ${recordDataHtml}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    searchResults.innerHTML = '<div class="no-results">查询失败，请稍后重试</div>';
+                }
+            } catch (error) {
+                console.error('查询失败:', error);
+                searchResults.innerHTML = '<div class="no-results">查询失败，请稍后重试</div>';
+            }
         }
 
         async function loadUserInfo() {
@@ -361,7 +480,10 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', loadUserInfo);
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadUserInfo();
+            await loadSportsEvents();
+        });
     </script>
 </body>
 </html>

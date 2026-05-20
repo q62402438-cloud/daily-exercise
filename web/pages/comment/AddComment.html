@@ -69,8 +69,51 @@
 
     <script src="../../asserts/js/api.js"></script>
     <script>
+        let postID = '';
+        
         function goBack() {
             window.location.href = '../post/UserForum.html';
+        }
+        
+        async function submitComment() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = '../user/signin.html';
+                return;
+            }
+            
+            const content = document.getElementById('commentContent').value.trim();
+            if (!content) {
+                alert('请输入评论内容');
+                return;
+            }
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            postID = urlParams.get('postID') || '1';
+            
+            try {
+                const response = await window.addComment({
+                    postID: postID,
+                    userID: userSession.userID,
+                    content: content
+                });
+                
+                if (!response) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    return;
+                }
+                
+                if (response.code === 200) {
+                    alert('评论发布成功！');
+                    window.location.href = '../post/UserForum.html';
+                } else {
+                    alert(response.msg || '发布失败，请重试');
+                }
+            } catch (error) {
+                console.error('发布评论错误:', error);
+                alert('发布失败：服务器连接异常');
+            }
         }
         
         document.addEventListener('DOMContentLoaded', function() {
@@ -88,13 +131,7 @@
             
             document.getElementById('commentForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                const content = document.getElementById('commentContent').value.trim();
-                if (!content) {
-                    alert('请输入评论内容');
-                    return;
-                }
-                alert('评论发布成功！');
-                window.location.href = '../post/UserForum.html';
+                submitComment();
             });
         });
     </script>

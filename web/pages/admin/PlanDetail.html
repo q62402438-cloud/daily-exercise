@@ -141,6 +141,7 @@
         </div>
     </div>
 
+    <script src="../asserts/js/api.js"></script>
     <script>
         const plansData = {
             '1': {
@@ -193,10 +194,21 @@
             window.location.href = 'auditVolunteerActivity.html';
         }
 
-        function approvePlan() {
-            if (confirm('确定要通过该计划的审核吗？')) {
-                alert('审核通过！计划已发布。');
-                goBack();
+        async function approvePlan() {
+            if (!confirm('确定要通过该计划的审核吗？')) {
+                return;
+            }
+            
+            try {
+                const result = await auditPlanPass(currentPlan.id);
+                if (result.code === 200) {
+                    alert('审核通过！计划已发布。');
+                    goBack();
+                } else {
+                    alert('审核失败：' + (result.msg || '未知错误'));
+                }
+            } catch (error) {
+                alert('审核失败：' + error.message);
             }
         }
 
@@ -209,16 +221,28 @@
             document.getElementById('rejectReason').value = '';
         }
 
-        function rejectPlan() {
+        async function rejectPlan() {
             const reason = document.getElementById('rejectReason').value.trim();
             if (!reason) {
                 alert('请输入拒绝原因');
                 return;
             }
-            if (confirm(`确定要拒绝该计划吗？\n拒绝原因：${reason}`)) {
-                alert('已拒绝该计划，拒绝原因已通知申请人。');
-                closeModal();
-                goBack();
+            
+            if (!confirm(`确定要拒绝该计划吗？\n拒绝原因：${reason}`)) {
+                return;
+            }
+            
+            try {
+                const result = await auditPlanReject(currentPlan.id);
+                if (result.code === 200) {
+                    alert('已拒绝该计划，拒绝原因已通知申请人。');
+                    closeModal();
+                    goBack();
+                } else {
+                    alert('拒绝失败：' + (result.msg || '未知错误'));
+                }
+            } catch (error) {
+                alert('拒绝失败：' + error.message);
             }
         }
 

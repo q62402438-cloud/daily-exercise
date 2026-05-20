@@ -193,10 +193,200 @@
             window.location.href = 'EditPlan.html?id=' + planId;
         }
 
-        function deletePlan(planId) {
-            if (confirm('确定要删除这个计划吗？')) {
-                window.location.href = 'DeletePlan.html?id=' + planId;
+        async function deletePlan(planId) {
+            if (!confirm('确定要删除这个计划吗？')) {
+                return;
             }
+            
+            try {
+                const response = await window.deleteTrainingPlan(planId);
+                
+                if (!response) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    return;
+                }
+                
+                if (response.code === 200) {
+                    alert('计划已删除');
+                    loadPlans();
+                } else {
+                    alert(response.msg || '删除失败，请重试');
+                }
+            } catch (error) {
+                console.error('删除计划错误:', error);
+                alert('删除失败：服务器连接异常');
+            }
+        }
+
+        async function loadPlans() {
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                return;
+            }
+            
+            try {
+                const [plansResponse, recordsResponse] = await Promise.all([
+                    window.getTrainingPlansByUser(userSession.userID),
+                    window.getExerciseRecordsByUser(userSession.userID)
+                ]);
+                
+                if (!plansResponse) {
+                    alert('服务器未响应，请检查服务器是否启动');
+                    return;
+                }
+                
+                if (plansResponse.code === 200 && plansResponse.data && plansResponse.data.length > 0) {
+                    const plans = plansResponse.data;
+                    const allRecords = recordsResponse && recordsResponse.code === 200 ? recordsResponse.data : [];
+                    
+                    await calculateProgress(plans, allRecords);
+                    renderPlans(plans);
+                } else {
+                    document.getElementById('plansList').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📋</div>
+                            <div class="empty-title">暂无训练计划</div>
+                            <div class="empty-desc">您还没有创建任何训练计划，点击右上角按钮创建新计划</div>
+                        </div>
+                    `;
+                    document.getElementById('planCount').textContent = '0';
+                }
+            } catch (error) {
+                console.error('加载计划失败:', error);
+            }
+        }
+
+        async function calculateProgress(plans, allRecords) {
+            for (let i = 0; i < plans.length; i++) {
+                const plan = plans[i];
+                const startTime = plan.startTime;
+                const endTime = plan.endTime;
+                
+                if (!startTime || !endTime) {
+                    plan.percentage = 0;
+                    plan.checkInDays = 0;
+                    plan.totalDays = 0;
+                    continue;
+                }
+                
+                const startDate = startTime.split('T')[0];
+                const endDate = endTime.split('T')[0];
+                
+                const today = new Date().toISOString().split('T')[0];
+                
+                if (compareDates(today, endDate) > 0) {
+                    await autoCompletePlan(plan.planID);
+                    plan.planType = 22;
+                }
+                
+                const totalDays = getDaysBetween(startDate, endDate);
+                
+                let checkInDays = 0;
+                const checkInDates = new Set();
+                
+                for (let j = 0; j < allRecords.length; j++) {
+                    const record = allRecords[j];
+                    if (record.recordType === 1 && record.sportsDate && isDateInRange(record.sportsDate, startDate, endDate)) {
+                        const dateOnly = record.sportsDate.split(' ')[0].split('T')[0];
+                        checkInDates.add(dateOnly);
+                    }
+                }
+                
+                checkInDays = checkInDates.size;
+                const percentage = totalDays > 0 ? Math.round((checkInDays / totalDays) * 100) : 0;
+                
+                plan.percentage = percentage;
+                plan.checkInDays = checkInDays;
+                plan.totalDays = totalDays;
+            }
+        }
+
+        function compareDates(date1, date2) {
+            const d1 = new Date(date1);
+            const d2 = new Date(date2);
+            if (d1 > d2) return 1;
+            if (d1 < d2) return -1;
+            return 0;
+        }
+
+        async function autoCompletePlan(planID) {
+            try {
+                const response = await window.completeTrainingPlan(planID);
+                if (response && response.code === 200) {
+                    console.log('计划已自动结束:', planID);
+                }
+            } catch (error) {
+                console.error('自动结束计划失败:', error);
+            }
+        }
+
+        function getDaysBetween(startDateStr, endDateStr) {
+            const startDate = new Date(startDateStr);
+            const endDate = new Date(endDateStr);
+            const timeDiff = endDate.getTime() - startDate.getTime();
+            return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        }
+
+        function isDateInRange(dateStr, startDateStr, endDateStr) {
+            const date = new Date(dateStr);
+            const startDate = new Date(startDateStr);
+            const endDate = new Date(endDateStr);
+            return date >= startDate && date <= endDate;
+        }
+
+        function renderPlans(data) {
+            const plansList = document.getElementById('plansList');
+            plansList.innerHTML = '';
+            
+            data.forEach(plan => {
+                const planType = plan.planType || 0;
+                const statusDigit = planType % 10;
+                const executionDigit = Math.floor(planType / 10) % 10;
+                
+                const executionStatus = executionDigit === 0 ? '未开始' : 
+                                      executionDigit === 1 ? '执行中' : 
+                                      executionDigit === 2 ? '已完毕' : '未知';
+                
+                const shelfStatus = statusDigit === 0 ? '未提交审核' : 
+                                   statusDigit === 1 ? '审核中' : 
+                                   statusDigit === 2 ? '已通过' : '未知';
+                
+                const statusClass = executionDigit === 2 ? 'status-completed' : 
+                                   executionDigit === 1 ? 'status-active' : 'status-inactive';
+                
+                const card = document.createElement('div');
+                card.className = 'plan-card';
+                card.innerHTML = `
+                    <div class="plan-header">
+                        <div>
+                            <div class="plan-title">${plan.planName}</div>
+                            <div class="plan-meta">
+                                <span class="plan-duration">⏱️ ${plan.sportName}</span>
+                                <span class="plan-type">${plan.exerciseAmount}分钟</span>
+                                <span style="padding: 2px 8px; background: #95a5a6; color: white; border-radius: 8px; font-size: 12px;">${shelfStatus}</span>
+                            </div>
+                        </div>
+                        <span class="status-badge ${statusClass}">${executionStatus}</span>
+                    </div>
+                    <div class="plan-description">训练计划详情描述</div>
+                    <div class="plan-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${plan.percentage}%"></div>
+                                </div>
+                                <div class="progress-text">已打卡 ${plan.checkInDays || 0}/${plan.totalDays || 0} 天 (${plan.percentage}%)</div>
+                            </div>
+                    <div class="plan-actions">
+                        <button class="action-btn detail-btn" onclick="viewPlanDetail('${plan.planID}')">查看详情</button>
+                        ${executionDigit === 0 ? `<button class="action-btn start-btn" onclick="startPlan('${plan.planID}')">开始训练</button>` : ''}
+                        ${executionDigit === 2 ? `<button class="action-btn start-btn" onclick="startPlan('${plan.planID}')">重新开始</button>` : ''}
+                        <button class="action-btn edit-btn" onclick="editPlan('${plan.planID}')">编辑计划</button>
+                        <button class="action-btn delete-btn" onclick="deletePlan('${plan.planID}')">删除计划</button>
+                    </div>
+                `;
+                plansList.appendChild(card);
+            });
+            
+            document.getElementById('planCount').textContent = data.length;
         }
 
         async function loadUserInfo() {
@@ -221,7 +411,10 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', loadUserInfo);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserInfo();
+            loadPlans();
+        });
     </script>
 </body>
 </html>
