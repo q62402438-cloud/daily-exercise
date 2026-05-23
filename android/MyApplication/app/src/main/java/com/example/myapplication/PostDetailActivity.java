@@ -25,7 +25,9 @@ import com.example.myapplication.model.Result;
 import com.example.myapplication.network.ApiService;
 import com.example.myapplication.network.RetrofitClient;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -178,6 +180,10 @@ public class PostDetailActivity extends AppCompatActivity {
             request.setUserID(userId);
             request.setTargetID(postId);
             request.setTargetType(2);
+            String linkUrl = "pages/post/DisplayPost.html?id=" + postId;
+            request.setLinkUrl(linkUrl);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            request.setFavoriteTime(sdf.format(new Date()));
             apiService.addFavorite(request).enqueue(new Callback<Result<String>>() {
                 @Override
                 public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {

@@ -273,8 +273,8 @@
         <h1 class="login-title">用户登录</h1>
         
         <div class="input-group">
-            <div class="input-hint">用户名</div>
-            <input type="text" class="input-field" id="userNameInput" placeholder="请输入您的用户名">
+            <div class="input-hint">用户名或手机号</div>
+            <input type="text" class="input-field" id="userNameInput" placeholder="请输入您的用户名或手机号">
         </div>
         
         <div class="input-group">
@@ -311,7 +311,7 @@
                 const userPassword = userPasswordInput.value.trim();
                 
                 if (!userName) {
-                    alert('请输入用户名');
+                    alert('请输入用户名或手机号');
                     userNameInput.focus();
                     return;
                 }

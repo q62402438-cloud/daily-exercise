@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">悦动</string>
     <string name="log_in">登录</string>
-    <string name="login">请输入手机号</string>
+    <string name="login">请输入用户名或手机号</string>
     <string name="password">请输入密码</string>
     <string name="login_page">登录</string>
     <string name="yonghuxieyi">我已阅读《用户隐私协议》</string>

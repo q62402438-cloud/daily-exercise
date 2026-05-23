@@ -58,6 +58,8 @@ CREATE TABLE IF NOT EXISTS `training_plan` (
     `startTime` DATETIME NOT NULL,
     `endTime` DATETIME NOT NULL,
     `sportName` VARCHAR(100) NOT NULL,
+    `sportType` VARCHAR(50) DEFAULT '其他运动',
+    `detail` TEXT,
     `exerciseAmount` FLOAT NOT NULL,
     `percentage` FLOAT NOT NULL DEFAULT 0,
     CONSTRAINT `fk_plan_user` FOREIGN KEY (`userID`) REFERENCES `user`(`userID`) ON DELETE CASCADE,
@@ -83,11 +85,11 @@ CREATE TABLE IF NOT EXISTS `comment` (
     `postID` INT NOT NULL,
     `userID` INT NOT NULL,
     `content` TEXT NOT NULL,
-    `commentTime` DATETIME NOT NULL,
+    `publishTime` DATETIME NOT NULL,
     CONSTRAINT `fk_comment_post` FOREIGN KEY (`postID`) REFERENCES `post`(`postID`) ON DELETE CASCADE,
     CONSTRAINT `fk_comment_user` FOREIGN KEY (`userID`) REFERENCES `user`(`userID`) ON DELETE CASCADE,
     INDEX `idx_comment_post` (`postID`),
-    INDEX `idx_comment_time` (`commentTime`)
+    INDEX `idx_comment_time` (`publishTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `favorite` (

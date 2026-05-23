@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>帖子详情 - 跃动社区</title>
+    <title>帖子详情 - 悦动社区</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #2c3e50; }
@@ -60,7 +60,7 @@
     <div class="header">
         <div class="logo-section">
             <img src="../user/images/logo.png" alt="系统Logo" class="logo">
-            <div class="site-title">跃动社区</div>
+            <div class="site-title">悦动社区</div>
         </div>
         <div class="user-info">
             <div class="user-name" id="userNameDisplay">用户</div>
@@ -174,11 +174,12 @@
                     favoriteBtnText.textContent = '收藏';
                 }
             } else {
+                const linkUrl = `pages/post/DisplayPost.html?id=${postId}`;
                 const response = await window.addFavorite({
                     userID: parseInt(userSession.userID),
                     targetID: parseInt(postId),
                     targetType: 2,
-                    linkUrl: postId.toString(),
+                    linkUrl: linkUrl,
                     favoriteTime: new Date().toISOString().replace('T', ' ').substring(0, 19)
                 });
                 if (response && response.code === 200) {

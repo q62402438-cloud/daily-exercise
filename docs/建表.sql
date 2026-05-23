@@ -94,6 +94,7 @@ CREATE TABLE `training_plan` (
   `sportName` VARCHAR(200) COMMENT '运动项目',
   `exerciseAmount` FLOAT COMMENT '每日目标运动量',
   `percentage` FLOAT COMMENT '完成百分比',
+  `detail` VARCHAR(255) COMMENT '计划详情',
   CONSTRAINT `fk_training_plan_user`
     FOREIGN KEY (`userID`) REFERENCES `ordinary_user`(`userID`)
 ) COMMENT='训练计划表';

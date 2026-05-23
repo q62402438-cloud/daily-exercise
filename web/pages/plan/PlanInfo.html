@@ -168,11 +168,12 @@
                     favoriteBtnText.textContent = '收藏计划';
                 }
             } else {
+                const linkUrl = `pages/plan/PlanInfo.html?id=${planId}`;
                 const response = await window.addFavorite({
                     userID: parseInt(userSession.userID),
                     targetID: parseInt(planId),
                     targetType: 1,
-                    linkUrl: planId.toString(),
+                    linkUrl: linkUrl,
                     favoriteTime: new Date().toISOString().replace('T', ' ').substring(0, 19)
                 });
                 if (response && response.code === 200) {
@@ -325,6 +326,29 @@
                 auditBtn.style.display = 'inline-block';
             } else {
                 auditBtn.style.display = 'none';
+            }
+            
+            const userSession = getUserSession();
+            const planUserId = plan.userId || plan.userID || 0;
+            const currentUserId = parseInt(userSession.userID) || 0;
+            const isOwner = planUserId === currentUserId;
+            
+            const startBtn = document.querySelector('.start-btn');
+            const editBtn = document.querySelector('.edit-btn');
+            const deleteBtn = document.querySelector('.delete-btn');
+            
+            if (isOwner) {
+                editBtn.style.display = 'inline-block';
+                deleteBtn.style.display = 'inline-block';
+                if (executionDigit === 1) {
+                    startBtn.style.display = 'none';
+                } else {
+                    startBtn.style.display = 'inline-block';
+                }
+            } else {
+                startBtn.style.display = 'none';
+                editBtn.style.display = 'none';
+                deleteBtn.style.display = 'none';
             }
         }
 

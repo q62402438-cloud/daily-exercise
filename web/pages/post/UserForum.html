@@ -62,7 +62,7 @@
     <div class="header">
         <div class="logo-section">
             <img src="../user/images/logo.png" alt="系统Logo" class="logo">
-            <div class="site-title">跃动</div>
+            <div class="site-title">悦动</div>
         </div>
         <div class="user-info">
             <div class="user-name" id="userNameDisplay">用户</div>
@@ -176,15 +176,7 @@
             return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
         }
 
-        function getAvatarChar(authorID) {
-            const chars = ['张', '李', '王', '陈', '刘', '赵', '杨', '黄', '周', '吴'];
-            return chars[authorID % chars.length];
-        }
 
-        function getAuthorName(authorID) {
-            const names = ['健身达人', '运动爱好者', '跑者小王', '健康生活', '瑜伽教练', '力量训练', '有氧运动', '减脂专家'];
-            return names[authorID % names.length];
-        }
 
         async function loadUserInfo() {
             const userSession = getUserSession();

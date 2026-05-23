@@ -22,7 +22,9 @@ import com.example.myapplication.model.TrainingPlan;
 import com.example.myapplication.network.ApiService;
 import com.example.myapplication.network.RetrofitClient;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -416,6 +418,10 @@ public class PlanDetailActivity extends AppCompatActivity {
             request.setUserID(userId);
             request.setTargetID(planId);
             request.setTargetType(1);
+            String linkUrl = "pages/plan/PlanInfo.html?id=" + planId;
+            request.setLinkUrl(linkUrl);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            request.setFavoriteTime(sdf.format(new Date()));
             apiService.addFavorite(request).enqueue(new Callback<Result<String>>() {
                 @Override
                 public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {

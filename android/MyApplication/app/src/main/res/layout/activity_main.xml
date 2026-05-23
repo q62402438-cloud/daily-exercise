@@ -99,7 +99,7 @@
             android:id="@+id/tv_private_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="已读隐私说明"
+            android:text="@string/yonghuxieyi"
             android:fontFamily="@font/yuanshen"
             android:textColor="@color/black"
             android:textSize="14sp"/>
