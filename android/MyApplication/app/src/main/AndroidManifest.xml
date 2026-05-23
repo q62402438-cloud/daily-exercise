@@ -94,6 +94,36 @@
         <activity
             android:name=".AdminPostReviewDetailActivity"
             android:exported="false" />
+        <activity
+            android:name=".DateRecordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserConsoleActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserInfoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChangePasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CancelUserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditPostActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CommentDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MyPlansActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditPlanActivity"
+            android:exported="false" />
+        <activity
+            android:name=".StartPlanActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

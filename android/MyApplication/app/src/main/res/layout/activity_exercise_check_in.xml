@@ -7,7 +7,6 @@
     android:orientation="vertical"
     android:background="#FFFFFF">
 
-    <!-- 顶部标题栏 -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -16,7 +15,6 @@
         android:paddingEnd="16dp"
         android:layout_marginBottom="20dp">
 
-        <!-- 返回按钮 -->
         <ImageButton
             android:id="@+id/btn_back"
             android:layout_width="40dp"
@@ -27,7 +25,6 @@
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"/>
 
-        <!-- 页面标题 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,7 +36,6 @@
 
     </RelativeLayout>
 
-    <!-- 主要内容区域（可滚动） -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -49,13 +45,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <!-- 运动信息卡片 -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
                 app:cardBackgroundColor="#FFFBF0">
@@ -66,7 +62,33 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- 运动项目选择 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="运动日期"
+                        android:textColor="#333333"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="1dp"
+                        app:cardBackgroundColor="#FFFFFF">
+
+                        <TextView
+                            android:id="@+id/tv_date"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="点击选择日期"
+                            android:textColor="#333333"
+                            android:textSize="14sp"
+                            android:background="@null"
+                            android:padding="12dp"/>
+                    </androidx.cardview.widget.CardView>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -90,7 +112,34 @@
                             android:padding="12dp"/>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- 开始时间 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="用户体重（kg）"
+                        android:textColor="#333333"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="1dp"
+                        app:cardBackgroundColor="#FFFFFF">
+
+                        <EditText
+                            android:id="@+id/et_user_weight"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:hint="请输入您的体重"
+                            android:textColor="#333333"
+                            android:textSize="14sp"
+                            android:inputType="numberDecimal"
+                            android:background="@null"
+                            android:padding="12dp"/>
+                    </androidx.cardview.widget.CardView>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -107,18 +156,17 @@
                         app:cardElevation="1dp"
                         app:cardBackgroundColor="#FFFFFF">
 
-                        <EditText
-                            android:id="@+id/et_start_time"
+                        <TextView
+                            android:id="@+id/tv_start_time"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:hint="请输入开始时间"
+                            android:text="点击选择开始时间"
                             android:textColor="#333333"
                             android:textSize="14sp"
                             android:background="@null"
                             android:padding="12dp"/>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- 结束时间 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -135,18 +183,17 @@
                         app:cardElevation="1dp"
                         app:cardBackgroundColor="#FFFFFF">
 
-                        <EditText
-                            android:id="@+id/et_end_time"
+                        <TextView
+                            android:id="@+id/tv_end_time"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:hint="请输入结束时间"
+                            android:text="点击选择结束时间"
                             android:textColor="#333333"
                             android:textSize="14sp"
                             android:background="@null"
                             android:padding="12dp"/>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- 运动时长 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -161,25 +208,31 @@
                         android:layout_marginBottom="16dp"
                         app:cardCornerRadius="8dp"
                         app:cardElevation="1dp"
-                        app:cardBackgroundColor="#FFFFFF">
+                        app:cardBackgroundColor="#E8F5E9">
 
-                        <EditText
-                            android:id="@+id/et_duration"
+                        <TextView
+                            android:id="@+id/tv_duration"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:hint="请输入运动时长"
-                            android:textColor="#333333"
-                            android:textSize="14sp"
-                            android:inputType="number"
-                            android:background="@null"
+                            android:text="0 分钟"
+                            android:textColor="#2E7D32"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:gravity="center"
                             android:padding="12dp"/>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- 运动量 -->
+                    <LinearLayout
+                        android:id="@+id/layout_exercise_amount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="运动量（如：跑步距离/公里）"
+                        android:text="运动数量"
                         android:textColor="#333333"
                         android:textSize="12sp"
                         android:layout_marginBottom="8dp"/>
@@ -192,23 +245,39 @@
                         app:cardElevation="1dp"
                         app:cardBackgroundColor="#FFFFFF">
 
-                        <EditText
-                            android:id="@+id/et_exercise_amount"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:hint="请输入运动量"
-                            android:textColor="#333333"
-                            android:textSize="14sp"
-                            android:inputType="numberDecimal"
-                            android:background="@null"
-                            android:padding="12dp"/>
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <EditText
+                                android:id="@+id/et_exercise_amount"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:hint="请输入运动数量"
+                                android:textColor="#333333"
+                                android:textSize="14sp"
+                                android:inputType="numberDecimal"
+                                android:background="@null"
+                                android:padding="12dp"/>
+
+                            <TextView
+                                android:id="@+id/tv_amount_unit"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="个"
+                                android:textColor="#666666"
+                                android:textSize="14sp"
+                                android:paddingEnd="12dp"/>
+                        </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- 卡路里消耗 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="卡路里消耗（kcal）"
+                        android:text="消耗卡路里（kcal）"
                         android:textColor="#333333"
                         android:textSize="12sp"
                         android:layout_marginBottom="8dp"/>
@@ -218,25 +287,26 @@
                         android:layout_height="50dp"
                         app:cardCornerRadius="8dp"
                         app:cardElevation="1dp"
-                        app:cardBackgroundColor="#FFFFFF">
+                        app:cardBackgroundColor="#FFF3E0">
 
-                        <EditText
-                            android:id="@+id/et_calorie"
+                        <TextView
+                            android:id="@+id/tv_calorie"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:hint="请输入卡路里消耗"
-                            android:textColor="#333333"
-                            android:textSize="14sp"
-                            android:inputType="numberDecimal"
-                            android:background="@null"
+                            android:text="根据体重和时长自动计算"
+                            android:textColor="#FF9800"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:gravity="center"
                             android:padding="12dp"/>
                     </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
-            <!-- 提示信息 -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -251,7 +321,6 @@
 
     </ScrollView>
 
-    <!-- 底部开始按钮 -->
     <Button
         android:id="@+id/btn_finish"
         android:layout_width="match_parent"

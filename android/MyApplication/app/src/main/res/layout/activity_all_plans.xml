@@ -36,6 +36,41 @@
 
     </RelativeLayout>
 
+    <!-- 搜索框 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/et_search"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:hint="搜索训练计划..."
+            android:textColor="#333333"
+            android:textSize="14sp"
+            android:background="@drawable/edittext_bg"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:singleLine="true"
+            android:imeOptions="actionSearch"/>
+
+        <Button
+            android:id="@+id/btn_search"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:text="搜索"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:background="@drawable/btn_green_solid"
+            android:layout_marginStart="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
+    </LinearLayout>
+
     <!-- 计划列表 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_plans"

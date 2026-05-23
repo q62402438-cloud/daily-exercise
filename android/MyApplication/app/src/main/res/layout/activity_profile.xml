@@ -49,7 +49,7 @@
                             android:layout_centerHorizontal="true"/>
 
                         <TextView
-                            android:id="@+id/user_name"
+                            android:id="@+id/tv_user_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="张运动"
@@ -59,6 +59,17 @@
                             android:layout_below="@id/user_avatar"
                             android:layout_centerHorizontal="true"
                             android:layout_marginTop="8dp"/>
+
+                        <TextView
+                            android:id="@+id/tv_user_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textColor="#666666"
+                            android:textSize="14sp"
+                            android:layout_below="@id/tv_user_name"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginTop="4dp"/>
 
                     </RelativeLayout>
 
@@ -268,6 +279,48 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="收藏的训练计划"
+                            android:textColor="#333333"
+                            android:textSize="14sp"/>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_arrow_right"
+                            app:tint="#999999"/>
+                    </LinearLayout>
+
+                    <!-- 分割线 -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0"
+                        android:layout_marginStart="36dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <!-- 我的训练计划入口 -->
+                    <LinearLayout
+                        android:id="@+id/my_plans"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="12dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_my_plans"
+                            app:tint="#4CAF50"
+                            android:layout_marginEnd="12dp"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="我的训练计划"
                             android:textColor="#333333"
                             android:textSize="14sp"/>
 

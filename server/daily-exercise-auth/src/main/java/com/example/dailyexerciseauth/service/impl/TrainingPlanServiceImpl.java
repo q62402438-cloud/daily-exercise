@@ -93,7 +93,7 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
         if (plan == null) return false;
         Integer currentType = plan.getPlanType() != null ? plan.getPlanType() : 0;
         Integer tens = (currentType / 10) * 10;
-        Integer newType = tens + 3;
+        Integer newType = tens + 0;
         return trainingPlanMapper.updatePlanType(planID, newType) > 0;
     }
 

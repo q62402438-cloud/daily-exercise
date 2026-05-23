@@ -118,9 +118,10 @@
                         android:layout_centerInParent="true">
 
                         <TextView
+                            android:id="@+id/tv_post_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="30天跑步挑战：遇见更好的自己"
+                            android:text="优秀主题帖"
                             android:textColor="#FFFFFF"
                             android:textSize="18sp"
                             android:textStyle="bold"
@@ -130,9 +131,10 @@
                             android:shadowRadius="4"/>
 
                         <TextView
+                            android:id="@+id/tv_view_count"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="已有328人浏览"
+                            android:text="0人浏览"
                             android:textColor="#E0E0E0"
                             android:textSize="12sp"
                             android:layout_marginTop="5px"/>
@@ -169,128 +171,11 @@
             </LinearLayout>
 
             <!-- 推荐计划列表 -->
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_recommended_plans"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- 计划1 -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/running_plan_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="80dp"
-                    android:layout_marginBottom="10dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="#FFFBF0">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:padding="12dp"
-                        android:background="?attr/selectableItemBackground">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_marginStart="15dp"
-                            android:layout_centerVertical="true">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="初级跑步计划"
-                                android:textColor="#333333"
-                                android:textSize="14sp"
-                                android:textStyle="bold"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="21天课程"
-                                android:textColor="#666666"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2px"/>
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="开始"
-                            android:textColor="#4CAF50"
-                            android:textSize="12sp"
-                            android:paddingStart="15dp"
-                            android:paddingEnd="15dp"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
-                            android:background="@drawable/green_stroke_bg"
-                            android:layout_centerVertical="true"
-                            android:layout_alignParentEnd="true"/>
-
-                    </RelativeLayout>
-
-                </androidx.cardview.widget.CardView>
-
-                <!-- 计划2 -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/yoga_plan_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="80dp"
-                    android:layout_marginBottom="10dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="#FFFBF0">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:padding="12dp"
-                        android:background="?attr/selectableItemBackground">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_marginStart="15dp"
-                            android:layout_centerVertical="true">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="清晨瑜伽放松"
-                                android:textColor="#333333"
-                                android:textSize="14sp"
-                                android:textStyle="bold"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="每日15分钟"
-                                android:textColor="#666666"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2px"/>
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="开始"
-                            android:textColor="#4CAF50"
-                            android:textSize="12sp"
-                            android:paddingStart="15dp"
-                            android:paddingEnd="15dp"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
-                            android:background="@drawable/green_stroke_bg"
-                            android:layout_centerVertical="true"
-                            android:layout_alignParentEnd="true"/>
-
-                    </RelativeLayout>
-
-                </androidx.cardview.widget.CardView>
-
-            </LinearLayout>
+                android:orientation="vertical"/>
 
         </LinearLayout>
     </ScrollView>

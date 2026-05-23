@@ -20,9 +20,21 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myapplication.model.PostEntity;
+import com.example.myapplication.model.Result;
+import com.example.myapplication.network.ApiService;
+import com.example.myapplication.network.RetrofitClient;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class CreatePostActivity extends AppCompatActivity {
 
-    private ImageAdapter imageAdapter;
     private ActivityResultLauncher<String> requestPermissionLauncher;
     private ActivityResultLauncher<String> pickImageLauncher;
 
@@ -37,53 +49,9 @@ public class CreatePostActivity extends AppCompatActivity {
             return insets;
         });
 
-        setupRecyclerView();
-        setupImagePickers();
         setupClickListeners();
     }
 
-    private void setupRecyclerView() {
-        RecyclerView recyclerView = findViewById(R.id.rv_images);
-        if (recyclerView != null) {
-            recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
-            imageAdapter = new ImageAdapter();
-            recyclerView.setAdapter(imageAdapter);
-
-            imageAdapter.setOnImageClickListener(new ImageAdapter.OnImageClickListener() {
-                @Override
-                public void onAddImageClick() {
-                    checkPermissionAndPickImage();
-                }
-
-                @Override
-                public void onRemoveImageClick(int position) {
-                    imageAdapter.removeImage(position);
-                }
-            });
-        }
-    }
-
-    private void setupImagePickers() {
-        requestPermissionLauncher = registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                isGranted -> {
-                    if (isGranted) {
-                        openImagePicker();
-                    } else {
-                        Toast.makeText(this, "需要相册权限才能添加图片", Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
-
-        pickImageLauncher = registerForActivityResult(
-                new ActivityResultContracts.GetContent(),
-                uri -> {
-                    if (uri != null) {
-                        imageAdapter.addImage(uri);
-                    }
-                }
-        );
-    }
 
     private void checkPermissionAndPickImage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -130,14 +98,44 @@ public class CreatePostActivity extends AppCompatActivity {
                 } else if (content.isEmpty()) {
                     Toast.makeText(CreatePostActivity.this, "请输入帖子内容", Toast.LENGTH_SHORT).show();
                 } else {
-                    int imageCount = imageAdapter.getImageList().size();
-                    String message = imageCount > 0 ? "发布成功！（包含" + imageCount + "张图片）" : "发布成功！";
-                    Toast.makeText(CreatePostActivity.this, message, Toast.LENGTH_SHORT).show();
-                    finish();
-                    overridePendingTransition(0, 0);
+                    publishPost(title, content);
                 }
             });
         }
+    }
+
+    private void publishPost(String title, String content) {
+        Integer userId = new SessionManager(this).getUserId();
+        if (userId == null) {
+            Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        PostEntity request = new PostEntity();
+        request.setAuthorID(userId);
+        request.setTitle(title);
+        request.setContent(content);
+        request.setPublishTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+
+        ApiService apiService = RetrofitClient.getInstance().create(ApiService.class);
+        apiService.createPost(request).enqueue(new Callback<Result<String>>() {
+            @Override
+            public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200) {
+                    Toast.makeText(CreatePostActivity.this, "发布成功，等待管理员审核", Toast.LENGTH_SHORT).show();
+                    finish();
+                    overridePendingTransition(0, 0);
+                } else {
+                    String msg = response.body() == null ? "发布失败" : response.body().getMessage();
+                    Toast.makeText(CreatePostActivity.this, msg == null ? "发布失败" : msg, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<String>> call, Throwable t) {
+                Toast.makeText(CreatePostActivity.this, "发布失败：" + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

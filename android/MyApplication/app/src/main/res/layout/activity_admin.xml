@@ -101,9 +101,10 @@
                 android:textStyle="bold"/>
 
             <TextView
+                android:id="@+id/tv_plan_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="待审核: 12条"
+                android:text="待审核: 0条"
                 android:textSize="12sp"
                 android:textColor="#999999"
                 android:layout_marginTop="8dp"/>
@@ -130,9 +131,10 @@
                 android:textStyle="bold"/>
 
             <TextView
+                android:id="@+id/tv_post_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="待审核: 8条"
+                android:text="待审核: 0条"
                 android:textSize="12sp"
                 android:textColor="#999999"
                 android:layout_marginTop="8dp"/>

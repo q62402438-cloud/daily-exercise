@@ -2,7 +2,9 @@ package com.example.myapplication;
 
 import android.os.Bundle;
 import android.content.Intent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -11,8 +13,36 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.myapplication.model.ExerciseRecord;
+import com.example.myapplication.model.OrdinaryUser;
+import com.example.myapplication.model.PostEntity;
+import com.example.myapplication.model.Result;
+import com.example.myapplication.model.TrainingPlan;
+import com.example.myapplication.model.User;
+import com.example.myapplication.network.ApiService;
+import com.example.myapplication.network.RetrofitClient;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomePage extends AppCompatActivity {
+
+    private ApiService apiService;
+    private SessionManager sessionManager;
+    private RecyclerView recyclerRecommendedPlans;
+    private RecommendedPlanAdapter recommendedPlanAdapter;
+    private List<TrainingPlan> recommendedPlanList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,8 +55,14 @@ public class HomePage extends AppCompatActivity {
             return insets;
         });
 
+        apiService = RetrofitClient.getInstance().create(ApiService.class);
+        sessionManager = new SessionManager(this);
+        initRecyclerView();
         highlightCurrentTab("home");
         initClickListeners();
+        loadUserData();
+        loadFeaturedPost();
+        loadRecommendedPlans();
     }
 
     private void highlightCurrentTab(String currentTab) {
@@ -70,47 +106,10 @@ public class HomePage extends AppCompatActivity {
             });
         }
 
-        View featuredPostCard = findViewById(R.id.featured_post_card);
-        if (featuredPostCard != null) {
-            featuredPostCard.setOnClickListener(v -> {
-                Intent intent = new Intent(HomePage.this, PostDetailActivity.class);
-                intent.putExtra("post_id", "featured_post");
-                intent.putExtra("author_name", "运动达人小明");
-                intent.putExtra("post_time", "3小时前");
-                intent.putExtra("post_title", "30天跑步挑战：遇见更好的自己");
-                intent.putExtra("post_content", "大家好！我是一个跑步爱好者，从去年开始坚持跑步，收获了健康和快乐。现在想发起一个30天跑步挑战，邀请大家一起参与！\n\n【挑战内容】\n每天至少跑步3公里，坚持30天\n\n【参与方式】\n1. 每天打卡记录跑步情况\n2. 可以分享跑步心得和感受\n3. 相互鼓励，共同进步\n\n【活动奖励】\n完成挑战的伙伴们可以获得特别勋章！\n\n有兴趣的朋友可以在评论区留言，我们一起加油！🏃‍♂️");
-                intent.putExtra("view_count", "328");
-                intent.putExtra("like_count", "56");
-                intent.putExtra("comment_count", "23");
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-            });
-        }
-
         TextView viewAllPlans = findViewById(R.id.view_all_plans);
         if (viewAllPlans != null) {
             viewAllPlans.setOnClickListener(v -> {
                 Intent intent = new Intent(HomePage.this, AllPlansActivity.class);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-            });
-        }
-
-        View runningPlanCard = findViewById(R.id.running_plan_card);
-        if (runningPlanCard != null) {
-            runningPlanCard.setOnClickListener(v -> {
-                Intent intent = new Intent(HomePage.this, PlanDetailActivity.class);
-                intent.putExtra("plan_id", "running_plan");
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-            });
-        }
-
-        View yogaPlanCard = findViewById(R.id.yoga_plan_card);
-        if (yogaPlanCard != null) {
-            yogaPlanCard.setOnClickListener(v -> {
-                Intent intent = new Intent(HomePage.this, PlanDetailActivity.class);
-                intent.putExtra("plan_id", "yoga_plan");
                 startActivity(intent);
                 overridePendingTransition(0, 0);
             });
@@ -157,6 +156,186 @@ public class HomePage extends AppCompatActivity {
                 finish();
                 overridePendingTransition(0, 0);
             });
+        }
+    }
+
+    private void initRecyclerView() {
+        recyclerRecommendedPlans = findViewById(R.id.recycler_recommended_plans);
+        if (recyclerRecommendedPlans != null) {
+            recyclerRecommendedPlans.setLayoutManager(new LinearLayoutManager(this));
+            recommendedPlanAdapter = new RecommendedPlanAdapter(recommendedPlanList, this::onPlanClick);
+            recyclerRecommendedPlans.setAdapter(recommendedPlanAdapter);
+        }
+    }
+
+    private void loadUserData() {
+        Integer userId = sessionManager.getUserId();
+        if (userId != null) {
+            loadCheckInDays(userId);
+        }
+    }
+
+    private void loadCheckInDays(Integer userId) {
+        User user = new User();
+        user.setUserID(userId);
+        apiService.getExerciseRecordsByUser(user).enqueue(new Callback<Result<List<ExerciseRecord>>>() {
+            @Override
+            public void onResponse(Call<Result<List<ExerciseRecord>>> call, Response<Result<List<ExerciseRecord>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200 && response.body().getData() != null) {
+                    List<ExerciseRecord> records = response.body().getData();
+                    Set<String> checkInDays = new HashSet<>();
+                    for (ExerciseRecord record : records) {
+                        String sportsDate = record.getSportsDate();
+                        if (sportsDate != null && !sportsDate.isEmpty()) {
+                            checkInDays.add(sportsDate);
+                        }
+                    }
+                    TextView stickDays = findViewById(R.id.stick_days);
+                    if (stickDays != null) {
+                        stickDays.setText(checkInDays.size() + "天");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<List<ExerciseRecord>>> call, Throwable t) {
+                // 加载失败时不做特殊处理
+            }
+        });
+    }
+
+    private void loadFeaturedPost() {
+        Map<String, Integer> body = new HashMap<>();
+        body.put("status", 1); // 已审核通过的帖子
+        body.put("page", 0);
+        body.put("size", 1);
+
+        apiService.getPosts(body).enqueue(new Callback<Result<List<PostEntity>>>() {
+            @Override
+            public void onResponse(Call<Result<List<PostEntity>>> call, Response<Result<List<PostEntity>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200 && response.body().getData() != null && !response.body().getData().isEmpty()) {
+                    PostEntity featuredPost = response.body().getData().get(0);
+                    updateFeaturedPostCard(featuredPost);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<List<PostEntity>>> call, Throwable t) {
+                // 加载失败时不做特殊处理
+            }
+        });
+    }
+
+    private void updateFeaturedPostCard(PostEntity post) {
+        View featuredPostCard = findViewById(R.id.featured_post_card);
+        if (featuredPostCard != null) {
+            ((TextView) featuredPostCard.findViewById(R.id.tv_post_title)).setText(post.getTitle() != null ? post.getTitle() : "优秀主题帖");
+            ((TextView) featuredPostCard.findViewById(R.id.tv_view_count)).setText((post.getViewCount() != null ? post.getViewCount() : 0) + "人浏览");
+
+            featuredPostCard.setOnClickListener(v -> {
+                Intent intent = new Intent(HomePage.this, PostDetailActivity.class);
+                intent.putExtra("post_id", post.getPostID() != null ? String.valueOf(post.getPostID()) : "featured_post");
+                intent.putExtra("author_name", post.getAuthorName() != null ? post.getAuthorName() : "用户");
+                intent.putExtra("post_time", post.getPublishTime() != null ? post.getPublishTime() : "");
+                intent.putExtra("post_title", post.getTitle() != null ? post.getTitle() : "");
+                intent.putExtra("post_content", post.getContent() != null ? post.getContent() : "");
+                intent.putExtra("view_count", post.getViewCount() != null ? String.valueOf(post.getViewCount()) : "0");
+                intent.putExtra("like_count", post.getLikeCount() != null ? String.valueOf(post.getLikeCount()) : "0");
+                intent.putExtra("comment_count", post.getCommentCount() != null ? String.valueOf(post.getCommentCount()) : "0");
+                startActivity(intent);
+                overridePendingTransition(0, 0);
+            });
+        }
+    }
+
+    private void loadRecommendedPlans() {
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", 2); // 审核通过的计划
+        body.put("page", 0);
+        body.put("size", 5);
+
+        apiService.getPublishedTrainingPlans(body).enqueue(new Callback<Result<List<TrainingPlan>>>() {
+            @Override
+            public void onResponse(Call<Result<List<TrainingPlan>>> call, Response<Result<List<TrainingPlan>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200 && response.body().getData() != null) {
+                    recommendedPlanList.clear();
+                    recommendedPlanList.addAll(response.body().getData());
+                    recommendedPlanAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<List<TrainingPlan>>> call, Throwable t) {
+                // 加载失败时不做特殊处理
+            }
+        });
+    }
+
+    private void onPlanClick(TrainingPlan plan) {
+        Intent intent = new Intent(HomePage.this, PlanDetailActivity.class);
+        intent.putExtra("plan_id", String.valueOf(plan.getPlanID()));
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+    }
+
+    public static class RecommendedPlanAdapter extends RecyclerView.Adapter<RecommendedPlanAdapter.PlanViewHolder> {
+        private List<TrainingPlan> planList;
+        private OnPlanClickListener listener;
+
+        public interface OnPlanClickListener {
+            void onPlanClick(TrainingPlan plan);
+        }
+
+        public RecommendedPlanAdapter(List<TrainingPlan> planList, OnPlanClickListener listener) {
+            this.planList = planList;
+            this.listener = listener;
+        }
+
+        @androidx.annotation.NonNull
+        @Override
+        public PlanViewHolder onCreateViewHolder(@androidx.annotation.NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_home_plan, parent, false);
+            return new PlanViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@androidx.annotation.NonNull PlanViewHolder holder, int position) {
+            TrainingPlan plan = planList.get(position);
+            holder.bind(plan);
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onPlanClick(plan);
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return planList.size();
+        }
+
+        static class PlanViewHolder extends RecyclerView.ViewHolder {
+            TextView tvPlanName;
+            TextView tvPlanInfo;
+            TextView tvStartButton;
+
+            public PlanViewHolder(@androidx.annotation.NonNull View itemView) {
+                super(itemView);
+                tvPlanName = itemView.findViewById(R.id.tv_plan_name);
+                tvPlanInfo = itemView.findViewById(R.id.tv_plan_info);
+                tvStartButton = itemView.findViewById(R.id.tv_start_button);
+            }
+
+            public void bind(TrainingPlan plan) {
+                if (tvPlanName != null) {
+                    tvPlanName.setText(plan.getPlanName() != null ? plan.getPlanName() : "未命名计划");
+                }
+                if (tvPlanInfo != null) {
+                    String sportType = plan.getSportName() != null ? plan.getSportName() : "";
+                    String exerciseAmount = plan.getExerciseAmount() != null ? plan.getExerciseAmount() : "";
+                    tvPlanInfo.setText(!sportType.isEmpty() && !exerciseAmount.isEmpty() ? sportType + " · " + exerciseAmount + "分钟" : !sportType.isEmpty() ? sportType : !exerciseAmount.isEmpty() ? exerciseAmount + "分钟" : "推荐计划");
+                }
+            }
         }
     }
 }

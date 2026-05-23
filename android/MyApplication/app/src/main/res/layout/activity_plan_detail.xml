@@ -15,7 +15,6 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
-        <!-- 返回按钮 -->
         <ImageButton
             android:id="@+id/btn_back"
             android:layout_width="40dp"
@@ -26,7 +25,6 @@
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"/>
 
-        <!-- 页面标题 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -105,7 +103,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="12dp">
 
                         <TextView
                             android:layout_width="0dp"
@@ -124,12 +122,84 @@
                             android:textSize="14sp"/>
                     </LinearLayout>
 
+                    <!-- 每日训练时长 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="每日训练时长"
+                            android:textColor="#666666"
+                            android:textSize="12sp"/>
+
+                        <TextView
+                            android:id="@+id/tv_daily_exercise"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="30 分钟"
+                            android:textColor="#333333"
+                            android:textSize="14sp"/>
+                    </LinearLayout>
+
+                    <!-- 执行状态 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="执行状态"
+                            android:textColor="#666666"
+                            android:textSize="12sp"/>
+
+                        <TextView
+                            android:id="@+id/tv_execution_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="未开始"
+                            android:textColor="#333333"
+                            android:textSize="14sp"/>
+                    </LinearLayout>
+
+                    <!-- 上架状态 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="上架状态"
+                            android:textColor="#666666"
+                            android:textSize="12sp"/>
+
+                        <TextView
+                            android:id="@+id/tv_shelf_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="未提交审核"
+                            android:textColor="#333333"
+                            android:textSize="14sp"/>
+                    </LinearLayout>
+
                     <!-- 开始日期 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="12dp">
 
                         <TextView
                             android:layout_width="0dp"
@@ -153,7 +223,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="12dp">
 
                         <TextView
                             android:layout_width="0dp"
@@ -172,55 +242,7 @@
                             android:textSize="14sp"/>
                     </LinearLayout>
 
-                    <!-- 每日运动量 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="每日运动量"
-                            android:textColor="#666666"
-                            android:textSize="12sp"/>
-
-                        <TextView
-                            android:id="@+id/tv_daily_exercise"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="5 公里"
-                            android:textColor="#333333"
-                            android:textSize="14sp"/>
-                    </LinearLayout>
-
-                    <!-- 每日卡路里 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="每日卡路里目标"
-                            android:textColor="#666666"
-                            android:textSize="12sp"/>
-
-                        <TextView
-                            android:id="@+id/tv_daily_calorie"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="300 kcal"
-                            android:textColor="#333333"
-                            android:textSize="14sp"/>
-                    </LinearLayout>
-
-                    <!-- 是否公开 -->
+                    <!-- 进度 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -230,46 +252,138 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="是否公开"
+                            android:text="完成进度"
                             android:textColor="#666666"
                             android:textSize="12sp"/>
 
                         <TextView
-                            android:id="@+id/tv_visibility"
+                            android:id="@+id/tv_percentage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="公开"
-                            android:textColor="#4CAF50"
+                            android:text="0%"
+                            android:textColor="#333333"
                             android:textSize="14sp"/>
                     </LinearLayout>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- 提示信息 -->
-            <TextView
+            <!-- 计划详情卡片 -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="点击下方按钮开始执行此计划，坚持锻炼，遇见更好的自己！"
-                android:textColor="#666666"
-                android:textSize="12sp"
-                android:gravity="center"
-                android:padding="8dp"
-                android:layout_marginBottom="20dp"/>
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#FFFBF0">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="计划详情"
+                        android:textColor="#666666"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:id="@+id/tv_detail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="暂无详情"
+                        android:textColor="#333333"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- 底部开始执行按钮 -->
-    <Button
-        android:id="@+id/btn_start_plan"
+    <!-- 底部操作按钮区域 -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="开始执行计划"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:background="@drawable/green_gradient_bg"
-        android:layout_margin="16dp"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="8dp">
+
+        <!-- 操作按钮第一行 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/btn_collect_plan"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="收藏计划"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:background="@drawable/btn_search_bg"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btn_start_plan"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="开始训练"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:background="@drawable/btn_green_solid"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+        <!-- 操作按钮第二行 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_edit_plan"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="编辑"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:background="@drawable/btn_search_bg"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btn_submit_audit"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="提交审核"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:background="#9B59B6"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btn_delete_plan"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="删除"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:background="@drawable/btn_red_solid"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

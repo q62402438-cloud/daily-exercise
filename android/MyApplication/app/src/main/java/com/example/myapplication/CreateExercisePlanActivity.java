@@ -2,10 +2,12 @@ package com.example.myapplication;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,13 +18,21 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.myapplication.model.Result;
+import com.example.myapplication.model.TrainingPlan;
+import com.example.myapplication.network.ApiService;
+import com.example.myapplication.network.RetrofitClient;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import java.util.Calendar;
 
 public class CreateExercisePlanActivity extends AppCompatActivity {
 
     private TextView tvStartDate;
     private TextView tvEndDate;
-    private SwitchMaterial switchPublic;
     private String startDateStr = "";
     private String endDateStr = "";
 
@@ -39,7 +49,8 @@ public class CreateExercisePlanActivity extends AppCompatActivity {
 
         tvStartDate = findViewById(R.id.tv_start_date);
         tvEndDate = findViewById(R.id.tv_end_date);
-        switchPublic = findViewById(R.id.switch_public);
+
+        setupSpinner();
 
         ImageButton backBtn = findViewById(R.id.btn_back);
         if (backBtn != null) {
@@ -63,13 +74,12 @@ public class CreateExercisePlanActivity extends AppCompatActivity {
         if (saveBtn != null) {
             saveBtn.setOnClickListener(v -> {
                 EditText planName = findViewById(R.id.et_plan_name);
-                EditText dailyExercise = findViewById(R.id.et_daily_exercise);
-                EditText dailyCalorie = findViewById(R.id.et_daily_calorie);
-                Spinner sportType = findViewById(R.id.sp_sport_type);
+                RadioGroup rgExerciseType = findViewById(R.id.rg_exercise_type);
+                Spinner spExerciseAmount = findViewById(R.id.sp_exercise_amount);
+                EditText etDetail = findViewById(R.id.et_detail);
 
                 String name = planName != null ? planName.getText().toString() : "";
-                String dailyEx = dailyExercise != null ? dailyExercise.getText().toString() : "";
-                String dailyCal = dailyCalorie != null ? dailyCalorie.getText().toString() : "";
+                String detail = etDetail != null ? etDetail.getText().toString() : "";
 
                 if (name.isEmpty()) {
                     Toast.makeText(CreateExercisePlanActivity.this, "请填写计划名称", Toast.LENGTH_SHORT).show();
@@ -78,16 +88,82 @@ public class CreateExercisePlanActivity extends AppCompatActivity {
                 } else if (endDateStr.isEmpty()) {
                     Toast.makeText(CreateExercisePlanActivity.this, "请选择结束日期", Toast.LENGTH_SHORT).show();
                 } else {
-                    boolean isPublic = switchPublic != null && switchPublic.isChecked();
-                    String visibilityText = isPublic ? "公开" : "私密";
-                    Toast.makeText(CreateExercisePlanActivity.this,
-                            "计划创建成功！（" + visibilityText + "）",
-                            Toast.LENGTH_SHORT).show();
-                    finish();
-                    overridePendingTransition(0, 0);
+                    String sportName = getSelectedSportType();
+                    String exerciseAmount = getSelectedExerciseAmount(spExerciseAmount);
+                    createPlan(name, sportName, detail, exerciseAmount);
                 }
             });
         }
+    }
+
+    private void setupSpinner() {
+        Spinner spinner = findViewById(R.id.sp_exercise_amount);
+        if (spinner != null) {
+            String[] amounts = {"15分钟", "30分钟", "45分钟", "60分钟", "90分钟", "120分钟"};
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                    android.R.layout.simple_spinner_item, amounts);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(adapter);
+        }
+    }
+
+    private String getSelectedSportType() {
+        RadioGroup rgExerciseType = findViewById(R.id.rg_exercise_type);
+        if (rgExerciseType == null) return "其他运动";
+
+        int checkedId = rgExerciseType.getCheckedRadioButtonId();
+        if (checkedId == R.id.rb_fat_loss) {
+            return "减脂运动";
+        } else if (checkedId == R.id.rb_muscle_gain) {
+            return "增肌运动";
+        } else if (checkedId == R.id.rb_rehabilitation) {
+            return "康复运动";
+        }
+        return "其他运动";
+    }
+
+    private String getSelectedExerciseAmount(Spinner spinner) {
+        if (spinner == null) return "30";
+        String selected = spinner.getSelectedItem().toString();
+        return selected.replace("分钟", "");
+    }
+
+    private void createPlan(String name, String sportName, String detail, String exerciseAmount) {
+        Integer userId = new SessionManager(this).getUserId();
+        if (userId == null) {
+            Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        TrainingPlan request = new TrainingPlan();
+        request.setPlanName(name);
+        request.setUserID(userId);
+        request.setPlanType(0);
+        request.setStartTime(startDateStr);
+        request.setEndTime(endDateStr);
+        request.setSportName(sportName);
+        request.setExerciseAmount(exerciseAmount);
+        request.setDetail(detail);
+
+        ApiService apiService = RetrofitClient.getInstance().create(ApiService.class);
+        apiService.createTrainingPlan(request).enqueue(new Callback<Result<String>>() {
+            @Override
+            public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200) {
+                    Toast.makeText(CreateExercisePlanActivity.this, "计划创建成功", Toast.LENGTH_SHORT).show();
+                    finish();
+                    overridePendingTransition(0, 0);
+                } else {
+                    String msg = response.body() == null ? "计划创建失败" : response.body().getMessage();
+                    Toast.makeText(CreateExercisePlanActivity.this, msg == null ? "计划创建失败" : msg, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<String>> call, Throwable t) {
+                Toast.makeText(CreateExercisePlanActivity.this, "计划创建失败：" + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showDatePicker(boolean isStartDate) {

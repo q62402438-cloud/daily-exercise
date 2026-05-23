@@ -10,6 +10,7 @@ public class Post {
     private String likeCount;
     private String commentCount;
     private int imageResId;
+    private int auditState;
 
     public Post(String postId, String authorName, String title, String content,
                 String postTime, String viewCount, String likeCount, String commentCount) {
@@ -22,6 +23,7 @@ public class Post {
         this.likeCount = likeCount;
         this.commentCount = commentCount;
         this.imageResId = 0;
+        this.auditState = 1;
     }
 
     public Post(String postId, String authorName, String title, String content,
@@ -35,6 +37,21 @@ public class Post {
         this.likeCount = likeCount;
         this.commentCount = commentCount;
         this.imageResId = imageResId;
+        this.auditState = 1;
+    }
+
+    public Post(String postId, String authorName, String title, String content,
+                String postTime, String viewCount, String likeCount, String commentCount, int imageResId, int auditState) {
+        this.postId = postId;
+        this.authorName = authorName;
+        this.title = title;
+        this.content = content;
+        this.postTime = postTime;
+        this.viewCount = viewCount;
+        this.likeCount = likeCount;
+        this.commentCount = commentCount;
+        this.imageResId = imageResId;
+        this.auditState = auditState;
     }
 
     public String getPostId() {
@@ -107,5 +124,13 @@ public class Post {
 
     public void setImageResId(int imageResId) {
         this.imageResId = imageResId;
+    }
+
+    public int getAuditState() {
+        return auditState;
+    }
+
+    public void setAuditState(int auditState) {
+        this.auditState = auditState;
     }
 }

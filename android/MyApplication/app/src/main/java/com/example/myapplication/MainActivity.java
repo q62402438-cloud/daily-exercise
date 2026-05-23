@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvRegister, tvForgetPassword;
     private CheckBox cbAdminLogin, cbAgreePrivacy;
     private ApiService apiService;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         initView();
         initListener();
         apiService = RetrofitClient.getInstance().create(ApiService.class);
+        sessionManager = new SessionManager(this);
     }
 
     private void initView() {
@@ -111,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(MainActivity.this, HomePage.class);
                         if (result.getData() != null) {
                             User user = result.getData();
+                            sessionManager.saveUser(user.getUserID(), user.getUserName(), user.getUserType());
                             OrdinaryUser ordinaryUser = new OrdinaryUser();
                             ordinaryUser.setUserID(user.getUserID());
                             ordinaryUser.setUserName(user.getUserName());
@@ -177,12 +180,14 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(MainActivity.this, AdminPage.class);
                         if (result.getData() != null) {
                             User admin = result.getData();
+                            sessionManager.saveUser(admin.getUserID(), admin.getUserName(), 0);
                             AdminUser adminUser = new AdminUser();
                             adminUser.setAdminId(admin.getPhoneNumber());
                             adminUser.setAdminName(admin.getUserName());
                             adminUser.setRole("系统管理员");
                             intent.putExtra("admin_data", adminUser);
                         } else {
+                            sessionManager.saveUser(null, username, 0);
                             AdminUser defaultAdmin = new AdminUser();
                             defaultAdmin.setAdminId(username);
                             defaultAdmin.setAdminName("系统管理员");

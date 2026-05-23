@@ -4,24 +4,40 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myapplication.model.OrdinaryUser;
+import com.example.myapplication.model.PostEntity;
+import com.example.myapplication.model.Result;
+import com.example.myapplication.model.User;
+import com.example.myapplication.network.ApiService;
+import com.example.myapplication.network.RetrofitClient;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AdminPostReviewActivity extends AppCompatActivity {
 
     private RecyclerView rvPosts;
-    private PostReviewAdapter postReviewAdapter;
+    private PostEntityAdapter postReviewAdapter;
+    private ApiService apiService;
+    private List<PostEntity> postList = new ArrayList<>();
+    private java.util.Map<Integer, String> authorNameMap = new java.util.HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_post_review);
 
+        apiService = RetrofitClient.getInstance().create(ApiService.class);
         initViews();
         loadPostList();
         setupClickListeners();
@@ -31,14 +47,19 @@ public class AdminPostReviewActivity extends AppCompatActivity {
         rvPosts = findViewById(R.id.rv_post_list);
         if (rvPosts != null) {
             rvPosts.setLayoutManager(new LinearLayoutManager(this));
-            postReviewAdapter = new PostReviewAdapter();
+            postReviewAdapter = new PostEntityAdapter();
             rvPosts.setAdapter(postReviewAdapter);
 
             postReviewAdapter.setOnPostClickListener(post -> {
                 Intent intent = new Intent(AdminPostReviewActivity.this, AdminPostReviewDetailActivity.class);
-                intent.putExtra("post_id", post.getPostId());
+                Integer postId = post.getPostID();
+                if (postId != null) {
+                    intent.putExtra("post_id", postId);
+                } else {
+                    intent.putExtra("post_id", -1);
+                }
                 intent.putExtra("author_name", post.getAuthorName());
-                intent.putExtra("post_time", post.getPostTime());
+                intent.putExtra("post_time", post.getPublishTime());
                 intent.putExtra("post_title", post.getTitle());
                 intent.putExtra("post_content", post.getContent());
                 startActivity(intent);
@@ -47,36 +68,107 @@ public class AdminPostReviewActivity extends AppCompatActivity {
     }
 
     private void loadPostList() {
-        List<Post> posts = new ArrayList<>();
+        Call<Result<List<PostEntity>>> call = apiService.getPendingPosts();
+        call.enqueue(new Callback<Result<List<PostEntity>>>() {
+            @Override
+            public void onResponse(Call<Result<List<PostEntity>>> call, Response<Result<List<PostEntity>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Result<List<PostEntity>> result = response.body();
+                    if (result.getCode() == 200 && result.getData() != null) {
+                        postList = result.getData();
+                        loadAuthorNames(postList);
+                    } else {
+                        String message = result.getMessage() != null ? result.getMessage() : "未知错误";
+                        Toast.makeText(AdminPostReviewActivity.this, "加载失败: " + message, Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(AdminPostReviewActivity.this, "网络请求失败", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-        posts.add(new Post("post_1", "健康生活家",
-                "健康饮食搭配建议",
-                "运动配合健康饮食效果更好！给大家分享一些简单的健康食谱...",
-                "3天前", "189", "45", "23"));
+            @Override
+            public void onFailure(Call<Result<List<PostEntity>>> call, Throwable t) {
+                Toast.makeText(AdminPostReviewActivity.this, "加载失败: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
-        posts.add(new Post("post_2", "晨跑爱好者",
-                "早起晨跑的心得体会",
-                "坚持晨跑三个月了，分享一些心得和遇到的问题解决方案...",
-                "1周前", "423", "78", "34"));
+    private void loadAuthorNames(List<PostEntity> posts) {
+        authorNameMap.clear();
+        int pendingCount = 0;
 
-        posts.add(new Post("post_3", "力量训练达人",
-                "无器械健身动作分享",
-                "不需要去健身房，也能练出好身材！分享几个在家就能做的力量训练动作...",
-                "1周前", "567", "156", "89"));
+        for (PostEntity post : posts) {
+            Integer authorID = post.getAuthorID();
+            String authorName = post.getAuthorName();
 
-        posts.add(new Post("post_4", "跑步新手",
-                "我的第一个半马训练记录",
-                "从零开始到完成半马，分享我的训练计划和心得...",
-                "2周前", "734", "234", "123"));
-
-        posts.add(new Post("post_5", "营养师小美",
-                "运动后的营养补充",
-                "运动后吃什么？给大家分享一些科学的营养补充建议...",
-                "2周前", "298", "67", "45"));
-
-        if (postReviewAdapter != null) {
-            postReviewAdapter.setPostList(posts);
+            if (authorID != null && (authorName == null || authorName.isEmpty() || "匿名用户".equals(authorName))) {
+                if (!authorNameMap.containsKey(authorID)) {
+                    pendingCount++;
+                    fetchUserName(authorID);
+                }
+            } else if (authorName != null && !authorName.isEmpty()) {
+                authorNameMap.put(authorID, authorName);
+            }
         }
+
+        if (pendingCount == 0) {
+            updatePostAuthorNames();
+        }
+    }
+
+    private void fetchUserName(Integer userId) {
+        User user = new User();
+        user.setUserID(userId);
+
+        apiService.getUserInfo(user).enqueue(new Callback<Result<OrdinaryUser>>() {
+            @Override
+            public void onResponse(Call<Result<OrdinaryUser>> call, Response<Result<OrdinaryUser>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200 && response.body().getData() != null) {
+                    String userName = response.body().getData().getUserName();
+                    if (userName != null && !userName.isEmpty()) {
+                        authorNameMap.put(userId, userName);
+                    }
+                }
+                checkAllFetched();
+            }
+
+            @Override
+            public void onFailure(Call<Result<OrdinaryUser>> call, Throwable t) {
+                checkAllFetched();
+            }
+        });
+    }
+
+    private void checkAllFetched() {
+        boolean allFetched = true;
+        for (PostEntity post : postList) {
+            Integer authorID = post.getAuthorID();
+            String authorName = post.getAuthorName();
+            if (authorID != null && (authorName == null || authorName.isEmpty() || "匿名用户".equals(authorName))) {
+                if (!authorNameMap.containsKey(authorID)) {
+                    allFetched = false;
+                    break;
+                }
+            }
+        }
+
+        if (allFetched) {
+            updatePostAuthorNames();
+        }
+    }
+
+    private void updatePostAuthorNames() {
+        for (PostEntity post : postList) {
+            Integer authorID = post.getAuthorID();
+            String authorName = post.getAuthorName();
+            if (authorID != null && (authorName == null || authorName.isEmpty() || "匿名用户".equals(authorName))) {
+                String realName = authorNameMap.get(authorID);
+                if (realName != null && !realName.isEmpty()) {
+                    post.setAuthorName(realName);
+                }
+            }
+        }
+        postReviewAdapter.setPostList(postList);
     }
 
     private void setupClickListeners() {
@@ -87,6 +179,12 @@ public class AdminPostReviewActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
             });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadPostList(); // 刷新数据
     }
 
     @Override

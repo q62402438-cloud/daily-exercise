@@ -127,59 +127,8 @@
                 android:layout_marginBottom="16dp"/>
 
             <!-- 帖子图片 -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_post_images"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:layout_marginBottom="16dp"/>
 
             <!-- 浏览量和点赞信息 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="20dp">
-
-                <TextView
-                    android:id="@+id/tv_view_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="328 人浏览"
-                    android:textColor="#999999"
-                    android:textSize="12sp"/>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="12dp"
-                    android:background="#E0E0E0"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"/>
-
-                <TextView
-                    android:id="@+id/tv_like_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="56 点赞"
-                    android:textColor="#999999"
-                    android:textSize="12sp"/>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="12dp"
-                    android:background="#E0E0E0"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"/>
-
-                <TextView
-                    android:id="@+id/tv_comment_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="23 评论"
-                    android:textColor="#999999"
-                    android:textSize="12sp"/>
-            </LinearLayout>
 
             <!-- 分隔线 -->
             <View
@@ -189,87 +138,35 @@
                 android:layout_marginBottom="16dp"/>
 
             <!-- 评论区域标题 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="评论"
-                android:textColor="#333333"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp"/>
-
-            <!-- 评论区（样例） -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:layout_marginBottom="12dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="运动小白："
-                        android:textColor="#2E7D32"
-                        android:textSize="14sp"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="太棒了！我要参加！"
-                        android:textColor="#333333"
-                        android:textSize="14sp"/>
-                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2小时前"
-                    android:textColor="#999999"
-                    android:textSize="11sp"
-                    android:layout_marginTop="4dp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="12dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="跑步爱好者："
-                        android:textColor="#2E7D32"
-                        android:textSize="14sp"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="已经坚持了15天，感觉状态很好！"
-                        android:textColor="#333333"
-                        android:textSize="14sp"/>
-                </LinearLayout>
+                    android:text="评论"
+                    android:textColor="#333333"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
                 <TextView
+                    android:id="@+id/tv_comment_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1小时前"
+                    android:text="0"
                     android:textColor="#999999"
-                    android:textSize="11sp"
-                    android:layout_marginTop="4dp"/>
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"/>
             </LinearLayout>
+
+            <!-- 评论列表 -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_comments"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"/>
 
         </LinearLayout>
     </ScrollView>
@@ -286,31 +183,6 @@
         android:elevation="4dp">
 
         <!-- 点赞按钮 -->
-        <LinearLayout
-            android:id="@+id/layout_like"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:padding="8dp"
-            android:background="?attr/selectableItemBackground">
-
-            <ImageView
-                android:id="@+id/iv_like"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_like"/>
-
-            <TextView
-                android:id="@+id/tv_like_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="点赞"
-                android:textColor="#666666"
-                android:textSize="14sp"
-                android:layout_marginStart="8dp"/>
-        </LinearLayout>
 
         <!-- 收藏按钮 -->
         <LinearLayout

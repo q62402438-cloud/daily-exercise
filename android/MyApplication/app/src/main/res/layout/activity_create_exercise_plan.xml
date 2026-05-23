@@ -16,7 +16,6 @@
         android:paddingEnd="16dp"
         android:layout_marginBottom="20dp">
 
-        <!-- 返回按钮 -->
         <ImageButton
             android:id="@+id/btn_back"
             android:layout_width="40dp"
@@ -27,7 +26,6 @@
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"/>
 
-        <!-- 页面标题 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -103,20 +101,45 @@
                         android:textSize="12sp"
                         android:layout_marginBottom="8dp"/>
 
-                    <androidx.cardview.widget.CardView
+                    <RadioGroup
+                        android:id="@+id/rg_exercise_type"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="1dp"
-                        app:cardBackgroundColor="#FFFFFF">
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
 
-                        <Spinner
-                            android:id="@+id/sp_sport_type"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:padding="12dp"/>
-                    </androidx.cardview.widget.CardView>
+                        <RadioButton
+                            android:id="@+id/rb_fat_loss"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="减脂运动"
+                            android:textSize="14sp"
+                            android:checked="true"
+                            android:layout_marginEnd="12dp"/>
+
+                        <RadioButton
+                            android:id="@+id/rb_muscle_gain"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="增肌运动"
+                            android:textSize="14sp"
+                            android:layout_marginEnd="12dp"/>
+
+                        <RadioButton
+                            android:id="@+id/rb_rehabilitation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="康复运动"
+                            android:textSize="14sp"
+                            android:layout_marginEnd="12dp"/>
+
+                        <RadioButton
+                            android:id="@+id/rb_other"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="其他"
+                            android:textSize="14sp"/>
+                    </RadioGroup>
 
                     <!-- 开始时间 -->
                     <TextView
@@ -204,103 +227,51 @@
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- 每日运动量 -->
+                    <!-- 每日训练时长 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="每日运动量（如：跑步公里数）"
+                        android:text="每日训练时长"
+                        android:textColor="#333333"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <Spinner
+                        android:id="@+id/sp_exercise_amount"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@drawable/edittext_bg"
+                        android:padding="12dp"
+                        android:layout_marginBottom="16dp"/>
+
+                    <!-- 计划详情 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="计划详情"
                         android:textColor="#333333"
                         android:textSize="12sp"
                         android:layout_marginBottom="8dp"/>
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginBottom="16dp"
+                        android:layout_height="wrap_content"
                         app:cardCornerRadius="8dp"
                         app:cardElevation="1dp"
                         app:cardBackgroundColor="#FFFFFF">
 
                         <EditText
-                            android:id="@+id/et_daily_exercise"
+                            android:id="@+id/et_detail"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:hint="例如：5"
+                            android:layout_height="wrap_content"
+                            android:minHeight="100dp"
+                            android:hint="请输入计划的详细内容，如训练内容、注意事项等"
                             android:textColor="#333333"
                             android:textSize="14sp"
-                            android:inputType="numberDecimal"
                             android:background="@null"
-                            android:padding="12dp"/>
+                            android:padding="12dp"
+                            android:gravity="top"/>
                     </androidx.cardview.widget.CardView>
-
-                    <!-- 每日卡路里 -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="每日卡路里消耗目标（kcal）"
-                        android:textColor="#333333"
-                        android:textSize="12sp"
-                        android:layout_marginBottom="8dp"/>
-
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="1dp"
-                        app:cardBackgroundColor="#FFFFFF">
-
-                        <EditText
-                            android:id="@+id/et_daily_calorie"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:hint="例如：300"
-                            android:textColor="#333333"
-                            android:textSize="14sp"
-                            android:inputType="numberDecimal"
-                            android:background="@null"
-                            android:padding="12dp"/>
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- 是否公开 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="8dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="是否公开"
-                            android:textColor="#333333"
-                            android:textSize="14sp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="私密"
-                            android:textColor="#666666"
-                            android:textSize="12sp"
-                            android:layout_marginEnd="8dp"/>
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switch_public"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:trackTint="#4CAF50"
-                            app:thumbTint="#2E7D32"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="公开"
-                            android:textColor="#4CAF50"
-                            android:textSize="12sp"
-                            android:layout_marginStart="8dp"/>
-                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -331,6 +302,6 @@
         android:textSize="16sp"
         android:textStyle="bold"
         android:background="@drawable/green_gradient_bg"
-        android:layout_marginTop="16dp"/>
+        android:layout_margin="16dp"/>
 
 </LinearLayout>

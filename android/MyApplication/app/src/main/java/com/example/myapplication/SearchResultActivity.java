@@ -1,218 +1,246 @@
 package com.example.myapplication;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
+import android.content.Intent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.activity.EdgeToEdge;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.example.myapplication.model.PostEntity;
+import com.example.myapplication.model.Result;
+import com.example.myapplication.network.ApiService;
+import com.example.myapplication.network.RetrofitClient;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SearchResultActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
-    private SwipeRefreshLayout swipeRefresh;
+    private EditText etSearch;
+    private ImageButton btnBack;
+    private ImageButton btnClear;
+    private Button btnSearch;
+    private RecyclerView rvSearchResult;
+    private LinearLayout layoutEmpty;
+    private ProgressBar progressBar;
+    private TextView tvSearchResult;
+
     private PostAdapter postAdapter;
-    private String searchKeyword = "";
+    private ApiService apiService;
+    private String currentKeyword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_search_result);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
-        searchKeyword = getIntent().getStringExtra("keyword");
-        if (searchKeyword == null) {
-            searchKeyword = "";
-        }
-
-        highlightCurrentTab("forum");
+        apiService = RetrofitClient.getInstance().create(ApiService.class);
         initViews();
-        loadSearchResults();
-        setupClickListeners();
-    }
+        setupListeners();
 
-    private void highlightCurrentTab(String currentTab) {
-        ImageView homeIcon = findViewById(R.id.icon_home);
-        ImageView sportIcon = findViewById(R.id.icon_sport);
-        ImageView forumIcon = findViewById(R.id.icon_forum);
-        ImageView profileIcon = findViewById(R.id.icon_profile);
-
-        if (currentTab.equals("home")) {
-            if (homeIcon != null) homeIcon.setImageResource(R.drawable.ic_home_active);
-        } else {
-            if (homeIcon != null) homeIcon.setImageResource(R.drawable.ic_home);
-        }
-
-        if (currentTab.equals("sport")) {
-            if (sportIcon != null) sportIcon.setImageResource(R.drawable.ic_sports_active);
-        } else {
-            if (sportIcon != null) sportIcon.setImageResource(R.drawable.ic_sports);
-        }
-
-        if (currentTab.equals("forum")) {
-            if (forumIcon != null) forumIcon.setImageResource(R.drawable.ic_forum_active);
-        } else {
-            if (forumIcon != null) forumIcon.setImageResource(R.drawable.ic_forum);
-        }
-
-        if (currentTab.equals("profile")) {
-            if (profileIcon != null) profileIcon.setImageResource(R.drawable.ic_profile_active);
-        } else {
-            if (profileIcon != null) profileIcon.setImageResource(R.drawable.ic_profile);
+        String keyword = getIntent().getStringExtra("keyword");
+        if (keyword != null && !keyword.isEmpty()) {
+            currentKeyword = keyword;
+            etSearch.setText(keyword);
+            performSearch(keyword);
         }
     }
 
     private void initViews() {
-        TextView tvTitle = findViewById(R.id.tv_title);
-        if (tvTitle != null) {
-            tvTitle.setText("搜索: " + searchKeyword);
-        }
+        etSearch = findViewById(R.id.et_search);
+        btnBack = findViewById(R.id.btn_back);
+        btnClear = findViewById(R.id.btn_clear);
+        btnSearch = findViewById(R.id.btn_search);
+        rvSearchResult = findViewById(R.id.rv_search_result);
+        layoutEmpty = findViewById(R.id.layout_empty);
+        progressBar = findViewById(R.id.progress_bar);
+        tvSearchResult = findViewById(R.id.tv_search_result);
 
-        recyclerView = findViewById(R.id.rv_search_results);
-        swipeRefresh = findViewById(R.id.swipe_refresh);
+        rvSearchResult.setLayoutManager(new LinearLayoutManager(this));
+        postAdapter = new PostAdapter();
+        rvSearchResult.setAdapter(postAdapter);
 
-        if (recyclerView != null) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            postAdapter = new PostAdapter();
-            recyclerView.setAdapter(postAdapter);
-        }
-
-        if (swipeRefresh != null) {
-            swipeRefresh.setColorSchemeResources(
-                    android.R.color.holo_green_light,
-                    android.R.color.holo_green_dark
-            );
-            swipeRefresh.setOnRefreshListener(() -> {
-                new Handler().postDelayed(() -> {
-                    loadSearchResults();
-                    swipeRefresh.setRefreshing(false);
-                }, 1000);
-            });
-        }
+        postAdapter.setOnPostClickListener(post -> {
+            Intent intent = new Intent(SearchResultActivity.this, PostDetailActivity.class);
+            intent.putExtra("post_id", post.getPostId());
+            intent.putExtra("author_name", post.getAuthorName());
+            intent.putExtra("post_time", post.getPostTime());
+            intent.putExtra("post_title", post.getTitle());
+            intent.putExtra("post_content", post.getContent());
+            intent.putExtra("view_count", post.getViewCount());
+            intent.putExtra("like_count", post.getLikeCount());
+            intent.putExtra("comment_count", post.getCommentCount());
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        });
     }
 
-    private void loadSearchResults() {
-        List<Post> searchResults = new ArrayList<>();
+    private void setupListeners() {
+        btnBack.setOnClickListener(v -> {
+            finish();
+            overridePendingTransition(0, 0);
+        });
 
-        if (!searchKeyword.isEmpty()) {
-            List<Post> allPosts = getSamplePosts();
-            for (Post post : allPosts) {
-                if (post.getTitle().contains(searchKeyword) ||
-                        post.getContent().contains(searchKeyword)) {
-                    searchResults.add(post);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                btnClear.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        btnClear.setOnClickListener(v -> {
+            etSearch.setText("");
+            postAdapter.setPostList(new ArrayList<>());
+            layoutEmpty.setVisibility(View.GONE);
+            tvSearchResult.setText("");
+        });
+
+        btnSearch.setOnClickListener(v -> {
+            String keyword = etSearch.getText().toString().trim();
+            if (!keyword.isEmpty()) {
+                currentKeyword = keyword;
+                performSearch(keyword);
+            } else {
+                Toast.makeText(SearchResultActivity.this, "请输入搜索关键词", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            String keyword = etSearch.getText().toString().trim();
+            if (!keyword.isEmpty()) {
+                currentKeyword = keyword;
+                performSearch(keyword);
+            } else {
+                Toast.makeText(SearchResultActivity.this, "请输入搜索关键词", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        });
+    }
+
+    private void performSearch(String keyword) {
+        showLoading(true);
+        layoutEmpty.setVisibility(View.GONE);
+
+        Map<String, Integer> request = new HashMap<>();
+        request.put("page", 1);
+        request.put("pageSize", 100);
+
+        apiService.getPosts(request).enqueue(new Callback<Result<List<PostEntity>>>() {
+            @Override
+            public void onResponse(Call<Result<List<PostEntity>>> call, Response<Result<List<PostEntity>>> response) {
+                showLoading(false);
+
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().getCode() == 200) {
+                    List<PostEntity> entities = response.body().getData();
+                    if (entities != null && !entities.isEmpty()) {
+                        List<PostEntity> filteredEntities = filterPostsByKeyword(entities, keyword);
+                        if (!filteredEntities.isEmpty()) {
+                            List<Post> posts = mapPosts(filteredEntities);
+                            postAdapter.setPostList(posts);
+                            tvSearchResult.setText("搜索结果：共找到 " + posts.size() + " 条");
+                            rvSearchResult.setVisibility(View.VISIBLE);
+                            layoutEmpty.setVisibility(View.GONE);
+                        } else {
+                            rvSearchResult.setVisibility(View.GONE);
+                            layoutEmpty.setVisibility(View.VISIBLE);
+                            tvSearchResult.setText("搜索结果：共找到 0 条");
+                        }
+                    } else {
+                        rvSearchResult.setVisibility(View.GONE);
+                        layoutEmpty.setVisibility(View.VISIBLE);
+                        tvSearchResult.setText("搜索结果：共找到 0 条");
+                    }
+                } else {
+                    rvSearchResult.setVisibility(View.GONE);
+                    layoutEmpty.setVisibility(View.VISIBLE);
+                    tvSearchResult.setText("搜索结果：共找到 0 条");
                 }
             }
-        }
 
-        if (searchResults.isEmpty()) {
-            View emptyView = findViewById(R.id.layout_empty);
-            if (emptyView != null) {
-                emptyView.setVisibility(View.VISIBLE);
+            @Override
+            public void onFailure(Call<Result<List<PostEntity>>> call, Throwable t) {
+                showLoading(false);
+                Toast.makeText(SearchResultActivity.this, "搜索失败：" + t.getMessage(), Toast.LENGTH_SHORT).show();
+                rvSearchResult.setVisibility(View.GONE);
+                layoutEmpty.setVisibility(View.VISIBLE);
             }
-            Toast.makeText(this, "未找到相关帖子", Toast.LENGTH_SHORT).show();
-        } else {
-            View emptyView = findViewById(R.id.layout_empty);
-            if (emptyView != null) {
-                emptyView.setVisibility(View.GONE);
-            }
-        }
-
-        if (postAdapter != null) {
-            postAdapter.setPostList(searchResults);
-        }
+        });
     }
 
-    private List<Post> getSamplePosts() {
+    private List<PostEntity> filterPostsByKeyword(List<PostEntity> entities, String keyword) {
+        List<PostEntity> filtered = new ArrayList<>();
+        String lowerKeyword = keyword.toLowerCase();
+        
+        for (PostEntity entity : entities) {
+            String title = entity.getTitle();
+            String content = entity.getContent();
+            String authorName = entity.getAuthorName();
+            
+            boolean titleMatch = title != null && title.toLowerCase().contains(lowerKeyword);
+            boolean contentMatch = content != null && content.toLowerCase().contains(lowerKeyword);
+            boolean authorMatch = authorName != null && authorName.toLowerCase().contains(lowerKeyword);
+            
+            if (titleMatch || contentMatch || authorMatch) {
+                filtered.add(entity);
+            }
+        }
+        
+        return filtered;
+    }
+
+    private List<Post> mapPosts(List<PostEntity> entities) {
         List<Post> posts = new ArrayList<>();
-
-        posts.add(new Post("post_1", "运动达人小明",
-                "30天跑步挑战：遇见更好的自己",
-                "大家好！我是一个跑步爱好者，从去年开始坚持跑步，收获了健康和快乐。现在想发起一个30天跑步挑战...",
-                "5小时前", "328", "56", "23"));
-
-        posts.add(new Post("post_2", "瑜伽爱好者",
-                "清晨瑜伽放松计划",
-                "每天清晨花30分钟做瑜伽，感觉整个人都轻松了很多。分享我的瑜伽计划给大家...",
-                "昨天", "256", "89", "45"));
-
-        posts.add(new Post("post_3", "健身教练小李",
-                "居家健身计划分享",
-                "在家也能锻炼！分享一套简单有效的健身动作，不需要器械，适合上班族...",
-                "2天前", "512", "134", "67"));
-
-        posts.add(new Post("post_4", "健康生活家",
-                "健康饮食搭配建议",
-                "运动配合健康饮食效果更好！给大家分享一些简单的健康食谱...",
-                "3天前", "189", "45", "23"));
-
-        posts.add(new Post("post_5", "晨跑爱好者",
-                "早起晨跑的心得体会",
-                "坚持晨跑三个月了，分享一些心得和遇到的问题解决方案...",
-                "1周前", "423", "78", "34"));
-
+        for (PostEntity entity : entities) {
+            Integer postId = entity.getPostID();
+            Integer authorId = entity.getAuthorID();
+            String authorName = entity.getAuthorName();
+            if (authorName == null || authorName.isEmpty()) {
+                authorName = authorId == null ? "用户" : "用户" + authorId;
+            }
+            int auditState = entity.getAuditState() != null ? entity.getAuditState() : 1;
+            posts.add(new Post(
+                    postId == null ? "" : String.valueOf(postId),
+                    authorName,
+                    entity.getTitle() == null ? "" : entity.getTitle(),
+                    entity.getContent() == null ? "" : entity.getContent(),
+                    entity.getPublishTime() == null ? "" : entity.getPublishTime(),
+                    String.valueOf(entity.getViewCount() == null ? 0 : entity.getViewCount()),
+                    String.valueOf(entity.getLikeCount() == null ? 0 : entity.getLikeCount()),
+                    String.valueOf(entity.getCommentCount() == null ? 0 : entity.getCommentCount()),
+                    0,
+                    auditState
+            ));
+        }
         return posts;
     }
 
-    private void setupClickListeners() {
-        ImageButton backBtn = findViewById(R.id.btn_back);
-        if (backBtn != null) {
-            backBtn.setOnClickListener(v -> {
-                finish();
-                overridePendingTransition(0, 0);
-            });
-        }
-
-        RelativeLayout homeTab = findViewById(R.id.tab_home);
-        if (homeTab != null) {
-            homeTab.setOnClickListener(v -> {
-                Intent intent = new Intent(SearchResultActivity.this, HomePage.class);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-            });
-        }
-
-        RelativeLayout sportTab = findViewById(R.id.tab_sport);
-        if (sportTab != null) {
-            sportTab.setOnClickListener(v -> {
-                Intent intent = new Intent(SearchResultActivity.this, SportPage.class);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-            });
-        }
-
-        RelativeLayout forumTab = findViewById(R.id.tab_forum);
-        if (forumTab != null) {
-            forumTab.setOnClickListener(v -> {
-            });
-        }
-
-        RelativeLayout profileTab = findViewById(R.id.tab_profile);
-        if (profileTab != null) {
-            profileTab.setOnClickListener(v -> {
-                Intent intent = new Intent(SearchResultActivity.this, ProfileActivity.class);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-            });
-        }
+    private void showLoading(boolean loading) {
+        progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
+        rvSearchResult.setVisibility(loading ? View.GONE : View.VISIBLE);
     }
 
     @Override

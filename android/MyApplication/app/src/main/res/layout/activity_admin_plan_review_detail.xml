@@ -196,15 +196,15 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="每日卡路里目标"
+                            android:text="提交用户"
                             android:textColor="#666666"
                             android:textSize="12sp"/>
 
                         <TextView
-                            android:id="@+id/tv_daily_calorie"
+                            android:id="@+id/tv_user_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="300 kcal"
+                            android:text="用户"
                             android:textColor="#333333"
                             android:textSize="14sp"/>
                     </LinearLayout>
@@ -230,7 +230,38 @@
                             android:textColor="#FF9800"
                             android:textSize="14sp"/>
                     </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#FFFBF0">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="计划内容"
+                        android:textColor="#666666"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:id="@+id/tv_plan_detail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="计划详情内容"
+                        android:textColor="#333333"
+                        android:textSize="14sp"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

@@ -2,10 +2,12 @@ package com.example.myapplication;
 
 import android.os.Bundle;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,13 +17,30 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myapplication.model.ExerciseRecord;
+import com.example.myapplication.model.Result;
+import com.example.myapplication.model.TrainingPlan;
+import com.example.myapplication.model.User;
+import com.example.myapplication.network.ApiService;
+import com.example.myapplication.network.RetrofitClient;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SportPage extends AppCompatActivity {
+    private static final String TAG = "SportPage";
 
     private RecyclerView rvPlans;
     private PlanAdapter planAdapter;
+    private ApiService apiService;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +53,12 @@ public class SportPage extends AppCompatActivity {
             return insets;
         });
 
+        sessionManager = new SessionManager(this);
         highlightCurrentTab("sport");
         initViews();
+        apiService = RetrofitClient.getInstance().create(ApiService.class);
         loadPlanList();
+        checkTodayCheckIn();
         setupBottomNavigation();
         setupClickListeners();
     }
@@ -50,30 +72,86 @@ public class SportPage extends AppCompatActivity {
         }
     }
 
-    private void loadPlanList() {
-        List<Plan> plans = new ArrayList<>();
-
-        plans.add(new Plan("plan_1", "初级跑步计划", "跑步",
-                "2025-01-01", "2025-01-30", "5", "300", true));
-
-        plans.add(new Plan("plan_2", "清晨瑜伽放松计划", "瑜伽",
-                "2025-02-01", "2025-02-28", "30", "150", false));
-
-        plans.add(new Plan("plan_3", "减脂训练计划", "力量训练",
-                "2025-03-01", "2025-03-31", "45", "400", true));
-
-        plans.add(new Plan("plan_4", "游泳入门计划", "游泳",
-                "2025-04-01", "2025-04-30", "60", "500", true));
-
-        plans.add(new Plan("plan_5", "骑行挑战计划", "骑行",
-                "2025-05-01", "2025-05-31", "15", "450", false));
-
-        plans.add(new Plan("plan_6", "HIIT燃脂计划", "高强度间歇",
-                "2025-06-01", "2025-06-30", "20", "350", true));
-
-        if (planAdapter != null) {
-            planAdapter.setPlanList(plans);
+    private void checkTodayCheckIn() {
+        Integer userId = sessionManager.getUserId();
+        if (userId == null) {
+            return;
         }
+        User user = new User();
+        user.setUserID(userId);
+        apiService.getExerciseRecordsByUser(user).enqueue(new Callback<Result<List<ExerciseRecord>>>() {
+            @Override
+            public void onResponse(Call<Result<List<ExerciseRecord>>> call, Response<Result<List<ExerciseRecord>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200 && response.body().getData() != null) {
+                    List<ExerciseRecord> records = response.body().getData();
+                    String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+                    boolean hasCheckIn = false;
+                    for (ExerciseRecord record : records) {
+                        if (today.equals(record.getSportsDate())) {
+                            hasCheckIn = true;
+                            break;
+                        }
+                    }
+                    TextView tvTodayStatus = findViewById(R.id.tv_today_status);
+                    if (tvTodayStatus != null) {
+                        tvTodayStatus.setText(hasCheckIn ? "今天已经运动过啦" : "今天还没运动哦");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<List<ExerciseRecord>>> call, Throwable t) {
+                // 加载失败时不做特殊处理
+            }
+        });
+    }
+
+    private void loadPlanList() {
+        Integer userId = new SessionManager(this).getUserId();
+        if (userId == null) {
+            return;
+        }
+        User user = new User();
+        user.setUserID(userId);
+        apiService.getTrainingPlansByUser(user).enqueue(new Callback<Result<List<TrainingPlan>>>() {
+            @Override
+            public void onResponse(Call<Result<List<TrainingPlan>>> call, Response<Result<List<TrainingPlan>>> response) {
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().getCode() == 200 && response.body().getData() != null) {
+                    if (planAdapter != null) {
+                        planAdapter.setPlanList(mapPlans(response.body().getData()));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<List<TrainingPlan>>> call, Throwable t) {
+                Log.e(TAG, "load plans failed", t);
+            }
+        });
+    }
+
+    private List<Plan> mapPlans(List<TrainingPlan> trainingPlans) {
+        List<Plan> plans = new ArrayList<>();
+        for (TrainingPlan trainingPlan : trainingPlans) {
+            Integer planType = trainingPlan.getPlanType();
+            boolean isPublic = planType != null && planType >= 10;
+            plans.add(new Plan(
+                    String.valueOf(trainingPlan.getPlanID()),
+                    safe(trainingPlan.getPlanName()),
+                    safe(trainingPlan.getSportName()),
+                    safe(trainingPlan.getStartTime()),
+                    safe(trainingPlan.getEndTime()),
+                    safe(trainingPlan.getExerciseAmount()),
+                    safe(trainingPlan.getDailyCalorie()),
+                    isPublic
+            ));
+        }
+        return plans;
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
     }
 
     private void onPlanClick(Plan plan) {
@@ -189,6 +267,13 @@ public class SportPage extends AppCompatActivity {
                 overridePendingTransition(0, 0);
             });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadPlanList();
+        checkTodayCheckIn();
     }
 
     @Override

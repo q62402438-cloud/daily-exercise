@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/card_background"
+    android:elevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv_plan_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="计划名称"
+            android:textColor="#2c3e50"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end"/>
+
+        <ImageButton
+            android:id="@+id/btn_unfavorite"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_collect_filled"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="#e74c3c"
+            android:contentDescription="取消收藏"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv_sport_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="运动类型"
+            android:textColor="#4CAF50"
+            android:textSize="12sp"
+            android:background="@drawable/bg_tag"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" · "
+            android:textColor="#7f8c8d"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/tv_date_range"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="日期范围"
+            android:textColor="#7f8c8d"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_daily_target"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="每日目标: 30分钟"
+        android:textColor="#666666"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>

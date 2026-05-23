@@ -23,6 +23,12 @@ public class OrdinaryUser extends User implements Serializable {
     @SerializedName("weight")
     private Float weight;
 
+    @SerializedName("registerTime")
+    private String registerTime;
+
+    @SerializedName("stickDays")
+    private Integer stickDays;
+
     /* ===== 关键：构造函数 ===== */
 
     public OrdinaryUser() {
@@ -76,5 +82,19 @@ public class OrdinaryUser extends User implements Serializable {
     }
     public void setWeight(Float weight) {
         this.weight = weight;
+    }
+
+    public String getRegisterTime() {
+        return registerTime;
+    }
+    public void setRegisterTime(String registerTime) {
+        this.registerTime = registerTime;
+    }
+
+    public Integer getStickDays() {
+        return stickDays;
+    }
+    public void setStickDays(Integer stickDays) {
+        this.stickDays = stickDays;
     }
 }

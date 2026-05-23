@@ -60,6 +60,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         private TextView tvViewCount;
         private TextView tvLikeCount;
         private TextView tvCommentCount;
+        private TextView tvAuditStatus;
 
         public PostViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -68,8 +69,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             tvTitle = itemView.findViewById(R.id.tv_title);
             tvContent = itemView.findViewById(R.id.tv_content);
             tvViewCount = itemView.findViewById(R.id.tv_view_count);
-            tvLikeCount = itemView.findViewById(R.id.tv_like_count);
-            tvCommentCount = itemView.findViewById(R.id.tv_comment_count);
+            tvAuditStatus = itemView.findViewById(R.id.tv_audit_status);
         }
 
         public void bind(Post post) {
@@ -80,6 +80,23 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             if (tvViewCount != null) tvViewCount.setText(post.getViewCount());
             if (tvLikeCount != null) tvLikeCount.setText(post.getLikeCount());
             if (tvCommentCount != null) tvCommentCount.setText(post.getCommentCount());
+            
+            if (tvAuditStatus != null) {
+                int auditState = post.getAuditState();
+                if (auditState == 0) {
+                    tvAuditStatus.setVisibility(View.VISIBLE);
+                    tvAuditStatus.setText("待审核");
+                    tvAuditStatus.setTextColor(itemView.getContext().getResources().getColor(android.R.color.holo_orange_dark));
+                    tvAuditStatus.setBackgroundColor(itemView.getContext().getResources().getColor(android.R.color.holo_orange_light));
+                } else if (auditState == 2) {
+                    tvAuditStatus.setVisibility(View.VISIBLE);
+                    tvAuditStatus.setText("已驳回");
+                    tvAuditStatus.setTextColor(itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
+                    tvAuditStatus.setBackgroundColor(itemView.getContext().getResources().getColor(android.R.color.holo_red_light));
+                } else {
+                    tvAuditStatus.setVisibility(View.GONE);
+                }
+            }
         }
     }
 }

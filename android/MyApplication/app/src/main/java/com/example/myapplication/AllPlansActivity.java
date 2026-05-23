@@ -2,10 +2,13 @@ package com.example.myapplication;
 
 import android.os.Bundle;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,10 +21,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.myapplication.model.Result;
+import com.example.myapplication.model.TrainingPlan;
+import com.example.myapplication.network.ApiService;
+import com.example.myapplication.network.RetrofitClient;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class AllPlansActivity extends AppCompatActivity {
+    private static final String TAG = "AllPlansActivity";
 
     private RecyclerView rvPlans;
     private PlanAdapter planAdapter;
+    private ApiService apiService;
+    private List<TrainingPlan> allPlans = new ArrayList<>();
+    private EditText etSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +51,7 @@ public class AllPlansActivity extends AppCompatActivity {
         });
 
         initViews();
+        apiService = RetrofitClient.getInstance().create(ApiService.class);
         loadPlanList();
         setupBottomNavigation();
         setupClickListeners();
@@ -42,43 +59,92 @@ public class AllPlansActivity extends AppCompatActivity {
 
     private void initViews() {
         rvPlans = findViewById(R.id.rv_plans);
+        etSearch = findViewById(R.id.et_search);
+
         if (rvPlans != null) {
             rvPlans.setLayoutManager(new LinearLayoutManager(this));
             planAdapter = new PlanAdapter(new ArrayList<>(), this::onPlanClick);
             rvPlans.setAdapter(planAdapter);
         }
+
+        Button searchBtn = findViewById(R.id.btn_search);
+        if (searchBtn != null) {
+            searchBtn.setOnClickListener(v -> searchPlans());
+        }
+
+        if (etSearch != null) {
+            etSearch.setOnEditorActionListener((v, actionId, event) -> {
+                searchPlans();
+                return true;
+            });
+        }
+    }
+
+    private void searchPlans() {
+        String keyword = etSearch != null ? etSearch.getText().toString().toLowerCase().trim() : "";
+
+        if (keyword.isEmpty()) {
+            if (planAdapter != null) {
+                planAdapter.setPlanList(mapPlans(allPlans));
+            }
+            return;
+        }
+
+        List<TrainingPlan> filtered = new ArrayList<>();
+        for (TrainingPlan plan : allPlans) {
+            String planName = plan.getPlanName() != null ? plan.getPlanName().toLowerCase() : "";
+            String sportName = plan.getSportName() != null ? plan.getSportName().toLowerCase() : "";
+            if (planName.contains(keyword) || sportName.contains(keyword)) {
+                filtered.add(plan);
+            }
+        }
+
+        if (planAdapter != null) {
+            planAdapter.setPlanList(mapPlans(filtered));
+        }
+
+        if (filtered.isEmpty()) {
+            Toast.makeText(this, "未找到匹配的计划", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void loadPlanList() {
+        apiService.getPublishedTrainingPlans(new java.util.HashMap<>()).enqueue(new Callback<Result<List<TrainingPlan>>>() {
+            @Override
+            public void onResponse(Call<Result<List<TrainingPlan>>> call, Response<Result<List<TrainingPlan>>> response) {
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().getCode() == 200 && response.body().getData() != null) {
+                    allPlans = response.body().getData();
+                    if (planAdapter != null) {
+                        planAdapter.setPlanList(mapPlans(allPlans));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<List<TrainingPlan>>> call, Throwable t) {
+                Log.e(TAG, "load published plans failed", t);
+            }
+        });
+    }
+
+    private List<Plan> mapPlans(List<TrainingPlan> trainingPlans) {
         List<Plan> plans = new ArrayList<>();
-
-        plans.add(new Plan("plan_1", "初级跑步计划", "跑步",
-                "2025-01-01", "2025-01-30", "5", "300", true));
-
-        plans.add(new Plan("plan_2", "清晨瑜伽放松计划", "瑜伽",
-                "2025-02-01", "2025-02-28", "30", "150", false));
-
-        plans.add(new Plan("plan_3", "减脂训练计划", "力量训练",
-                "2025-03-01", "2025-03-31", "45", "400", true));
-
-        plans.add(new Plan("plan_4", "游泳入门计划", "游泳",
-                "2025-04-01", "2025-04-30", "60", "500", true));
-
-        plans.add(new Plan("plan_5", "骑行挑战计划", "骑行",
-                "2025-05-01", "2025-05-31", "15", "450", false));
-
-        plans.add(new Plan("plan_6", "HIIT燃脂计划", "高强度间歇",
-                "2025-06-01", "2025-06-30", "20", "350", true));
-
-        plans.add(new Plan("plan_7", "核心训练计划", "核心力量",
-                "2025-07-01", "2025-07-31", "30", "250", true));
-
-        plans.add(new Plan("plan_8", "柔韧性提升计划", "拉伸",
-                "2025-08-01", "2025-08-31", "20", "100", false));
-
-        if (planAdapter != null) {
-            planAdapter.setPlanList(plans);
+        for (TrainingPlan trainingPlan : trainingPlans) {
+            Integer planType = trainingPlan.getPlanType();
+            boolean isPublic = planType != null && planType >= 10;
+            plans.add(new Plan(
+                    String.valueOf(trainingPlan.getPlanID()),
+                    trainingPlan.getPlanName() == null ? "" : trainingPlan.getPlanName(),
+                    trainingPlan.getSportName() == null ? "" : trainingPlan.getSportName(),
+                    trainingPlan.getStartTime() == null ? "" : trainingPlan.getStartTime(),
+                    trainingPlan.getEndTime() == null ? "" : trainingPlan.getEndTime(),
+                    trainingPlan.getExerciseAmount() == null ? "" : trainingPlan.getExerciseAmount(),
+                    trainingPlan.getDailyCalorie() == null ? "" : trainingPlan.getDailyCalorie(),
+                    isPublic
+            ));
         }
+        return plans;
     }
 
     private void onPlanClick(Plan plan) {

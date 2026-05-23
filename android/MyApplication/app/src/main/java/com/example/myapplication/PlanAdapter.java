@@ -73,7 +73,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.PlanViewHolder
                 tvDateRange.setText(plan.getStartDate() + " - " + plan.getEndDate());
             }
             if (tvDailyTarget != null) {
-                tvDailyTarget.setText("每日目标: " + plan.getDailyExercise() + "km / " + plan.getDailyCalorie() + "kcal");
+                tvDailyTarget.setText("每日目标: " + plan.getDailyExercise() + "分钟");
             }
         }
     }

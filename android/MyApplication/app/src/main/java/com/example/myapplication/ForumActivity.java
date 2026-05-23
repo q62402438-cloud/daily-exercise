@@ -2,7 +2,7 @@ package com.example.myapplication;
 
 import android.os.Bundle;
 import android.content.Intent;
-import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,10 +22,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.myapplication.model.PostEntity;
+import com.example.myapplication.model.Result;
+import com.example.myapplication.network.ApiService;
+import com.example.myapplication.network.RetrofitClient;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ForumActivity extends AppCompatActivity {
+    private static final String TAG = "ForumActivity";
 
     private EditText etSearch;
     private ViewPager2 vpFeaturedPosts;
@@ -33,6 +45,7 @@ public class ForumActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefresh;
     private FeaturedPostAdapter featuredPostAdapter;
     private PostAdapter postAdapter;
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +60,7 @@ public class ForumActivity extends AppCompatActivity {
 
         initViews();
         highlightCurrentTab("forum");
-        loadFeaturedPosts();
+        apiService = RetrofitClient.getInstance().create(ApiService.class);
         loadPostList();
         setupBottomNavigation();
         setupClickListeners();
@@ -85,11 +98,7 @@ public class ForumActivity extends AppCompatActivity {
                     android.R.color.holo_green_dark
             );
             swipeRefresh.setOnRefreshListener(() -> {
-                new Handler().postDelayed(() -> {
-                    loadPostList();
-                    swipeRefresh.setRefreshing(false);
-                    Toast.makeText(this, "刷新成功", Toast.LENGTH_SHORT).show();
-                }, 1000);
+                loadPostList();
             });
         }
 
@@ -113,24 +122,13 @@ public class ForumActivity extends AppCompatActivity {
         }
     }
 
-    private void loadFeaturedPosts() {
+    private void loadFeaturedPosts(List<Post> allPosts) {
         if (vpFeaturedPosts != null) {
             List<Post> featuredPosts = new ArrayList<>();
-
-            featuredPosts.add(new Post("featured_1", "运动达人小明",
-                    "30天跑步挑战：遇见更好的自己",
-                    "大家好！我是一个跑步爱好者，从去年开始坚持跑步，收获了健康和快乐。",
-                    "5小时前", "328", "56", "23"));
-
-            featuredPosts.add(new Post("featured_2", "瑜伽爱好者",
-                    "清晨瑜伽放松计划",
-                    "每天清晨花30分钟做瑜伽，感觉整个人都轻松了很多。",
-                    "昨天", "256", "89", "45"));
-
-            featuredPosts.add(new Post("featured_3", "健身教练小李",
-                    "居家健身计划分享",
-                    "在家也能锻炼！分享一套简单有效的健身动作，适合上班族。",
-                    "2天前", "512", "134", "67"));
+            int take = Math.min(3, allPosts.size());
+            for (int i = 0; i < take; i++) {
+                featuredPosts.add(allPosts.get(i));
+            }
 
             featuredPostAdapter = new FeaturedPostAdapter(featuredPosts, post -> {
                 Intent intent = new Intent(ForumActivity.this, PostDetailActivity.class);
@@ -149,41 +147,69 @@ public class ForumActivity extends AppCompatActivity {
     }
 
     private void loadPostList() {
+        Map<String, Integer> request = new HashMap<>();
+        request.put("page", 1);
+        request.put("pageSize", 20);
+        apiService.getPosts(request).enqueue(new Callback<Result<List<PostEntity>>>() {
+            @Override
+            public void onResponse(Call<Result<List<PostEntity>>> call, Response<Result<List<PostEntity>>> response) {
+                if (swipeRefresh != null) {
+                    swipeRefresh.setRefreshing(false);
+                }
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().getCode() == 200 && response.body().getData() != null) {
+                    List<Post> posts = mapPosts(response.body().getData());
+                    if (postAdapter != null) {
+                        postAdapter.setPostList(posts);
+                    }
+                    loadFeaturedPosts(posts);
+                    if (posts.isEmpty()) {
+                        Toast.makeText(ForumActivity.this, "暂无帖子", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(ForumActivity.this, "加载帖子失败", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<List<PostEntity>>> call, Throwable t) {
+                if (swipeRefresh != null) {
+                    swipeRefresh.setRefreshing(false);
+                }
+                Log.e(TAG, "load posts failed", t);
+                Toast.makeText(ForumActivity.this, "网络异常，加载帖子失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private List<Post> mapPosts(List<PostEntity> entities) {
         List<Post> posts = new ArrayList<>();
-
-        posts.add(new Post("post_1", "健康生活家",
-                "健康饮食搭配建议",
-                "运动配合健康饮食效果更好！给大家分享一些简单的健康食谱...",
-                "3天前", "189", "45", "23"));
-
-        posts.add(new Post("post_2", "晨跑爱好者",
-                "早起晨跑的心得体会",
-                "坚持晨跑三个月了，分享一些心得和遇到的问题解决方案...",
-                "1周前", "423", "78", "34"));
-
-        posts.add(new Post("post_3", "力量训练达人",
-                "无器械健身动作分享",
-                "不需要去健身房，也能练出好身材！分享几个在家就能做的力量训练动作...",
-                "1周前", "567", "156", "89"));
-
-        posts.add(new Post("post_4", "跑步新手",
-                "我的第一个半马训练记录",
-                "从零开始到完成半马，分享我的训练计划和心得...",
-                "2周前", "734", "234", "123"));
-
-        posts.add(new Post("post_5", "营养师小美",
-                "运动后的营养补充",
-                "运动后吃什么？给大家分享一些科学的营养补充建议...",
-                "2周前", "298", "67", "45"));
-
-        posts.add(new Post("post_6", "游泳爱好者",
-                "游泳入门指南",
-                "夏天到了，学游泳正当时！分享一些游泳入门技巧...",
-                "3周前", "412", "98", "56"));
-
-        if (postAdapter != null) {
-            postAdapter.setPostList(posts);
+        for (PostEntity entity : entities) {
+            Integer postId = entity.getPostID();
+            Integer authorId = entity.getAuthorID();
+            String authorName = entity.getAuthorName();
+            if (authorName == null || authorName.isEmpty()) {
+                authorName = authorId == null ? "用户" : "用户" + authorId;
+            }
+            int auditState = entity.getAuditState() != null ? entity.getAuditState() : 1;
+            posts.add(new Post(
+                    postId == null ? "" : String.valueOf(postId),
+                    authorName,
+                    safe(entity.getTitle()),
+                    safe(entity.getContent()),
+                    safe(entity.getPublishTime()),
+                    String.valueOf(entity.getViewCount() == null ? 0 : entity.getViewCount()),
+                    String.valueOf(entity.getLikeCount() == null ? 0 : entity.getLikeCount()),
+                    String.valueOf(entity.getCommentCount() == null ? 0 : entity.getCommentCount()),
+                    0,
+                    auditState
+            ));
         }
+        return posts;
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
     }
 
     private void setupClickListeners() {
@@ -214,10 +240,26 @@ public class ForumActivity extends AppCompatActivity {
                     Intent intent = new Intent(ForumActivity.this, SearchResultActivity.class);
                     intent.putExtra("keyword", keyword);
                     startActivity(intent);
+                    overridePendingTransition(0, 0);
                 } else {
                     Toast.makeText(this, "请输入搜索关键词", Toast.LENGTH_SHORT).show();
                 }
                 return true;
+            });
+        }
+
+        ImageButton searchBtn = findViewById(R.id.btn_search);
+        if (searchBtn != null) {
+            searchBtn.setOnClickListener(v -> {
+                String keyword = etSearch.getText().toString().trim();
+                if (!keyword.isEmpty()) {
+                    Intent intent = new Intent(ForumActivity.this, SearchResultActivity.class);
+                    intent.putExtra("keyword", keyword);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
+                } else {
+                    Toast.makeText(this, "请输入搜索关键词", Toast.LENGTH_SHORT).show();
+                }
             });
         }
     }

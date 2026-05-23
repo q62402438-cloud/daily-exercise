@@ -59,6 +59,9 @@
         .empty-icon { font-size: 64px; margin-bottom: 20px; }
         .empty-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: #2c3e50; }
         .empty-desc { margin-bottom: 20px; }
+        .loading-state { text-align: center; padding: 40px 20px; color: #7f8c8d; }
+        .loading-spinner { font-size: 36px; animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -224,6 +227,14 @@
                 return;
             }
             
+            const plansList = document.getElementById('plansList');
+            plansList.innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-spinner">🔄</div>
+                    <div style="margin-top: 15px;">正在同步计划状态...</div>
+                </div>
+            `;
+            
             try {
                 const [plansResponse, recordsResponse] = await Promise.all([
                     window.getTrainingPlansByUser(userSession.userID),
@@ -231,7 +242,13 @@
                 ]);
                 
                 if (!plansResponse) {
-                    alert('服务器未响应，请检查服务器是否启动');
+                    plansList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">⚠️</div>
+                            <div class="empty-title">服务器连接失败</div>
+                            <div class="empty-desc">请检查服务器是否启动，端口是否为8082</div>
+                        </div>
+                    `;
                     return;
                 }
                 
@@ -242,7 +259,7 @@
                     await calculateProgress(plans, allRecords);
                     renderPlans(plans);
                 } else {
-                    document.getElementById('plansList').innerHTML = `
+                    plansList.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-icon">📋</div>
                             <div class="empty-title">暂无训练计划</div>
@@ -253,6 +270,13 @@
                 }
             } catch (error) {
                 console.error('加载计划失败:', error);
+                plansList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <div class="empty-title">加载失败</div>
+                        <div class="empty-desc">网络异常，请刷新页面重试</div>
+                    </div>
+                `;
             }
         }
 
@@ -411,9 +435,21 @@
             }
         }
 
+        function handleVisibilityChange() {
+            if (!document.hidden) {
+                loadPlans();
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             loadUserInfo();
             loadPlans();
+            
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            
+            window.addEventListener('focus', function() {
+                loadPlans();
+            });
         });
     </script>
 </body>

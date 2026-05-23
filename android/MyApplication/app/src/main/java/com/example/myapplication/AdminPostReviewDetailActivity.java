@@ -8,13 +8,28 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapplication.model.Result;
+import com.example.myapplication.network.ApiService;
+import com.example.myapplication.network.RetrofitClient;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class AdminPostReviewDetailActivity extends AppCompatActivity {
+
+    private Integer postId;
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_post_review_detail);
 
+        apiService = RetrofitClient.getInstance().create(ApiService.class);
         loadPostDetails();
         setupClickListeners();
     }
@@ -23,6 +38,7 @@ public class AdminPostReviewDetailActivity extends AppCompatActivity {
         if (getIntent() != null && getIntent().getExtras() != null) {
             Bundle bundle = getIntent().getExtras();
 
+            postId = bundle.getInt("post_id", -1);
             String authorName = bundle.getString("author_name", "运动达人小明");
             String postTime = bundle.getString("post_time", "3小时前");
             String title = bundle.getString("post_title", "30天跑步挑战：遇见更好的自己");
@@ -58,24 +74,56 @@ public class AdminPostReviewDetailActivity extends AppCompatActivity {
         Button approveBtn = findViewById(R.id.btn_approve);
         if (approveBtn != null) {
             approveBtn.setOnClickListener(v -> {
-                Toast.makeText(AdminPostReviewDetailActivity.this,
-                        "审核通过",
-                        Toast.LENGTH_SHORT).show();
-                finish();
-                overridePendingTransition(0, 0);
+                if (postId != null && postId != -1) {
+                    auditPost(1); // 1表示通过
+                } else {
+                    Toast.makeText(AdminPostReviewDetailActivity.this, "帖子ID无效", Toast.LENGTH_SHORT).show();
+                }
             });
         }
 
         Button rejectBtn = findViewById(R.id.btn_reject);
         if (rejectBtn != null) {
             rejectBtn.setOnClickListener(v -> {
-                Toast.makeText(AdminPostReviewDetailActivity.this,
-                        "审核不通过",
-                        Toast.LENGTH_SHORT).show();
-                finish();
-                overridePendingTransition(0, 0);
+                if (postId != null && postId != -1) {
+                    auditPost(2); // 2表示拒绝
+                } else {
+                    Toast.makeText(AdminPostReviewDetailActivity.this, "帖子ID无效", Toast.LENGTH_SHORT).show();
+                }
             });
         }
+    }
+
+    private void auditPost(int auditState) {
+        Map<String, Integer> request = new HashMap<>();
+        request.put("postID", postId);
+        request.put("auditState", auditState);
+
+        Call<Result<String>> call = apiService.auditPost(request);
+        call.enqueue(new Callback<Result<String>>() {
+            @Override
+            public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Result<String> result = response.body();
+                    if (result.getCode() == 200) {
+                        String message = auditState == 1 ? "审核通过" : "审核不通过";
+                        Toast.makeText(AdminPostReviewDetailActivity.this, message, Toast.LENGTH_SHORT).show();
+                        finish();
+                        overridePendingTransition(0, 0);
+                    } else {
+                        String errorMsg = result.getMessage() != null ? result.getMessage() : "操作失败";
+                        Toast.makeText(AdminPostReviewDetailActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(AdminPostReviewDetailActivity.this, "网络请求失败", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<String>> call, Throwable t) {
+                Toast.makeText(AdminPostReviewDetailActivity.this, "操作失败: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
