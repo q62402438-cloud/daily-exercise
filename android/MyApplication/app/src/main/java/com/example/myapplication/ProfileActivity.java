@@ -171,6 +171,8 @@ public class ProfileActivity extends AppCompatActivity {
         try {
             if (birthday.contains("T")) {
                 birthday = birthday.split("T")[0];
+            } else if (birthday.contains(" ")) {
+                birthday = birthday.split(" ")[0];
             }
             String[] parts = birthday.split("-");
             if (parts.length == 3) {
@@ -196,28 +198,23 @@ public class ProfileActivity extends AppCompatActivity {
         ImageView forumIcon = findViewById(R.id.icon_forum);
         ImageView profileIcon = findViewById(R.id.icon_profile);
 
-        if (currentTab.equals("home")) {
-            if (homeIcon != null) homeIcon.setImageResource(R.drawable.ic_home_active);
-        } else {
-            if (homeIcon != null) homeIcon.setImageResource(R.drawable.ic_home);
+        int activeColor = android.graphics.Color.parseColor("#2E7D32");
+        int inactiveColor = android.graphics.Color.parseColor("#666666");
+
+        if (homeIcon != null) {
+            homeIcon.setColorFilter(currentTab.equals("home") ? activeColor : inactiveColor);
         }
 
-        if (currentTab.equals("sport")) {
-            if (sportIcon != null) sportIcon.setImageResource(R.drawable.ic_sports_active);
-        } else {
-            if (sportIcon != null) sportIcon.setImageResource(R.drawable.ic_sports);
+        if (sportIcon != null) {
+            sportIcon.setColorFilter(currentTab.equals("sport") ? activeColor : inactiveColor);
         }
 
-        if (currentTab.equals("forum")) {
-            if (forumIcon != null) forumIcon.setImageResource(R.drawable.ic_forum_active);
-        } else {
-            if (forumIcon != null) forumIcon.setImageResource(R.drawable.ic_forum);
+        if (forumIcon != null) {
+            forumIcon.setColorFilter(currentTab.equals("forum") ? activeColor : inactiveColor);
         }
 
-        if (currentTab.equals("profile")) {
-            if (profileIcon != null) profileIcon.setImageResource(R.drawable.ic_profile_active);
-        } else {
-            if (profileIcon != null) profileIcon.setImageResource(R.drawable.ic_profile);
+        if (profileIcon != null) {
+            profileIcon.setColorFilter(currentTab.equals("profile") ? activeColor : inactiveColor);
         }
     }
 

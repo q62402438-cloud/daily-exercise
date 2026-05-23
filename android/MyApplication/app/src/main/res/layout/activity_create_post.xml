@@ -126,22 +126,8 @@
             </androidx.cardview.widget.CardView>
 
             <!-- 添加图片区域 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="12dp"
-                android:text="添加图片（最多9张）"
-                android:textColor="#333333"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
 
             <!-- 图片网格 -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_images"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"/>
 
             <!-- 提示 -->
             <TextView

@@ -1,6 +1,7 @@
 package com.example.dailyexerciseauth.service.impl;
 
 import com.example.dailyexerciseauth.entity.Post;
+import com.example.dailyexerciseauth.mapper.CommentMapper;
 import com.example.dailyexerciseauth.mapper.PostMapper;
 import com.example.dailyexerciseauth.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private PostMapper postMapper;
+
+    @Autowired
+    private CommentMapper commentMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -53,6 +57,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public boolean deletePost(Integer postID) {
+        commentMapper.deleteCommentsByPostId(postID);
         return postMapper.deletePost(postID) > 0;
     }
 

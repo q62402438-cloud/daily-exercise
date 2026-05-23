@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8082/api';
+const API_BASE_URL = 'http://192.168.88.101:8082/api';
 
 async function request(url, options = {}) {
     const defaultOptions = {

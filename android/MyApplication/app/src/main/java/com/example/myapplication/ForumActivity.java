@@ -72,17 +72,23 @@ public class ForumActivity extends AppCompatActivity {
         ImageView forumIcon = findViewById(R.id.icon_forum);
         ImageView profileIcon = findViewById(R.id.icon_profile);
 
+        int activeColor = android.graphics.Color.parseColor("#2E7D32");
+        int inactiveColor = android.graphics.Color.parseColor("#666666");
+
         if (homeIcon != null) {
-            homeIcon.setImageResource(currentTab.equals("home") ? R.drawable.ic_home_active : R.drawable.ic_home);
+            homeIcon.setColorFilter(currentTab.equals("home") ? activeColor : inactiveColor);
         }
+
         if (sportIcon != null) {
-            sportIcon.setImageResource(currentTab.equals("sport") ? R.drawable.ic_sports_active : R.drawable.ic_sports);
+            sportIcon.setColorFilter(currentTab.equals("sport") ? activeColor : inactiveColor);
         }
+
         if (forumIcon != null) {
-            forumIcon.setImageResource(currentTab.equals("forum") ? R.drawable.ic_forum_active : R.drawable.ic_forum);
+            forumIcon.setColorFilter(currentTab.equals("forum") ? activeColor : inactiveColor);
         }
+
         if (profileIcon != null) {
-            profileIcon.setImageResource(currentTab.equals("profile") ? R.drawable.ic_profile_active : R.drawable.ic_profile);
+            profileIcon.setColorFilter(currentTab.equals("profile") ? activeColor : inactiveColor);
         }
     }
 

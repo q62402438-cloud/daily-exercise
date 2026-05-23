@@ -288,7 +288,9 @@
                     if (!plan.startTime || !plan.endTime) return false;
                     const startTime = plan.startTime.split(' ')[0] || plan.startTime.split('T')[0];
                     const endTime = plan.endTime.split(' ')[0] || plan.endTime.split('T')[0];
-                    return todayStr >= startTime && todayStr <= endTime;
+                    const planType = plan.planType || 0;
+                    const executionDigit = Math.floor(planType / 10) % 10;
+                    return todayStr >= startTime && todayStr <= endTime && executionDigit === 1;
                 });
 
                 if (todayPlans.length === 0) {

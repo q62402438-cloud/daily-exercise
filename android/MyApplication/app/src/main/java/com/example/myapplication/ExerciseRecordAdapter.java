@@ -54,7 +54,14 @@ public class ExerciseRecordAdapter extends RecyclerView.Adapter<ExerciseRecordAd
         }
 
         holder.tvDuration.setText(record.getExerciseDuration() + " 分钟");
-        holder.tvCalorie.setText(record.getCalorie() + " kcal");
+
+        Integer recordType = record.getRecordType();
+        if (recordType != null && recordType == 1) {
+            holder.layoutCalorie.setVisibility(View.GONE);
+        } else {
+            holder.layoutCalorie.setVisibility(View.VISIBLE);
+            holder.tvCalorie.setText(record.getCalorie() + " kcal");
+        }
 
         holder.btnDelete.setOnClickListener(v -> {
             if (deleteClickListener != null) {
@@ -97,6 +104,7 @@ public class ExerciseRecordAdapter extends RecyclerView.Adapter<ExerciseRecordAd
         TextView tvTime;
         TextView tvDuration;
         TextView tvCalorie;
+        View layoutCalorie;
         TextView btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
@@ -106,6 +114,7 @@ public class ExerciseRecordAdapter extends RecyclerView.Adapter<ExerciseRecordAd
             tvTime = itemView.findViewById(R.id.tv_record_time);
             tvDuration = itemView.findViewById(R.id.tv_record_duration);
             tvCalorie = itemView.findViewById(R.id.tv_record_calorie);
+            layoutCalorie = itemView.findViewById(R.id.layout_calorie);
             btnDelete = itemView.findViewById(R.id.btn_delete);
         }
     }

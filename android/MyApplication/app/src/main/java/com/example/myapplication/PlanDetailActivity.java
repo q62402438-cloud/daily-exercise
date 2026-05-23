@@ -165,6 +165,8 @@ public class PlanDetailActivity extends AppCompatActivity {
         TextView tvDetail = findViewById(R.id.tv_detail);
         Button submitAuditBtn = findViewById(R.id.btn_submit_audit);
         Button startPlanBtn = findViewById(R.id.btn_start_plan);
+        Button editPlanBtn = findViewById(R.id.btn_edit_plan);
+        Button deletePlanBtn = findViewById(R.id.btn_delete_plan);
 
         if (tvPlanName != null) tvPlanName.setText(plan.getPlanName() != null ? plan.getPlanName() : "");
         if (tvSportType != null) tvSportType.setText(plan.getSportName() != null ? plan.getSportName() : "");
@@ -180,6 +182,15 @@ public class PlanDetailActivity extends AppCompatActivity {
         Integer planType = plan.getPlanType();
         int executionDigit = planType != null ? (planType / 10) % 10 : 0;
         int statusDigit = planType != null ? planType % 10 : 0;
+
+        String endDate = endTime != null ? extractDatePart(endTime) : null;
+        boolean isExpired = isEndDatePassed(endDate);
+        
+        if (isExpired && executionDigit != 2) {
+            Log.d(TAG, "计划已过期，自动设置为已结束状态");
+            executionDigit = 2;
+            autoCompletePlan(plan.getPlanID(), statusDigit);
+        }
 
         String executionStatus;
         if (executionDigit == 0) {
@@ -208,8 +219,7 @@ public class PlanDetailActivity extends AppCompatActivity {
         int percentage = 0;
         if (tvPercentage != null) tvPercentage.setText(percentage + "%");
 
-        String startDate = startTime != null ? startTime.split("T")[0] : null;
-        String endDate = endTime != null ? endTime.split("T")[0] : null;
+        String startDate = startTime != null ? extractDatePart(startTime) : null;
         Log.d(TAG, "renderPlanDetail: startDate=" + startDate + ", endDate=" + endDate + ", userId=" + userId);
         if (startDate != null && endDate != null && userId != null && currentPlan != null) {
             Log.d(TAG, "Calling loadPlanCompletionRate");
@@ -218,8 +228,10 @@ public class PlanDetailActivity extends AppCompatActivity {
 
         if (tvDetail != null) tvDetail.setText(plan.getDetail() != null ? plan.getDetail() : "暂无详情");
 
+        boolean isOwner = isCurrentUserOwner(plan);
+
         if (submitAuditBtn != null) {
-            if (statusDigit == 0) {
+            if (isOwner && statusDigit == 0) {
                 submitAuditBtn.setVisibility(View.VISIBLE);
             } else {
                 submitAuditBtn.setVisibility(View.GONE);
@@ -227,12 +239,81 @@ public class PlanDetailActivity extends AppCompatActivity {
         }
 
         if (startPlanBtn != null) {
-            if (executionDigit == 1) {
-                startPlanBtn.setVisibility(View.GONE);
-            } else {
+            if (isOwner && executionDigit == 0) {
                 startPlanBtn.setVisibility(View.VISIBLE);
+            } else {
+                startPlanBtn.setVisibility(View.GONE);
             }
         }
+
+        if (editPlanBtn != null) {
+            editPlanBtn.setVisibility(isOwner ? View.VISIBLE : View.GONE);
+        }
+
+        if (deletePlanBtn != null) {
+            deletePlanBtn.setVisibility(isOwner ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private boolean isEndDatePassed(String endDate) {
+        if (endDate == null) {
+            return false;
+        }
+        try {
+            java.time.LocalDate end = java.time.LocalDate.parse(endDate);
+            java.time.LocalDate today = java.time.LocalDate.now();
+            return end.isBefore(today);
+        } catch (Exception e) {
+            Log.e(TAG, "isEndDatePassed error: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void autoCompletePlan(Integer planId, int statusDigit) {
+        if (planId == null || currentPlan == null) return;
+        
+        int newPlanType = 20 + statusDigit;
+        
+        TrainingPlan request = new TrainingPlan();
+        request.setPlanID(planId);
+        request.setPlanType(newPlanType);
+        request.setPlanName(currentPlan.getPlanName());
+        request.setStartTime(currentPlan.getStartTime());
+        request.setEndTime(currentPlan.getEndTime());
+        request.setSportName(currentPlan.getSportName());
+        request.setExerciseAmount(currentPlan.getExerciseAmount());
+        request.setDetail(currentPlan.getDetail());
+        
+        apiService.updateTrainingPlan(request).enqueue(new Callback<Result<String>>() {
+            @Override
+            public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200) {
+                    Log.d(TAG, "计划已自动结束: planId=" + planId);
+                    loadPlanById(planId);
+                } else {
+                    Log.d(TAG, "自动结束计划失败: code=" + (response.body() != null ? response.body().getCode() : "null"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<String>> call, Throwable t) {
+                Log.e(TAG, "自动结束计划失败", t);
+            }
+        });
+    }
+
+    private boolean isCurrentUserOwner(TrainingPlan plan) {
+        if (plan == null || userId == null) {
+            Log.d(TAG, "isCurrentUserOwner: plan or userId is null");
+            return false;
+        }
+        if (plan.getUserID() == null) {
+            Log.d(TAG, "isCurrentUserOwner: plan.userID is null, cannot determine owner, showing buttons for safety");
+            return true;
+        }
+        boolean result = plan.getUserID().equals(userId);
+        Log.d(TAG, "isCurrentUserOwner: plan.userID=" + plan.getUserID() + ", userId=" + userId + ", result=" + result);
+        return result;
     }
 
     private void startPlan() {
@@ -608,6 +689,10 @@ public class PlanDetailActivity extends AppCompatActivity {
     
     private boolean isDateInRange(String dateStr, String startDate, String endDate) {
         try {
+            dateStr = extractDatePart(dateStr);
+            startDate = extractDatePart(startDate);
+            endDate = extractDatePart(endDate);
+            
             java.time.LocalDate date = java.time.LocalDate.parse(dateStr);
             java.time.LocalDate start = java.time.LocalDate.parse(startDate);
             java.time.LocalDate end = java.time.LocalDate.parse(endDate);
@@ -616,6 +701,15 @@ public class PlanDetailActivity extends AppCompatActivity {
             Log.e(TAG, "isDateInRange error: " + e.getMessage());
             return false;
         }
+    }
+    
+    private String extractDatePart(String dateTimeStr) {
+        if (dateTimeStr == null) {
+            return null;
+        }
+        String datePart = dateTimeStr.split("T")[0];
+        datePart = datePart.split(" ")[0];
+        return datePart;
     }
 
     private void updatePlanPercentage(int percentage) {
@@ -648,6 +742,9 @@ public class PlanDetailActivity extends AppCompatActivity {
 
     private int calculateDaysBetween(String startDate, String endDate) {
         try {
+            startDate = extractDatePart(startDate);
+            endDate = extractDatePart(endDate);
+            
             String[] startParts = startDate.split("-");
             String[] endParts = endDate.split("-");
 
@@ -660,6 +757,7 @@ public class PlanDetailActivity extends AppCompatActivity {
             long diffMillis = endCal.getTimeInMillis() - startCal.getTimeInMillis();
             return (int) (diffMillis / (1000 * 60 * 60 * 24)) + 1;
         } catch (Exception e) {
+            Log.e(TAG, "calculateDaysBetween error: " + e.getMessage());
             return 0;
         }
     }

@@ -41,6 +41,7 @@ public class PostDetailActivity extends AppCompatActivity {
     private Integer postId;
     private Integer userId;
     private Integer favoriteId;
+    private Integer authorId;
     private ApiService apiService;
     private RecyclerView rvComments;
     private CommentAdapter commentAdapter;
@@ -348,12 +349,88 @@ public class PostDetailActivity extends AppCompatActivity {
                     if (tvAuthorName != null) tvAuthorName.setText(post.getAuthorName() == null ? "用户" + post.getAuthorID() : post.getAuthorName());
                     if (tvPostTime != null) tvPostTime.setText(post.getPublishTime() == null ? "" : post.getPublishTime());
                     if (tvViewCount != null) tvViewCount.setText((post.getViewCount() == null ? 0 : post.getViewCount()) + " 人浏览");
+                    
+                    authorId = post.getAuthorID();
+                    updateAuthorButtons();
                 }
             }
 
             @Override
             public void onFailure(Call<Result<PostEntity>> call, Throwable t) {
                 // ignore
+            }
+        });
+    }
+
+    private void updateAuthorButtons() {
+        boolean isOwner = isCurrentUserAuthor();
+        
+        LinearLayout editLayout = findViewById(R.id.layout_edit);
+        LinearLayout deleteLayout = findViewById(R.id.layout_delete);
+        
+        if (editLayout != null) {
+            editLayout.setVisibility(isOwner ? android.view.View.VISIBLE : android.view.View.GONE);
+            editLayout.setOnClickListener(v -> editPost());
+        }
+        
+        if (deleteLayout != null) {
+            deleteLayout.setVisibility(isOwner ? android.view.View.VISIBLE : android.view.View.GONE);
+            deleteLayout.setOnClickListener(v -> confirmDeletePost());
+        }
+    }
+
+    private boolean isCurrentUserAuthor() {
+        if (authorId == null || userId == null) {
+            return false;
+        }
+        return authorId.equals(userId);
+    }
+
+    private void editPost() {
+        if (postId == null) {
+            Toast.makeText(this, "帖子加载失败", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent(PostDetailActivity.this, EditPostActivity.class);
+        intent.putExtra("post_id", String.valueOf(postId));
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+    }
+
+    private void confirmDeletePost() {
+        if (postId == null) {
+            Toast.makeText(this, "帖子加载失败", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("删除帖子")
+                .setMessage("确定要删除这篇帖子吗？")
+                .setPositiveButton("确定", (dialog, which) -> deletePost())
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    private void deletePost() {
+        PostEntity request = new PostEntity();
+        request.setPostID(postId);
+        
+        apiService.deletePost(request).enqueue(new Callback<Result<String>>() {
+            @Override
+            public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200) {
+                    Toast.makeText(PostDetailActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
+                    finish();
+                    overridePendingTransition(0, 0);
+                } else {
+                    String msg = response.body() == null ? "删除失败" : response.body().getMessage();
+                    Toast.makeText(PostDetailActivity.this, msg == null ? "删除失败" : msg, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<String>> call, Throwable t) {
+                Toast.makeText(PostDetailActivity.this, "删除失败：" + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

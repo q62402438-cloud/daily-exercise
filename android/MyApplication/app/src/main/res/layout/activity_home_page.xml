@@ -83,7 +83,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="优秀主题帖"
+                android:text="主题帖"
                 android:textColor="#2E7D32"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -121,7 +121,7 @@
                             android:id="@+id/tv_post_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="优秀主题帖"
+                            android:text="主题帖"
                             android:textColor="#FFFFFF"
                             android:textSize="18sp"
                             android:textStyle="bold"
@@ -130,19 +130,28 @@
                             android:shadowDy="2"
                             android:shadowRadius="4"/>
 
-                        <TextView
-                            android:id="@+id/tv_view_count"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="0人浏览"
-                            android:textColor="#E0E0E0"
-                            android:textSize="12sp"
-                            android:layout_marginTop="5px"/>
                     </LinearLayout>
 
                 </RelativeLayout>
 
             </androidx.cardview.widget.CardView>
+
+            <!-- 今日计划 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="今日计划"
+                android:textColor="#2E7D32"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_today_plans"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical"/>
 
             <!-- 推荐计划标题 -->
             <LinearLayout
@@ -155,7 +164,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="推荐计划"
+                    android:text="运动计划"
                     android:textColor="#2E7D32"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -281,7 +290,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_profile"
-                app:tint="#4CAF50"
+                app:tint="#666666"
                 android:id="@+id/icon_profile"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="8dp"/>
@@ -290,7 +299,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="我的"
-                android:textColor="#4CAF50"
+                android:textColor="#666666"
                 android:textSize="10sp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="35dp"/>

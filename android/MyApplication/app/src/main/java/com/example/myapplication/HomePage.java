@@ -43,6 +43,9 @@ public class HomePage extends AppCompatActivity {
     private RecyclerView recyclerRecommendedPlans;
     private RecommendedPlanAdapter recommendedPlanAdapter;
     private List<TrainingPlan> recommendedPlanList = new ArrayList<>();
+    private RecyclerView recyclerTodayPlans;
+    private TodayPlanAdapter todayPlanAdapter;
+    private List<TrainingPlan> todayPlanList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,7 @@ public class HomePage extends AppCompatActivity {
         initClickListeners();
         loadUserData();
         loadFeaturedPost();
+        loadTodayPlan();
         loadRecommendedPlans();
     }
 
@@ -71,28 +75,23 @@ public class HomePage extends AppCompatActivity {
         ImageView forumIcon = findViewById(R.id.icon_forum);
         ImageView profileIcon = findViewById(R.id.icon_profile);
 
-        if (currentTab.equals("home")) {
-            if (homeIcon != null) homeIcon.setImageResource(R.drawable.ic_home_active);
-        } else {
-            if (homeIcon != null) homeIcon.setImageResource(R.drawable.ic_home);
+        int activeColor = android.graphics.Color.parseColor("#2E7D32");
+        int inactiveColor = android.graphics.Color.parseColor("#666666");
+
+        if (homeIcon != null) {
+            homeIcon.setColorFilter(currentTab.equals("home") ? activeColor : inactiveColor);
         }
 
-        if (currentTab.equals("sport")) {
-            if (sportIcon != null) sportIcon.setImageResource(R.drawable.ic_sports_active);
-        } else {
-            if (sportIcon != null) sportIcon.setImageResource(R.drawable.ic_sports);
+        if (sportIcon != null) {
+            sportIcon.setColorFilter(currentTab.equals("sport") ? activeColor : inactiveColor);
         }
 
-        if (currentTab.equals("forum")) {
-            if (forumIcon != null) forumIcon.setImageResource(R.drawable.ic_forum_active);
-        } else {
-            if (forumIcon != null) forumIcon.setImageResource(R.drawable.ic_forum);
+        if (forumIcon != null) {
+            forumIcon.setColorFilter(currentTab.equals("forum") ? activeColor : inactiveColor);
         }
 
-        if (currentTab.equals("profile")) {
-            if (profileIcon != null) profileIcon.setImageResource(R.drawable.ic_profile_active);
-        } else {
-            if (profileIcon != null) profileIcon.setImageResource(R.drawable.ic_profile);
+        if (profileIcon != null) {
+            profileIcon.setColorFilter(currentTab.equals("profile") ? activeColor : inactiveColor);
         }
     }
 
@@ -166,6 +165,13 @@ public class HomePage extends AppCompatActivity {
             recommendedPlanAdapter = new RecommendedPlanAdapter(recommendedPlanList, this::onPlanClick);
             recyclerRecommendedPlans.setAdapter(recommendedPlanAdapter);
         }
+
+        recyclerTodayPlans = findViewById(R.id.recycler_today_plans);
+        if (recyclerTodayPlans != null) {
+            recyclerTodayPlans.setLayoutManager(new LinearLayoutManager(this));
+            todayPlanAdapter = new TodayPlanAdapter(todayPlanList, this::onPlanClick);
+            recyclerTodayPlans.setAdapter(todayPlanAdapter);
+        }
     }
 
     private void loadUserData() {
@@ -204,6 +210,85 @@ public class HomePage extends AppCompatActivity {
         });
     }
 
+    private void loadTodayPlan() {
+        Integer userId = sessionManager.getUserId();
+        if (userId == null) {
+            return;
+        }
+        User user = new User();
+        user.setUserID(userId);
+
+        apiService.getTrainingPlansByUser(user).enqueue(new Callback<Result<List<TrainingPlan>>>() {
+            @Override
+            public void onResponse(Call<Result<List<TrainingPlan>>> call, Response<Result<List<TrainingPlan>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200 && response.body().getData() != null) {
+                    List<TrainingPlan> userPlans = response.body().getData();
+                    String todayDate = getTodayDate();
+                    android.util.Log.d("HomePage", "=== 加载今日计划 ===");
+                    android.util.Log.d("HomePage", "用户所有计划数: " + userPlans.size());
+                    android.util.Log.d("HomePage", "今日日期: " + todayDate);
+                    todayPlanList.clear();
+                    for (TrainingPlan plan : userPlans) {
+                        if (isPlanTodayAndInProgress(plan, todayDate)) {
+                            todayPlanList.add(plan);
+                            android.util.Log.d("HomePage", "添加今日计划: " + plan.getPlanName() + ", planType: " + plan.getPlanType());
+                        }
+                    }
+                    android.util.Log.d("HomePage", "最终今日计划数: " + todayPlanList.size());
+                    todayPlanAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<List<TrainingPlan>>> call, Throwable t) {
+                // 加载失败时不做特殊处理
+            }
+        });
+    }
+
+    private String getTodayDate() {
+        java.time.LocalDate today = java.time.LocalDate.now();
+        return today.toString();
+    }
+
+    private boolean isPlanTodayAndInProgress(TrainingPlan plan, String todayDate) {
+        String startTime = plan.getStartTime();
+        String endTime = plan.getEndTime();
+        Integer planType = plan.getPlanType();
+
+        if (startTime == null || endTime == null || planType == null) {
+            return false;
+        }
+
+        String startDateStr = extractDatePart(startTime);
+        String endDateStr = extractDatePart(endTime);
+
+        try {
+            java.time.LocalDate today = java.time.LocalDate.parse(todayDate);
+            java.time.LocalDate startDate = java.time.LocalDate.parse(startDateStr);
+            java.time.LocalDate endDate = java.time.LocalDate.parse(endDateStr);
+
+            boolean isDateInRange = !today.isBefore(startDate) && !today.isAfter(endDate);
+            boolean isInProgress = (planType >= 10 && planType < 20);
+
+            return isDateInRange && isInProgress;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private String extractDatePart(String dateTime) {
+        if (dateTime == null) {
+            return "";
+        }
+        if (dateTime.contains("T")) {
+            return dateTime.split("T")[0];
+        } else if (dateTime.contains(" ")) {
+            return dateTime.split(" ")[0];
+        }
+        return dateTime;
+    }
+
     private void loadFeaturedPost() {
         Map<String, Integer> body = new HashMap<>();
         body.put("status", 1); // 已审核通过的帖子
@@ -229,8 +314,10 @@ public class HomePage extends AppCompatActivity {
     private void updateFeaturedPostCard(PostEntity post) {
         View featuredPostCard = findViewById(R.id.featured_post_card);
         if (featuredPostCard != null) {
-            ((TextView) featuredPostCard.findViewById(R.id.tv_post_title)).setText(post.getTitle() != null ? post.getTitle() : "优秀主题帖");
-            ((TextView) featuredPostCard.findViewById(R.id.tv_view_count)).setText((post.getViewCount() != null ? post.getViewCount() : 0) + "人浏览");
+            TextView tvPostTitle = featuredPostCard.findViewById(R.id.tv_post_title);
+            if (tvPostTitle != null) {
+                tvPostTitle.setText(post.getTitle() != null ? post.getTitle() : "优秀主题帖");
+            }
 
             featuredPostCard.setOnClickListener(v -> {
                 Intent intent = new Intent(HomePage.this, PostDetailActivity.class);
@@ -334,6 +421,69 @@ public class HomePage extends AppCompatActivity {
                     String sportType = plan.getSportName() != null ? plan.getSportName() : "";
                     String exerciseAmount = plan.getExerciseAmount() != null ? plan.getExerciseAmount() : "";
                     tvPlanInfo.setText(!sportType.isEmpty() && !exerciseAmount.isEmpty() ? sportType + " · " + exerciseAmount + "分钟" : !sportType.isEmpty() ? sportType : !exerciseAmount.isEmpty() ? exerciseAmount + "分钟" : "推荐计划");
+                }
+            }
+        }
+    }
+
+    public static class TodayPlanAdapter extends RecyclerView.Adapter<TodayPlanAdapter.TodayPlanViewHolder> {
+        private List<TrainingPlan> planList;
+        private RecommendedPlanAdapter.OnPlanClickListener listener;
+
+        public TodayPlanAdapter(List<TrainingPlan> planList, RecommendedPlanAdapter.OnPlanClickListener listener) {
+            this.planList = planList;
+            this.listener = listener;
+        }
+
+        @androidx.annotation.NonNull
+        @Override
+        public TodayPlanViewHolder onCreateViewHolder(@androidx.annotation.NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_today_plan, parent, false);
+            return new TodayPlanViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@androidx.annotation.NonNull TodayPlanViewHolder holder, int position) {
+            TrainingPlan plan = planList.get(position);
+            holder.bind(plan);
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onPlanClick(plan);
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return planList.size();
+        }
+
+        static class TodayPlanViewHolder extends RecyclerView.ViewHolder {
+            TextView tvPlanName;
+            TextView tvPlanInfo;
+
+            public TodayPlanViewHolder(@androidx.annotation.NonNull View itemView) {
+                super(itemView);
+                tvPlanName = itemView.findViewById(R.id.tv_plan_name);
+                tvPlanInfo = itemView.findViewById(R.id.tv_plan_info);
+            }
+
+            public void bind(TrainingPlan plan) {
+                if (tvPlanName != null) {
+                    tvPlanName.setText(plan.getPlanName() != null ? plan.getPlanName() : "今日训练计划");
+                }
+                if (tvPlanInfo != null) {
+                    String sportType = plan.getSportName() != null ? plan.getSportName() : "";
+                    String exerciseAmount = plan.getExerciseAmount() != null ? plan.getExerciseAmount() : "";
+                    if (!sportType.isEmpty() && !exerciseAmount.isEmpty()) {
+                        tvPlanInfo.setText(sportType + " · " + exerciseAmount + "分钟");
+                    } else if (!sportType.isEmpty()) {
+                        tvPlanInfo.setText(sportType);
+                    } else if (!exerciseAmount.isEmpty()) {
+                        tvPlanInfo.setText(exerciseAmount + "分钟");
+                    } else {
+                        tvPlanInfo.setText("点击查看详情");
+                    }
                 }
             }
         }

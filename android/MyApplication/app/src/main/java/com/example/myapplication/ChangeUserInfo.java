@@ -157,6 +157,11 @@ public class ChangeUserInfo extends AppCompatActivity {
 
         String birthday = currentUser.getBirthday();
         if (birthday != null && !birthday.isEmpty()) {
+            if (birthday.contains("T")) {
+                birthday = birthday.split("T")[0];
+            } else if (birthday.contains(" ")) {
+                birthday = birthday.split(" ")[0];
+            }
             etBirthday.setText(birthday);
             int age = calculateAge(birthday);
             etAge.setText(String.valueOf(age));

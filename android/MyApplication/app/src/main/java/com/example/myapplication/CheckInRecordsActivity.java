@@ -163,8 +163,8 @@ public class CheckInRecordsActivity extends AppCompatActivity {
                     String startTime = plan.getStartTime();
                     String endTime = plan.getEndTime();
                     if (startTime != null && endTime != null) {
-                        String startDate = startTime.split("T")[0];
-                        String endDate = endTime.split("T")[0];
+                        String startDate = extractDatePart(startTime);
+                        String endDate = extractDatePart(endTime);
                         recalculateAndUpdatePlanPercentage(planId, startDate, endDate);
                     }
                 }
@@ -195,22 +195,63 @@ public class CheckInRecordsActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null
                         && response.body().getCode() == 200 && response.body().getData() != null) {
                     List<ExerciseRecord> records = response.body().getData();
-                    Set<String> checkInDays = new HashSet<>();
+                    java.util.Set<String> checkInDays = new java.util.HashSet<>();
+
+                    Log.d("CheckInRecords", "=== 开始筛选打卡记录 ===");
+                    Log.d("CheckInRecords", "目标计划ID: " + planId);
+                    Log.d("CheckInRecords", "总记录数: " + records.size());
+
+                    int matchingRecords = 0;
+                    int skippedRecords = 0;
+
                     for (ExerciseRecord record : records) {
-                        if (record.getPlanID() != null && record.getPlanID().equals(planId)) {
-                            String sportsDate = record.getSportsDate();
+                        Integer recordType = record.getRecordType();
+                        Integer eventId = record.getEventID();
+                        String sportsDate = record.getSportsDate();
+
+                        if (recordType == null) {
+                            skippedRecords++;
+                            continue;
+                        }
+
+                        if (recordType == 0) {
+                            skippedRecords++;
+                            continue;
+                        }
+
+                        if (recordType == 1 && eventId != null && eventId.equals(planId)) {
                             if (sportsDate != null && !sportsDate.isEmpty()) {
-                                checkInDays.add(sportsDate);
+                                String datePart = sportsDate.contains("T") ? sportsDate.split("T")[0] : sportsDate.split(" ")[0];
+                                if (isDateInRange(datePart, startDate, endDate)) {
+                                    checkInDays.add(datePart);
+                                    matchingRecords++;
+                                } else {
+                                    skippedRecords++;
+                                }
                             }
+                        } else {
+                            skippedRecords++;
                         }
                     }
+
+                    Log.d("CheckInRecords", "符合当前计划的记录数: " + matchingRecords);
+                    Log.d("CheckInRecords", "跳过的记录数: " + skippedRecords);
+                    Log.d("CheckInRecords", "去重后的打卡天数: " + checkInDays.size());
 
                     int checkInDaysCount = checkInDays.size();
                     int totalDays = calculateDaysBetween(startDate, endDate);
                     int percentage = 0;
                     if (totalDays > 0) {
-                        percentage = Math.round((float) checkInDaysCount / totalDays * 100);
+                        percentage = Math.min(100, Math.round((float) checkInDaysCount / totalDays * 100));
                     }
+
+                    Log.d("CheckInRecords", "=== 计划完成率计算详情 ===");
+                    Log.d("CheckInRecords", "计划ID: " + planId);
+                    Log.d("CheckInRecords", "日期范围: " + startDate + " 至 " + endDate);
+                    Log.d("CheckInRecords", "符合当前计划的打卡天数: " + checkInDaysCount);
+                    Log.d("CheckInRecords", "计划总天数: " + totalDays);
+                    Log.d("CheckInRecords", "完成率: " + percentage + "%");
+                    Log.d("CheckInRecords", "================================");
 
                     updatePlanPercentage(planId, percentage);
                 }
@@ -223,31 +264,67 @@ public class CheckInRecordsActivity extends AppCompatActivity {
         });
     }
 
+    private boolean isDateInRange(String dateStr, String startDate, String endDate) {
+        try {
+            dateStr = extractDatePart(dateStr);
+            startDate = extractDatePart(startDate);
+            endDate = extractDatePart(endDate);
+            
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date date = sdf.parse(dateStr);
+            java.util.Date start = sdf.parse(startDate);
+            java.util.Date end = sdf.parse(endDate);
+            return !date.before(start) && !date.after(end);
+        } catch (java.text.ParseException e) {
+            Log.e("CheckInRecords", "日期解析失败", e);
+            return false;
+        }
+    }
+    
+    private String extractDatePart(String dateTimeStr) {
+        if (dateTimeStr == null) {
+            return null;
+        }
+        String datePart = dateTimeStr.split("T")[0];
+        datePart = datePart.split(" ")[0];
+        return datePart;
+    }
+
     private void updatePlanPercentage(Integer planId, int percentage) {
-        TrainingPlan request = new TrainingPlan();
-        request.setPlanID(planId);
-        request.setDailyCalorie(String.valueOf(percentage));
+        if (planId == null) {
+            Log.d("CheckInRecords", "updatePlanPercentage skipped: planId is null");
+            return;
+        }
+
+        java.util.Map<String, Object> requestBody = new java.util.HashMap<>();
+        requestBody.put("planID", planId);
+        requestBody.put("percentage", percentage);
 
         ApiService apiService = RetrofitClient.getInstance().create(ApiService.class);
-        Call<Result<String>> call = apiService.updateTrainingPlan(request);
+        Call<Result<String>> call = apiService.updatePlanProgress(requestBody);
 
         call.enqueue(new Callback<Result<String>>() {
             @Override
             public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200) {
-                    Log.d("CheckInRecords", "计划完成度已更新: " + percentage + "%");
+                    Log.d("CheckInRecords", "计划完成率已更新到数据库: " + percentage + "%");
+                } else {
+                    Log.d("CheckInRecords", "更新计划完成率失败: code=" + (response.body() != null ? response.body().getCode() : "null"));
                 }
             }
 
             @Override
             public void onFailure(Call<Result<String>> call, Throwable t) {
-                Log.e("CheckInRecords", "更新计划完成度失败", t);
+                Log.e("CheckInRecords", "更新计划完成率失败", t);
             }
         });
     }
 
     private int calculateDaysBetween(String startDate, String endDate) {
         try {
+            startDate = extractDatePart(startDate);
+            endDate = extractDatePart(endDate);
+            
             String[] startParts = startDate.split("-");
             String[] endParts = endDate.split("-");
 
@@ -260,6 +337,7 @@ public class CheckInRecordsActivity extends AppCompatActivity {
             long diffMillis = endCal.getTimeInMillis() - startCal.getTimeInMillis();
             return (int) (diffMillis / (1000 * 60 * 60 * 24)) + 1;
         } catch (Exception e) {
+            Log.e("CheckInRecords", "calculateDaysBetween error: " + e.getMessage());
             return 0;
         }
     }

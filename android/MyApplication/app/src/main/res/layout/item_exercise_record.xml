@@ -112,7 +112,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginStart="16dp">
+                    android:layout_marginStart="16dp"
+                    android:id="@+id/layout_calorie">
 
                     <ImageView
                         android:layout_width="16dp"
