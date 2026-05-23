@@ -85,6 +85,9 @@ public interface ApiService {
     @POST("api/trainingPlan/update")
     Call<Result<String>> updateTrainingPlan(@Body TrainingPlan plan);
 
+    @POST("api/trainingPlan/updateProgress")
+    Call<Result<String>> updatePlanProgress(@Body Map<String, Object> body);
+
     @POST("api/trainingPlan/delete")
     Call<Result<String>> deleteTrainingPlan(@Body TrainingPlan plan);
 

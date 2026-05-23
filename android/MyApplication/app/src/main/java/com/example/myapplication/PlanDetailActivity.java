@@ -498,6 +498,11 @@ public class PlanDetailActivity extends AppCompatActivity {
     }
 
     private void loadPlanCompletionRate(String startDate, String endDate) {
+        TextView tvPercentage = findViewById(R.id.tv_percentage);
+        if (tvPercentage != null) {
+            tvPercentage.setText("0%");
+        }
+        
         ExerciseRecord request = new ExerciseRecord();
         request.setUserID(userId);
         request.setStartDate(startDate);
@@ -509,31 +514,79 @@ public class PlanDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "getExerciseRecordsByDateRange response: " + response.isSuccessful() + ", code=" + (response.body() != null ? response.body().getCode() : "null"));
                 if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200 && response.body().getData() != null) {
                     List<ExerciseRecord> records = response.body().getData();
+                    
                     java.util.Set<String> checkInDays = new java.util.HashSet<>();
+                    
+                    Log.d(TAG, "=== 开始筛选打卡记录 ===");
+                    Log.d(TAG, "目标计划ID (planId): " + planId);
+                    Log.d(TAG, "总记录数: " + records.size());
+                    
+                    int matchingRecords = 0;
+                    int skippedRecords = 0;
+                    
                     for (ExerciseRecord record : records) {
-                        if (record.getPlanID() != null && record.getPlanID().equals(planId)) {
-                            String sportsDate = record.getSportsDate();
+                        Integer recordType = record.getRecordType();
+                        Integer eventId = record.getEventID();
+                        String sportsDate = record.getSportsDate();
+                        
+                        if (recordType == null) {
+                            Log.v(TAG, "✗ 跳过记录: recordType=null, eventId=" + eventId + ", 日期=" + sportsDate);
+                            skippedRecords++;
+                            continue;
+                        }
+                        
+                        if (recordType == 0) {
+                            Log.v(TAG, "✗ 赛事记录 (recordType=0): eventId=" + eventId + ", 日期=" + sportsDate);
+                            skippedRecords++;
+                            continue;
+                        }
+                        
+                        if (recordType == 1 && eventId != null && eventId.equals(planId)) {
                             if (sportsDate != null && !sportsDate.isEmpty()) {
-                                checkInDays.add(sportsDate);
+                                String datePart = sportsDate.contains("T") ? sportsDate.split("T")[0] : sportsDate.split(" ")[0];
+                                if (isDateInRange(datePart, startDate, endDate)) {
+                                    checkInDays.add(datePart);
+                                    Log.d(TAG, "✓ 符合当前计划的打卡记录: 日期=" + datePart + ", eventId(planId)=" + eventId);
+                                    matchingRecords++;
+                                } else {
+                                    Log.v(TAG, "✗ 日期不在范围内: 日期=" + datePart + ", 范围=" + startDate + " 至 " + endDate);
+                                    skippedRecords++;
+                                }
                             }
+                        } else {
+                            Log.v(TAG, "✗ 其他计划记录: eventId=" + eventId + ", 日期=" + sportsDate + " (不匹配目标planId=" + planId + ")");
+                            skippedRecords++;
                         }
                     }
-
+                    
+                    Log.d(TAG, "=== 筛选统计结果 ===");
+                    Log.d(TAG, "符合当前计划的记录数: " + matchingRecords);
+                    Log.d(TAG, "赛事记录数 (跳过): " + (skippedRecords - (records.size() - matchingRecords - skippedRecords)));
+                    Log.d(TAG, "其他计划记录数 (跳过): " + (records.size() - matchingRecords - skippedRecords));
+                    Log.d(TAG, "去重后的打卡天数: " + checkInDays.size());
+                    
                     int checkInDaysCount = checkInDays.size();
                     int totalDays = calculateDaysBetween(startDate, endDate);
                     int calculatedPercentage = 0;
                     if (totalDays > 0) {
-                        calculatedPercentage = Math.round((float) checkInDaysCount / totalDays * 100);
+                        calculatedPercentage = Math.min(100, Math.round((float) checkInDaysCount / totalDays * 100));
                     }
-
-                    Log.d(TAG, "checkInDays=" + checkInDaysCount + ", totalDays=" + totalDays + ", percentage=" + calculatedPercentage);
-
+                    
+                    Log.d(TAG, "=== 计划完成率计算详情 ===");
+                    Log.d(TAG, "计划ID: " + planId);
+                    Log.d(TAG, "日期范围: " + startDate + " 至 " + endDate);
+                    Log.d(TAG, "该时间段内所有计划记录数: " + records.size());
+                    Log.d(TAG, "符合当前计划的打卡天数: " + checkInDaysCount);
+                    Log.d(TAG, "计划总天数: " + totalDays);
+                    Log.d(TAG, "完成率: " + calculatedPercentage + "%");
+                    Log.d(TAG, "打卡日期列表: " + checkInDays.toString());
+                    Log.d(TAG, "================================");
+                    
                     final int percentage = calculatedPercentage;
-                    TextView tvPercentage = findViewById(R.id.tv_percentage);
                     if (tvPercentage != null) {
                         tvPercentage.setText(percentage + "%");
                     }
-
+                    
                     updatePlanPercentage(percentage);
                 } else {
                     Log.d(TAG, "getExerciseRecordsByDateRange failed or no data");
@@ -546,42 +599,43 @@ public class PlanDetailActivity extends AppCompatActivity {
             }
         });
     }
+    
+    private boolean isDateInRange(String dateStr, String startDate, String endDate) {
+        try {
+            java.time.LocalDate date = java.time.LocalDate.parse(dateStr);
+            java.time.LocalDate start = java.time.LocalDate.parse(startDate);
+            java.time.LocalDate end = java.time.LocalDate.parse(endDate);
+            return !date.isBefore(start) && !date.isAfter(end);
+        } catch (Exception e) {
+            Log.e(TAG, "isDateInRange error: " + e.getMessage());
+            return false;
+        }
+    }
 
     private void updatePlanPercentage(int percentage) {
-        Log.d(TAG, "updatePlanPercentage called: planId=" + planId + ", currentPlan=" + (currentPlan != null) + ", percentage=" + percentage);
+        Log.d(TAG, "updatePlanPercentage called: planId=" + planId + ", percentage=" + percentage);
         if (planId == null) {
             Log.d(TAG, "updatePlanPercentage skipped: planId is null");
             return;
         }
-        if (currentPlan == null) {
-            Log.d(TAG, "updatePlanPercentage skipped: currentPlan is null");
-            return;
-        }
 
-        TrainingPlan request = new TrainingPlan();
-        request.setPlanID(planId);
-        request.setPlanType(currentPlan.getPlanType());
-        request.setPlanName(currentPlan.getPlanName());
-        request.setStartTime(currentPlan.getStartTime());
-        request.setEndTime(currentPlan.getEndTime());
-        request.setSportName(currentPlan.getSportName());
-        request.setExerciseAmount(currentPlan.getExerciseAmount());
-        request.setDetail(currentPlan.getDetail());
-        request.setDailyCalorie(String.valueOf(percentage));
+        java.util.Map<String, Object> requestBody = new java.util.HashMap<>();
+        requestBody.put("planID", planId);
+        requestBody.put("percentage", percentage);
 
-        apiService.updateTrainingPlan(request).enqueue(new Callback<Result<String>>() {
+        apiService.updatePlanProgress(requestBody).enqueue(new Callback<Result<String>>() {
             @Override
             public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200) {
-                    Log.d(TAG, "plan percentage updated to " + percentage + "%");
+                    Log.d(TAG, "计划完成率已更新到数据库: " + percentage + "%");
                 } else {
-                    Log.d(TAG, "update plan percentage failed: code=" + (response.body() != null ? response.body().getCode() : "null"));
+                    Log.d(TAG, "更新计划完成率失败: code=" + (response.body() != null ? response.body().getCode() : "null"));
                 }
             }
 
             @Override
             public void onFailure(Call<Result<String>> call, Throwable t) {
-                Log.e(TAG, "update plan percentage failed", t);
+                Log.e(TAG, "更新计划完成率失败", t);
             }
         });
     }

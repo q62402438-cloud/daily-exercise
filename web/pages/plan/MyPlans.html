@@ -296,11 +296,18 @@
                 const startDate = startTime.split('T')[0];
                 const endDate = endTime.split('T')[0];
                 
-                const today = new Date().toISOString().split('T')[0];
+                const now = new Date();
+                const today = now.getFullYear() + '-' + 
+                           String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                           String(now.getDate()).padStart(2, '0');
                 
-                if (compareDates(today, endDate) > 0) {
-                    await autoCompletePlan(plan.planID);
-                    plan.planType = 22;
+                if (today > endDate) {
+                    const planType = plan.planType || 0;
+                    const executionDigit = Math.floor(planType / 10) % 10;
+                    if (executionDigit === 1) {
+                        await autoCompletePlan(plan.planID);
+                        plan.planType = 22;
+                    }
                 }
                 
                 const totalDays = getDaysBetween(startDate, endDate);
@@ -308,20 +315,89 @@
                 let checkInDays = 0;
                 const checkInDates = new Set();
                 
+                console.log(`=== 开始计算计划 ${plan.planID} 的完成率 ===`);
+                console.log(`计划日期范围: ${startDate} 至 ${endDate}`);
+                console.log(`总记录数: ${allRecords.length}`);
+                
+                let matchingRecords = 0;
+                let skippedEventRecords = 0;
+                let skippedOtherPlanRecords = 0;
+                let skippedOutOfRangeRecords = 0;
+                
                 for (let j = 0; j < allRecords.length; j++) {
                     const record = allRecords[j];
-                    if (record.recordType === 1 && record.sportsDate && isDateInRange(record.sportsDate, startDate, endDate)) {
-                        const dateOnly = record.sportsDate.split(' ')[0].split('T')[0];
-                        checkInDates.add(dateOnly);
+                    const recordType = record.recordType;
+                    const eventId = record.eventID;
+                    const sportsDate = record.sportsDate;
+                    
+                    if (recordType !== 1) {
+                        console.log(`✗ 赛事记录 (recordType=${recordType}): eventId=${eventId}, 日期=${sportsDate}`);
+                        skippedEventRecords++;
+                        continue;
+                    }
+                    
+                    if (eventId !== plan.planID) {
+                        console.log(`✗ 其他计划记录: eventId=${eventId}, 日期=${sportsDate} (不匹配目标planId=${plan.planID})`);
+                        skippedOtherPlanRecords++;
+                        continue;
+                    }
+                    
+                    if (sportsDate) {
+                        const dateOnly = sportsDate.split(' ')[0].split('T')[0];
+                        if (isDateInRange(dateOnly, startDate, endDate)) {
+                            checkInDates.add(dateOnly);
+                            console.log(`✓ 符合当前计划的打卡记录: 日期=${dateOnly}, eventId=${eventId}`);
+                            matchingRecords++;
+                        } else {
+                            console.log(`✗ 日期不在范围内: 日期=${dateOnly}, 范围=${startDate} 至 ${endDate}`);
+                            skippedOutOfRangeRecords++;
+                        }
                     }
                 }
                 
                 checkInDays = checkInDates.size;
+                
+                console.log(`=== 筛选统计结果 (计划 ${plan.planID}) ===`);
+                console.log(`符合当前计划的记录数: ${matchingRecords}`);
+                console.log(`赛事记录数 (跳过): ${skippedEventRecords}`);
+                console.log(`其他计划记录数 (跳过): ${skippedOtherPlanRecords}`);
+                console.log(`日期不在范围内记录数 (跳过): ${skippedOutOfRangeRecords}`);
+                console.log(`去重后的打卡天数: ${checkInDays}`);
+                
                 const percentage = totalDays > 0 ? Math.round((checkInDays / totalDays) * 100) : 0;
+                
+                console.log(`完成率计算: ${checkInDays}/${totalDays} = ${percentage}%`);
+                console.log(`======================================`);
                 
                 plan.percentage = percentage;
                 plan.checkInDays = checkInDays;
                 plan.totalDays = totalDays;
+                
+                await savePlanProgress(plan.planID, percentage);
+            }
+        }
+        
+        async function savePlanProgress(planID, percentage) {
+            try {
+                const response = await fetch('http://localhost:8082/api/trainingPlan/updateProgress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        planID: planID,
+                        percentage: percentage
+                    })
+                });
+                
+                const data = await response.json();
+                if (data && data.code === 200) {
+                    console.log('完成率已更新到数据库:', planID, percentage + '%');
+                } else {
+                    console.error('更新完成率失败:', data.msg || '未知错误');
+                }
+            } catch (error) {
+                console.error('更新完成率失败:', error);
             }
         }
 
@@ -348,7 +424,7 @@
             const startDate = new Date(startDateStr);
             const endDate = new Date(endDateStr);
             const timeDiff = endDate.getTime() - startDate.getTime();
-            return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            return Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
         }
 
         function isDateInRange(dateStr, startDateStr, endDateStr) {

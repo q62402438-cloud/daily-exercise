@@ -90,20 +90,8 @@
                     <div class="detail-value" id="plan-type"></div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">训练强度</div>
-                    <div class="detail-value" id="plan-intensity"></div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">训练频率</div>
-                    <div class="detail-value" id="plan-frequency"></div>
-                </div>
-                <div class="detail-item">
                     <div class="detail-label">每日时长</div>
                     <div class="detail-value" id="plan-duration"></div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">当前进度</div>
-                    <div class="detail-value" id="plan-percentage"></div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">训练天数</div>
@@ -189,19 +177,10 @@
                 if (plan) {
                     document.getElementById('selected-plan-name').textContent = plan.planName || '未命名计划';
                     
-                    const intensity = plan.sportName?.includes('康复') ? '低级' : 
-                                     plan.sportName?.includes('减脂') || plan.sportName?.includes('塑形') ? '中级' :
-                                     plan.sportName?.includes('增肌') || plan.sportName?.includes('心肺') ? '高级' : '中级';
-                    const frequency = plan.sportName?.includes('康复') ? '每周5天' :
-                                     plan.sportName?.includes('增肌') || plan.sportName?.includes('心肺') ? '每周4天' : '每周3天';
-                    
                     document.getElementById('plan-type').textContent = plan.sportName || '其他运动';
-                    document.getElementById('plan-intensity').textContent = intensity;
-                    document.getElementById('plan-frequency').textContent = frequency;
                     document.getElementById('plan-duration').textContent = (plan.exerciseAmount || 30) + ' 分钟';
                     
                     const percentage = plan.percentage || 0;
-                    document.getElementById('plan-percentage').textContent = percentage + '%';
                     document.getElementById('progress-fill').style.width = percentage + '%';
                     document.getElementById('progress-percentage').textContent = percentage + '%';
                     

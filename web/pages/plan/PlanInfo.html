@@ -257,6 +257,33 @@
             
             if (response && response.code === 200 && response.data) {
                 currentPlan = response.data;
+                
+                const startTime = currentPlan.startTime;
+                const endTime = currentPlan.endTime;
+                const planType = currentPlan.planType || 0;
+                const executionDigit = Math.floor(planType / 10) % 10;
+                
+                if (startTime && endTime && executionDigit === 1) {
+                    const startDate = startTime.split('T')[0];
+                    const endDate = endTime.split('T')[0];
+                    
+                    const now = new Date();
+                    const today = now.getFullYear() + '-' + 
+                               String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                               String(now.getDate()).padStart(2, '0');
+                    
+                    console.log(`计划 ${planId} 状态检查: planType=${planType}, executionDigit=${executionDigit}`);
+                    console.log(`今日(本地时间)=${today}, 结束日期=${endDate}`);
+                    
+                    if (today > endDate) {
+                        console.log(`日期比较: today(${today}) > endDate(${endDate}) = true`);
+                        await window.completeTrainingPlan(planId);
+                        currentPlan.planType = 22;
+                    } else {
+                        console.log(`日期比较: today(${today}) > endDate(${endDate}) = false`);
+                    }
+                }
+                
                 renderPlanDetail(currentPlan);
                 checkFavoriteStatus();
             } else {
