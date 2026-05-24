@@ -105,40 +105,55 @@
                         android:id="@+id/rg_exercise_type"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:layout_marginBottom="16dp">
 
-                        <RadioButton
-                            android:id="@+id/rb_fat_loss"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="减脂运动"
-                            android:textSize="14sp"
-                            android:checked="true"
-                            android:layout_marginEnd="12dp"/>
+                            android:orientation="horizontal">
 
-                        <RadioButton
-                            android:id="@+id/rb_muscle_gain"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="增肌运动"
-                            android:textSize="14sp"
-                            android:layout_marginEnd="12dp"/>
+                            <RadioButton
+                                android:id="@+id/rb_fat_loss"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="减脂运动"
+                                android:textSize="14sp"
+                                android:checked="true"
+                                android:layout_marginEnd="8dp"/>
 
-                        <RadioButton
-                            android:id="@+id/rb_rehabilitation"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="康复运动"
-                            android:textSize="14sp"
-                            android:layout_marginEnd="12dp"/>
+                            <RadioButton
+                                android:id="@+id/rb_muscle_gain"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="增肌运动"
+                                android:textSize="14sp"/>
+                        </LinearLayout>
 
-                        <RadioButton
-                            android:id="@+id/rb_other"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="其他"
-                            android:textSize="14sp"/>
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp">
+
+                            <RadioButton
+                                android:id="@+id/rb_rehabilitation"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="康复运动"
+                                android:textSize="14sp"
+                                android:layout_marginEnd="8dp"/>
+
+                            <RadioButton
+                                android:id="@+id/rb_other"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="其他"
+                                android:textSize="14sp"/>
+                        </LinearLayout>
                     </RadioGroup>
 
                     <!-- 开始时间 -->

@@ -8,7 +8,7 @@ INSERT INTO user (userPassword, userType) VALUES
 ('123456', 1),
 ('123456', 1),
 ('123456', 1),
-('123456', 2);
+('123456', 0);
 
 -- 3. 普通用户数据
 INSERT INTO ordinary_user (userID, userName, phoneNumber, userMailbox, gender, birthday, registerTime, age, weight) VALUES

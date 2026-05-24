@@ -221,10 +221,31 @@
                 return;
             }
 
-            registerBtn.textContent = '注册中...';
+            if (userPassword.length < 6) {
+                alert('密码至少6位');
+                return;
+            }
+
+            registerBtn.textContent = '验证手机号...';
             registerBtn.disabled = true;
 
             try {
+                console.log('开始验证手机号:', phoneNumber);
+                
+                const verifyResponse = await window.verifyPhone(phoneNumber);
+                console.log('手机号验证响应:', JSON.stringify(verifyResponse));
+                
+                if (verifyResponse && verifyResponse.code === 200) {
+                    alert('该手机号已被注册，请使用其他手机号或登录已有账号');
+                    registerBtn.textContent = '注册';
+                    registerBtn.disabled = false;
+                    return;
+                }
+
+                console.log('手机号未注册，继续注册流程');
+                
+                registerBtn.textContent = '注册中...';
+
                 const response = await window.register({
                     userName: 'user_' + phoneNumber.slice(-8),
                     phoneNumber: phoneNumber,

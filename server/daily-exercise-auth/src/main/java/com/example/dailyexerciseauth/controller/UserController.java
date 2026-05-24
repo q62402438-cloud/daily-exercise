@@ -34,18 +34,31 @@ public class UserController {
 
     @PostMapping("/register")
     public Result register(@RequestBody User user) {
-        // 调试日志
-        System.out.println("=== Register Request ===");
-        System.out.println("User object: " + user);
-        System.out.println("userID: " + user.getUserID());
-        System.out.println("userPassword: " + user.getUserPassword());
-        System.out.println("userType: " + user.getUserType());
-        
-        boolean success = userService.register(user);
-        if (success) {
-            return Result.success("注册成功");
-        } else {
-            return Result.error("注册失败，ID冲突或其他错误");
+        try {
+            System.out.println("=== Register Request ===");
+            System.out.println("User object: " + user);
+            System.out.println("userID: " + user.getUserID());
+            System.out.println("userPassword: " + user.getUserPassword());
+            System.out.println("userType: " + user.getUserType());
+            System.out.println("phoneNumber: " + user.getPhoneNumber());
+            
+            boolean success = userService.register(user);
+            if (success) {
+                return Result.success("注册成功");
+            } else {
+                return Result.error("注册失败，ID冲突或其他错误");
+            }
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("=== Register Error ===");
+            System.out.println("Error type: " + e.getClass().getName());
+            System.out.println("Error message: " + e.getMessage());
+            e.printStackTrace();
+            if (e.getMessage() != null && e.getMessage().contains("Duplicate entry")) {
+                return Result.error("该手机号已被注册");
+            }
+            return Result.error("注册失败：" + e.getMessage());
         }
     }
 
@@ -93,11 +106,15 @@ public class UserController {
         System.out.println("=== Verify Phone Request ===");
         System.out.println("phoneNumber: " + user.getPhoneNumber());
         
-        boolean exists = userService.verifyPhoneNumber(user.getPhoneNumber());
-        if (exists) {
-            return Result.success("手机号已注册");
-        } else {
-            return Result.error("手机号未注册");
+        try {
+            boolean exists = userService.verifyPhoneNumber(user.getPhoneNumber());
+            if (exists) {
+                return Result.success("该手机号已被注册");
+            } else {
+                return Result.error("该手机号可以使用");
+            }
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
         }
     }
 

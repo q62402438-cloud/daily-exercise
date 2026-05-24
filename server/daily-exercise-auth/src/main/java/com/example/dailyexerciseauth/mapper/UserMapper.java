@@ -75,14 +75,35 @@ public interface UserMapper {
     OrdinaryUser getOrdinaryUserByUserId(Integer userID);
 
     @Select("""
-        SELECT u.userID, u.userPassword, u.userType, COALESCE(o.userName, a.userName) as userName, COALESCE(o.phoneNumber, a.phoneNumber) as phoneNumber
+        SELECT u.userID, u.userPassword, u.userType, 
+               o.userName as userName, 
+               o.phoneNumber as phoneNumber
         FROM user u 
-        LEFT JOIN ordinary_user o ON u.userID = o.userID
-        LEFT JOIN administrator a ON u.userID = a.userID
-        WHERE o.phoneNumber = #{phoneNumber} OR a.phoneNumber = #{phoneNumber}
+        INNER JOIN ordinary_user o ON u.userID = o.userID
+        WHERE o.phoneNumber = #{phoneNumber}
         """)
     User findUserByPhoneNumber(String phoneNumber);
 
+    @Select("""
+        SELECT u.userID, u.userPassword, u.userType, 
+               a.userName as userName, 
+               a.phoneNumber as phoneNumber
+        FROM user u 
+        INNER JOIN administrator a ON u.userID = a.userID
+        WHERE a.phoneNumber = #{phoneNumber}
+        """)
+    User findAdminByPhoneNumber(String phoneNumber);
+
     @Update("UPDATE user SET userPassword = #{newPassword} WHERE userID = #{userID}")
     int resetPassword(@Param("userID") Integer userID, @Param("newPassword") String newPassword);
+
+    @Select("""
+        SELECT COUNT(*) FROM ordinary_user WHERE userName = #{userName} AND userID != #{excludeUserId}
+        """)
+    int countOrdinaryUserByUserName(@Param("userName") String userName, @Param("excludeUserId") Integer excludeUserId);
+
+    @Select("""
+        SELECT COUNT(*) FROM administrator WHERE userName = #{userName} AND userID != #{excludeUserId}
+        """)
+    int countAdminByUserName(@Param("userName") String userName, @Param("excludeUserId") Integer excludeUserId);
 }

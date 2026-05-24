@@ -9,10 +9,10 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         android:usesCleartextTraffic="true">
@@ -112,9 +112,7 @@
         <activity
             android:name=".EditPostActivity"
             android:exported="false" />
-        <activity
-            android:name=".CommentDetailActivity"
-            android:exported="false" />
+
         <activity
             android:name=".MyPlansActivity"
             android:exported="false" />

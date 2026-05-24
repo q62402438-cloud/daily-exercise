@@ -55,16 +55,39 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("用户信息不能为空");
         }
 
-        // 设置用户类型：1-普通用户
-        user.setUserType(1);
+        String phoneNumber = user.getPhoneNumber();
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            throw new IllegalArgumentException("手机号不能为空");
+        }
+
+        phoneNumber = phoneNumber.trim();
+
+        if (!isPhoneNumber(phoneNumber)) {
+            throw new IllegalArgumentException("手机号格式不正确");
+        }
+
+        System.out.println("=== Checking phone number: " + phoneNumber + " ===");
         
-        // 1. 先插入 user 表（包含密码和用户类型）
+        User existingOrdinaryUser = userMapper.findUserByPhoneNumber(phoneNumber);
+        System.out.println("=== Ordinary user check result: " + existingOrdinaryUser + " ===");
+        
+        User existingAdmin = userMapper.findAdminByPhoneNumber(phoneNumber);
+        System.out.println("=== Admin check result: " + existingAdmin + " ===");
+        
+        if (existingOrdinaryUser != null || existingAdmin != null) {
+            System.out.println("=== Phone number already exists in database! ===");
+            throw new IllegalArgumentException("该手机号已被注册");
+        }
+
+        System.out.println("=== Phone number is available, proceeding with registration ===");
+
+        user.setUserType(1);
+        user.setPhoneNumber(phoneNumber);
+        
         userMapper.insertUser(user);
         
-        // 2. 获取刚插入的用户ID
         Integer userId = userMapper.getLastInsertId();
         
-        // 3. 插入 ordinary_user 表（使用获取的 userID）
         OrdinaryUser ou = new OrdinaryUser();
         BeanUtils.copyProperties(user, ou);
         ou.setUserID(userId);
@@ -80,8 +103,17 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("用户ID不能为空");
         }
 
+        String newUserName = user.getUserName();
+        if (newUserName != null && !newUserName.isEmpty()) {
+            int ordinaryUserCount = userMapper.countOrdinaryUserByUserName(newUserName, user.getUserID());
+            int adminCount = userMapper.countAdminByUserName(newUserName, user.getUserID());
+            
+            if (ordinaryUserCount > 0 || adminCount > 0) {
+                throw new IllegalArgumentException("该用户名已被使用");
+            }
+        }
+
         int userUpdated = 0;
-        // 只有当用户提供了新密码时才更新密码
         if (user.getUserPassword() != null && !user.getUserPassword().isEmpty()) {
             userUpdated = userMapper.updateUserPassword(user);
         }
@@ -106,8 +138,16 @@ public class UserServiceImpl implements UserService {
         if (phoneNumber == null || phoneNumber.isEmpty()) {
             throw new IllegalArgumentException("手机号不能为空");
         }
-        User user = userMapper.findUserByPhoneNumber(phoneNumber);
-        return user != null;
+        
+        phoneNumber = phoneNumber.trim();
+        
+        User ordinaryUser = userMapper.findUserByPhoneNumber(phoneNumber);
+        if (ordinaryUser != null) {
+            return true;
+        }
+        
+        User admin = userMapper.findAdminByPhoneNumber(phoneNumber);
+        return admin != null;
     }
 
     @Override
@@ -120,11 +160,35 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("新密码不能为空");
         }
         
+        phoneNumber = phoneNumber.trim();
+        
         User user = userMapper.findUserByPhoneNumber(phoneNumber);
+        if (user == null) {
+            user = userMapper.findAdminByPhoneNumber(phoneNumber);
+        }
+        
         if (user == null) {
             return false;
         }
         
         return userMapper.resetPassword(user.getUserID(), newPassword) > 0;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int countOrdinaryUserByUserName(String userName, Integer excludeUserId) {
+        if (userName == null || userName.isEmpty()) {
+            return 0;
+        }
+        return userMapper.countOrdinaryUserByUserName(userName, excludeUserId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int countAdminByUserName(String userName, Integer excludeUserId) {
+        if (userName == null || userName.isEmpty()) {
+            return 0;
+        }
+        return userMapper.countAdminByUserName(userName, excludeUserId);
     }
 }

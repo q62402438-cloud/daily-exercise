@@ -328,9 +328,14 @@
                             <span class="detail-value">${plan.sportName}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">运动量</span>
-                            <span class="detail-value">${plan.exerciseAmount}</span>
+                            <span class="detail-label">每日时长</span>
+                            <span class="detail-value">${plan.exerciseAmount} 分钟</span>
                         </div>
+                    </div>
+                    
+                    <div class="plan-description">
+                        <div class="description-label">计划详情</div>
+                        <div class="description-content">${plan.detail || '暂无详情'}</div>
                     </div>
                     
                     <div class="review-actions">

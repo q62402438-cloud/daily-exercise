@@ -15,15 +15,9 @@ import java.util.List;
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
 
     private List<CommentEntity> commentList;
-    private OnCommentClickListener listener;
 
-    public interface OnCommentClickListener {
-        void onCommentClick(CommentEntity comment);
-    }
-
-    public CommentAdapter(List<CommentEntity> commentList, OnCommentClickListener listener) {
+    public CommentAdapter(List<CommentEntity> commentList) {
         this.commentList = commentList;
-        this.listener = listener;
     }
 
     public void setCommentList(List<CommentEntity> commentList) {
@@ -45,12 +39,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.tvAuthor.setText(comment.getUserName());
         holder.tvContent.setText(comment.getContent());
         holder.tvTime.setText(comment.getPublishTime());
-
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onCommentClick(comment);
-            }
-        });
     }
 
     @Override

@@ -28,12 +28,37 @@ public class UserUpdateController {
         System.out.println("User object: " + user);
         System.out.println("userID: " + user.getUserID());
         
-        boolean success = userService.update(user);
-        if (success) {
-            return Result.success("更新成功");
-        } else {
-            return Result.error("更新失败");
+        try {
+            boolean success = userService.update(user);
+            if (success) {
+                return Result.success("更新成功");
+            } else {
+                return Result.error("更新失败");
+            }
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
         }
+    }
+
+    @PostMapping("/checkUserName")
+    public Result checkUserName(@RequestBody Map<String, Object> request) {
+        String userName = (String) request.get("userName");
+        Integer excludeUserId = (Integer) request.get("excludeUserId");
+        
+        System.out.println("=== Check UserName Request ===");
+        System.out.println("userName: " + userName);
+        System.out.println("excludeUserId: " + excludeUserId);
+        
+        int ordinaryUserCount = userService.countOrdinaryUserByUserName(userName, excludeUserId);
+        int adminCount = userService.countAdminByUserName(userName, excludeUserId);
+        
+        boolean exists = ordinaryUserCount > 0 || adminCount > 0;
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("exists", exists);
+        result.put("message", exists ? "用户名已存在" : "用户名可用");
+        
+        return Result.success(result);
     }
 
     @PostMapping("/sendCode")

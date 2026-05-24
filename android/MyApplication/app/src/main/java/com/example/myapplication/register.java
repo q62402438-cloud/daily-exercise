@@ -112,7 +112,14 @@ public class register extends AppCompatActivity {
         newUser.setUserName(phone);
         newUser.setUserPassword(pwd);
         newUser.setPhoneNumber(phone);
-        newUser.setUserType(1); // 1-普通用户
+        newUser.setUserType(1);
+
+        Log.d("Register", "=== User对象创建完成 ===");
+        Log.d("Register", "userName: " + newUser.getUserName());
+        Log.d("Register", "phoneNumber: " + newUser.getPhoneNumber());
+        Log.d("Register", "userPassword: " + newUser.getUserPassword());
+        Log.d("Register", "userType: " + newUser.getUserType());
+        Log.d("Register", "JSON: " + newUserToJson(newUser));
 
         Log.d("Register", "准备创建ApiService");
         
@@ -121,22 +128,31 @@ public class register extends AppCompatActivity {
             Log.d("Register", "ApiService创建成功");
 
             Call<Result<String>> call = apiService.register(newUser);
-            Log.d("Register", "准备发送注册请求");
+            Log.d("Register", "=== 准备发送注册请求 ===");
+            Log.d("Register", "Request URL: " + call.request().url());
+            Log.d("Register", "Request Headers: " + call.request().headers());
+            Log.d("Register", "Request Body: " + newUserToJson(newUser));
 
             call.enqueue(new Callback<Result<String>>() {
                 @Override
                 public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
-                    Log.d("Register", "收到响应，code: " + response.code());
+                    Log.d("Register", "=== 收到服务器响应 ===");
+                    Log.d("Register", "HTTP Status Code: " + response.code());
+                    Log.d("Register", "Is Successful: " + response.isSuccessful());
                     
                     if (response.isSuccessful()) {
                         if (response.body() != null) {
                             Result<String> result = response.body();
-                            Log.d("Register", "响应码: " + result.getCode() + ", 消息: " + result.getMessage());
+                            Log.d("Register", "响应码: " + result.getCode());
+                            Log.d("Register", "响应消息: " + result.getMessage());
+                            Log.d("Register", "响应数据: " + result.getData());
                             
                             if (result.getCode() == 200) {
+                                Log.d("Register", "注册成功！");
                                 showToast("注册成功！请返回登录");
                                 finish();
                             } else {
+                                Log.d("Register", "注册失败: " + result.getMessage());
                                 showToast("注册失败：" + result.getMessage());
                             }
                         } else {
@@ -159,7 +175,7 @@ public class register extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<Result<String>> call, Throwable t) {
-                    Log.e("Register", "网络请求失败", t);
+                    Log.e("Register", "=== 网络请求失败 ===", t);
                     showToast("网络请求失败：" + t.getMessage());
                 }
             });
@@ -167,6 +183,13 @@ public class register extends AppCompatActivity {
             Log.e("Register", "注册过程中发生异常", e);
             showToast("注册异常：" + e.getMessage());
         }
+    }
+
+    private String newUserToJson(User user) {
+        return "{\"userName\":\"" + user.getUserName() + 
+               "\",\"phoneNumber\":\"" + user.getPhoneNumber() + 
+               "\",\"userPassword\":\"" + user.getUserPassword() + 
+               "\",\"userType\":" + user.getUserType() + "}";
     }
 
     private void showToast(String msg) {

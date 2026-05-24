@@ -157,6 +157,7 @@ public class MyPlansActivity extends AppCompatActivity {
         for (TrainingPlan plan : plans) {
             String startTime = plan.getStartTime();
             String endTime = plan.getEndTime();
+            Integer planId = plan.getPlanID();
 
             if (startTime == null || endTime == null) {
                 plan.setDailyCalorie("0");
@@ -167,19 +168,21 @@ public class MyPlansActivity extends AppCompatActivity {
             String endDate = endTime.split("T")[0];
 
             int totalDays = getDaysBetween(startDate, endDate);
-            int checkInDays = 0;
+            java.util.Set<String> checkedInDates = new java.util.HashSet<>();
 
             for (ExerciseRecord record : allRecords) {
                 if (record.getRecordType() != null && record.getRecordType() == 1
-                        && record.getSportsDate() != null) {
+                        && record.getSportsDate() != null
+                        && record.getEventID() != null && record.getEventID().equals(planId)) {
                     String recordDate = record.getSportsDate().split(" ")[0].split("T")[0];
                     if (isDateInRange(recordDate, startDate, endDate)) {
-                        checkInDays++;
+                        checkedInDates.add(recordDate);
                     }
                 }
             }
 
-            int percentage = totalDays > 0 ? (checkInDays * 100 / totalDays) : 0;
+            int checkInDays = checkedInDates.size();
+            int percentage = totalDays > 0 ? Math.round((float) checkInDays / totalDays * 100) : 0;
             plan.setDailyCalorie(String.valueOf(percentage));
             plan.setDetail(checkInDays + "/" + totalDays);
         }
@@ -206,15 +209,26 @@ public class MyPlansActivity extends AppCompatActivity {
 
     private boolean isDateInRange(String dateStr, String startDateStr, String endDateStr) {
         try {
-            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date date = sdf.parse(dateStr);
-            java.util.Date startDate = sdf.parse(startDateStr);
-            java.util.Date endDate = sdf.parse(endDateStr);
-            if (date == null || startDate == null || endDate == null) return false;
-            return !date.before(startDate) && !date.after(endDate);
+            dateStr = extractDatePart(dateStr);
+            startDateStr = extractDatePart(startDateStr);
+            endDateStr = extractDatePart(endDateStr);
+
+            java.time.LocalDate date = java.time.LocalDate.parse(dateStr);
+            java.time.LocalDate startDate = java.time.LocalDate.parse(startDateStr);
+            java.time.LocalDate endDate = java.time.LocalDate.parse(endDateStr);
+            return !date.isBefore(startDate) && !date.isAfter(endDate);
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private String extractDatePart(String dateTimeStr) {
+        if (dateTimeStr == null) {
+            return null;
+        }
+        String datePart = dateTimeStr.split("T")[0];
+        datePart = datePart.split(" ")[0];
+        return datePart;
     }
 
     private void showLoading() {
@@ -376,19 +390,18 @@ public class MyPlansActivity extends AppCompatActivity {
                 }
 
                 if (btnStart != null) {
-                    if (executionDigit == 2) {
-                        btnStart.setText("重新开始");
-                    } else if (executionDigit == 1) {
-                        btnStart.setText("继续");
-                    } else {
+                    if (executionDigit == 0) {
                         btnStart.setText("开始");
+                        btnStart.setVisibility(View.VISIBLE);
+                        btnStart.setOnClickListener(v -> {
+                            Intent intent = new Intent(MyPlansActivity.this, StartPlanActivity.class);
+                            intent.putExtra("plan_id", String.valueOf(planId));
+                            startActivity(intent);
+                            overridePendingTransition(0, 0);
+                        });
+                    } else {
+                        btnStart.setVisibility(View.GONE);
                     }
-                    btnStart.setOnClickListener(v -> {
-                        Intent intent = new Intent(MyPlansActivity.this, StartPlanActivity.class);
-                        intent.putExtra("plan_id", String.valueOf(planId));
-                        startActivity(intent);
-                        overridePendingTransition(0, 0);
-                    });
                 }
 
                 if (btnEdit != null) {

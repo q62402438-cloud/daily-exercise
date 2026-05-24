@@ -122,48 +122,61 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="12dp"
-            android:gravity="end">
+            android:orientation="vertical"
+            android:layout_marginTop="12dp">
 
-            <Button
-                android:id="@+id/btn_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:text="详情"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:background="@drawable/btn_gray_solid"
-                android:layout_marginEnd="8dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
 
-            <Button
-                android:id="@+id/btn_start"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:text="开始"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:background="@drawable/btn_green_solid"
-                android:layout_marginEnd="8dp"/>
+                <Button
+                    android:id="@+id/btn_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:text="详情"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:background="@drawable/btn_gray_solid"
+                    android:layout_marginEnd="8dp"/>
 
-            <Button
-                android:id="@+id/btn_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:text="编辑"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:background="@drawable/btn_search_bg"
-                android:layout_marginEnd="8dp"/>
+                <Button
+                    android:id="@+id/btn_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:text="开始"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:background="@drawable/btn_green_solid"/>
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_delete"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:text="删除"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:background="@drawable/btn_red_solid"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/btn_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:text="编辑"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:background="@drawable/btn_search_bg"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/btn_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:text="删除"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:background="@drawable/btn_red_solid"/>
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

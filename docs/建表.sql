@@ -58,7 +58,7 @@ DROP TABLE IF EXISTS `sports_event`;
 CREATE TABLE `sports_event` (
   `eventID` INT PRIMARY KEY AUTO_INCREMENT COMMENT '运动项目ID',
   `sportName` VARCHAR(200) COMMENT '运动名称',
-  `averageCalorie` INT COMMENT '平均消耗卡路里'
+  `averageCalorie` FLOAT COMMENT '平均消耗卡路里'
 ) COMMENT='运动项目表';
 
 -- --------------------------------------------------------

@@ -169,6 +169,22 @@
             color: #95a5a6;
             margin-top: 4px;
         }
+
+        .validation-hint {
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .validation-hint.valid {
+            color: #27ae60;
+            display: block;
+        }
+
+        .validation-hint.invalid {
+            color: #e74c3c;
+            display: block;
+        }
         
         .unit-suffix {
             color: #7f8c8d;
@@ -192,9 +208,55 @@
     <script src="../../asserts/js/api.js"></script>
     <script>
         let currentUserId = null;
+        let originalUserName = '';
+        let userNameValid = true;
 
         function goBack() {
             window.location.href = 'index.html';
+        }
+
+        async function validateUserName() {
+            const userNameInput = document.getElementById('userName');
+            const validationDiv = document.getElementById('userNameValidation');
+            const userName = userNameInput.value.trim();
+
+            if (!userName) {
+                validationDiv.className = 'validation-hint invalid';
+                validationDiv.textContent = '用户名不能为空';
+                userNameValid = false;
+                return;
+            }
+
+            if (userName === originalUserName) {
+                validationDiv.className = 'validation-hint valid';
+                validationDiv.textContent = '用户名可用';
+                userNameValid = true;
+                return;
+            }
+
+            try {
+                const response = await window.checkUserNameExists(userName, currentUserId);
+                if (response && response.code === 200) {
+                    if (response.data.exists) {
+                        validationDiv.className = 'validation-hint invalid';
+                        validationDiv.textContent = '该用户名已被使用';
+                        userNameValid = false;
+                    } else {
+                        validationDiv.className = 'validation-hint valid';
+                        validationDiv.textContent = '用户名可用';
+                        userNameValid = true;
+                    }
+                } else {
+                    validationDiv.className = 'validation-hint invalid';
+                    validationDiv.textContent = '验证失败，请重试';
+                    userNameValid = false;
+                }
+            } catch (error) {
+                console.error('验证用户名失败:', error);
+                validationDiv.className = 'validation-hint invalid';
+                validationDiv.textContent = '网络异常，请稍后重试';
+                userNameValid = false;
+            }
         }
 
         function calculateAge(birthdayStr) {
@@ -235,9 +297,18 @@
             saveBtn.disabled = true;
 
             try {
+                const userName = document.getElementById('userName').value.trim();
+                
+                if (!userName) {
+                    alert('请输入用户名');
+                    saveBtn.textContent = '保存';
+                    saveBtn.disabled = false;
+                    return;
+                }
+
                 const userData = {
                     userID: currentUserId,
-                    userName: document.getElementById('userName').value.trim(),
+                    userName: userName,
                     phoneNumber: document.getElementById('phoneNumber').value.trim(),
                     userMailbox: document.getElementById('email').value.trim(),
                     gender: document.getElementById('gender').value,
@@ -283,6 +354,7 @@
                 }
 
                 const user = response.data || {};
+                originalUserName = user.userName || '';
                 
                 const birthdayVal = formatDate(user.birthday);
 
@@ -299,7 +371,8 @@
                             
                             <div class="form-group">
                                 <label class="form-label">用户名</label>
-                                <input type="text" class="form-input" id="userName" value="${user.userName || ''}">
+                                <input type="text" class="form-input" id="userName" value="${user.userName || ''}" onblur="validateUserName()">
+                                <div id="userNameValidation" class="validation-hint"></div>
                             </div>
                             
                             <div class="form-group">

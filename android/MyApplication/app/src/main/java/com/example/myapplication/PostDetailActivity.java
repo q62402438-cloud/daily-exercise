@@ -72,15 +72,9 @@ public class PostDetailActivity extends AppCompatActivity {
         rvComments = findViewById(R.id.rv_comments);
         if (rvComments != null) {
             rvComments.setLayoutManager(new LinearLayoutManager(this));
-            commentAdapter = new CommentAdapter(commentList, this::onCommentClick);
+            commentAdapter = new CommentAdapter(commentList);
             rvComments.setAdapter(commentAdapter);
         }
-    }
-
-    private void onCommentClick(CommentEntity comment) {
-        Intent intent = new Intent(this, CommentDetailActivity.class);
-        intent.putExtra("commentId", comment.getCommentID());
-        startActivity(intent);
     }
 
     private void setupClickListeners() {

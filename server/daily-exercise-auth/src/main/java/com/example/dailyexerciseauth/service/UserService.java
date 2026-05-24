@@ -10,4 +10,6 @@ public interface UserService {
     OrdinaryUser getUserInfo(User user);
     boolean verifyPhoneNumber(String phoneNumber);
     boolean resetPassword(String phoneNumber, String newPassword);
+    int countOrdinaryUserByUserName(String userName, Integer excludeUserId);
+    int countAdminByUserName(String userName, Integer excludeUserId);
 }
