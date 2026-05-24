@@ -266,15 +266,26 @@ public class ProfileActivity extends AppCompatActivity {
 
         LinearLayout logout = findViewById(R.id.logout);
         if (logout != null) {
-            logout.setOnClickListener(v -> {
-                new SessionManager(ProfileActivity.this).clear();
-                Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            logout.setOnClickListener(v -> logout());
+        }
+
+        LinearLayout cancelAccount = findViewById(R.id.cancel_account);
+        if (cancelAccount != null) {
+            cancelAccount.setOnClickListener(v -> {
+                Intent intent = new Intent(ProfileActivity.this, CancelUserActivity.class);
                 startActivity(intent);
-                finish();
                 overridePendingTransition(0, 0);
             });
         }
+    }
+
+    private void logout() {
+        new SessionManager(ProfileActivity.this).clear();
+        Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+        overridePendingTransition(0, 0);
     }
 
     private void setupBottomNavigation() {

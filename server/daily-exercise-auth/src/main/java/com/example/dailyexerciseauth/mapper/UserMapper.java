@@ -106,4 +106,25 @@ public interface UserMapper {
         SELECT COUNT(*) FROM administrator WHERE userName = #{userName} AND userID != #{excludeUserId}
         """)
     int countAdminByUserName(@Param("userName") String userName, @Param("excludeUserId") Integer excludeUserId);
+
+    @Delete("DELETE FROM favorite WHERE userID = #{userID}")
+    int deleteFavoritesByUserId(Integer userID);
+
+    @Delete("DELETE FROM comment WHERE userID = #{userID}")
+    int deleteCommentsByUserId(Integer userID);
+
+    @Delete("DELETE FROM post WHERE authorID = #{userID}")
+    int deletePostsByAuthorId(Integer userID);
+
+    @Delete("DELETE FROM training_plan WHERE userID = #{userID}")
+    int deleteTrainingPlansByUserId(Integer userID);
+
+    @Delete("DELETE FROM exercise_record WHERE userID = #{userID}")
+    int deleteExerciseRecordsByUserId(Integer userID);
+
+    @Delete("DELETE FROM ordinary_user WHERE userID = #{userID}")
+    int deleteOrdinaryUser(Integer userID);
+
+    @Delete("DELETE FROM user WHERE userID = #{userID}")
+    int deleteUser(Integer userID);
 }

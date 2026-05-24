@@ -146,11 +146,37 @@
             window.location.href = 'index.html';
         }
 
-        function cancelAccount() {
-            if (confirm('确定要永久注销账户吗？此操作不可恢复！')) {
-                clearUserSession();
-                alert('账户已成功注销');
-                window.location.href = 'signupOrdinaryUser.html';
+        async function cancelAccount() {
+            if (!confirm('确定要永久注销账户吗？此操作不可恢复！')) {
+                return;
+            }
+            
+            const userSession = getUserSession();
+            if (!userSession.userID) {
+                alert('请先登录');
+                window.location.href = 'signin.html';
+                return;
+            }
+            
+            const userId = parseInt(userSession.userID);
+            if (isNaN(userId)) {
+                alert('无效的用户ID');
+                return;
+            }
+            
+            try {
+                const response = await window.deleteUser(userId);
+                
+                if (response && response.code === 200) {
+                    clearUserSession();
+                    alert('账户已成功注销');
+                    window.location.href = 'signupOrdinaryUser.html';
+                } else {
+                    alert('注销失败：' + (response?.msg || '未知错误'));
+                }
+            } catch (error) {
+                console.error('注销失败:', error);
+                alert('注销失败，请检查网络连接');
             }
         }
     </script>

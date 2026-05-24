@@ -73,6 +73,22 @@
             background: #c0392b;
         }
         
+        .cancel-account-btn {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .cancel-account-btn:hover {
+            background: #d68910;
+        }
+        
         .main-container {
             max-width: 1200px;
             margin: 30px auto;
@@ -219,6 +235,7 @@
         </div>
         <div class="user-info">
             <div class="user-name" id="userNameDisplay">加载中...</div>
+            <button class="cancel-account-btn" id="cancelAccountBtn">注销</button>
             <button class="logout-btn" id="logoutBtn">退出登录</button>
         </div>
     </div>
@@ -259,6 +276,8 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const logoutBtn = document.getElementById('logoutBtn');
+            const cancelAccountBtn = document.getElementById('cancelAccountBtn');
+            
             logoutBtn.addEventListener('click', function() {
                 if (confirm('确定要退出登录吗？')) {
                     localStorage.removeItem('userID');
@@ -266,6 +285,10 @@
                     localStorage.removeItem('userType');
                     window.location.href = 'signin.html';
                 }
+            });
+            
+            cancelAccountBtn.addEventListener('click', function() {
+                window.location.href = 'cancelUser.html';
             });
 
             loadUserInfo();

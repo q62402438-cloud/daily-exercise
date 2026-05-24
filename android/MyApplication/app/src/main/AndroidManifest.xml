@@ -98,13 +98,7 @@
             android:name=".DateRecordActivity"
             android:exported="false" />
         <activity
-            android:name=".UserConsoleActivity"
-            android:exported="false" />
-        <activity
             android:name=".UserInfoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ChangePasswordActivity"
             android:exported="false" />
         <activity
             android:name=".CancelUserActivity"

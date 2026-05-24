@@ -98,6 +98,15 @@ async function checkUserNameExists(userName, excludeUserId) {
     });
 }
 
+async function deleteUser(userID) {
+    return request('/user/delete', {
+        method: 'POST',
+        body: {
+            userID: userID
+        }
+    });
+}
+
 async function verifyPhone(phoneNumber) {
     return request('/auth/verifyPhone', {
         method: 'POST',
@@ -537,6 +546,7 @@ window.getFavoritesByUser = getFavoritesByUser;
 window.deleteFavorite = deleteFavorite;
 window.checkFavorite = checkFavorite;
 window.checkUserNameExists = checkUserNameExists;
+window.deleteUser = deleteUser;
 
 async function auditPlanPass(planID) {
     return request('/trainingPlan/auditPass', {

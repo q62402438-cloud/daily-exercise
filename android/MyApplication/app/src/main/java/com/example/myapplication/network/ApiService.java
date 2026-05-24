@@ -151,6 +151,6 @@ public interface ApiService {
     @POST("api/favorite/check")
     Call<Result<FavoriteEntity>> checkFavorite(@Body FavoriteEntity favorite);
 
-    @POST("api/user/cancel")
+    @POST("api/user/delete")
     Call<Result<Object>> cancelUser(@Body User user);
 }

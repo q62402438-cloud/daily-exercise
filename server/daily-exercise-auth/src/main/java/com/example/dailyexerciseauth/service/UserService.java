@@ -12,4 +12,5 @@ public interface UserService {
     boolean resetPassword(String phoneNumber, String newPassword);
     int countOrdinaryUserByUserName(String userName, Integer excludeUserId);
     int countAdminByUserName(String userName, Integer excludeUserId);
+    boolean deleteUser(Integer userID);
 }

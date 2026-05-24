@@ -118,4 +118,29 @@ public class UserUpdateController {
             return Result.error("密码重置失败，手机号未注册");
         }
     }
+
+    @PostMapping("/delete")
+    public Result deleteUser(@RequestBody Map<String, Object> request) {
+        Integer userID = (Integer) request.get("userID");
+        
+        System.out.println("=== Delete User Request ===");
+        System.out.println("userID: " + userID);
+        
+        try {
+            boolean success = userService.deleteUser(userID);
+            if (success) {
+                return Result.success("账户注销成功");
+            } else {
+                return Result.error("账户注销失败");
+            }
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("=== Delete User Error ===");
+            System.out.println("Error type: " + e.getClass().getName());
+            System.out.println("Error message: " + e.getMessage());
+            e.printStackTrace();
+            return Result.error("账户注销失败：" + e.getMessage());
+        }
+    }
 }

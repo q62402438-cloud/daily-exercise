@@ -92,6 +92,7 @@ public class CancelUserActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     Result<Object> result = response.body();
                     if (result.getCode() == 200) {
+                        new SessionManager(CancelUserActivity.this).clear();
                         Toast.makeText(CancelUserActivity.this, "账户已成功注销", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(CancelUserActivity.this, MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);

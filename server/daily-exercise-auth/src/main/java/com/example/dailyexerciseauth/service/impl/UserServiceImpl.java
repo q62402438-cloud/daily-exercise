@@ -191,4 +191,22 @@ public class UserServiceImpl implements UserService {
         }
         return userMapper.countAdminByUserName(userName, excludeUserId);
     }
+
+    @Override
+    @Transactional
+    public boolean deleteUser(Integer userID) {
+        if (userID == null) {
+            throw new IllegalArgumentException("用户ID不能为空");
+        }
+
+        userMapper.deleteFavoritesByUserId(userID);
+        userMapper.deleteCommentsByUserId(userID);
+        userMapper.deletePostsByAuthorId(userID);
+        userMapper.deleteTrainingPlansByUserId(userID);
+        userMapper.deleteExerciseRecordsByUserId(userID);
+        userMapper.deleteOrdinaryUser(userID);
+        userMapper.deleteUser(userID);
+        
+        return true;
+    }
 }
