@@ -118,6 +118,8 @@ public class CreateExercisePlanActivity extends AppCompatActivity {
             return "增肌运动";
         } else if (checkedId == R.id.rb_rehabilitation) {
             return "康复运动";
+        } else if (checkedId == R.id.rb_other) {
+            return "其他运动";
         }
         return "其他运动";
     }

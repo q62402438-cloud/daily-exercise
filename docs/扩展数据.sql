@@ -299,7 +299,6 @@ INSERT INTO favorite (userID, targetID, targetType, linkUrl, favoriteTime) VALUE
 (4, 14, 1, 'pages/plan/PlanInfo.html?id=14', '2026-05-23 15:00:00'),
 (5, 17, 1, 'pages/plan/PlanInfo.html?id=17', '2026-05-22 12:00:00'),
 (6, 18, 1, 'pages/plan/PlanInfo.html?id=18', '2026-05-21 16:00:00'),
-(7, 19, 1, 'pages/plan/PlanInfo.html?id=19', '2026-05-20 11:00:00'),
 (8, 20, 1, 'pages/plan/PlanInfo.html?id=20', '2026-05-19 13:00:00'),
 (9, 21, 1, 'pages/plan/PlanInfo.html?id=21', '2026-05-18 14:00:00'),
 (10, 22, 1, 'pages/plan/PlanInfo.html?id=22', '2026-05-17 15:00:00'),

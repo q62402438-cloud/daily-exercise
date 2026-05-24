@@ -249,6 +249,8 @@ public class EditPlanActivity extends AppCompatActivity {
                 exerciseType = "增肌运动";
             } else if (checkedId == R.id.rb_rehabilitation) {
                 exerciseType = "康复运动";
+            } else if (checkedId == R.id.rb_other) {
+                exerciseType = "其他运动";
             }
         }
 

@@ -138,7 +138,7 @@
                     </div>
                     <div class="plan-actions">
                         <button class="action-btn detail-btn" onclick="viewPlanDetail(2)">查看详情</button>
-                        <button class="action-btn start-btn" onclick="startPlan(2)">重新开始</button>
+                        <button class="action-btn start-btn" onclick="startPlan(2)">开始训练</button>
                         <button class="action-btn edit-btn" onclick="editPlan(2)">编辑计划</button>
                         <button class="action-btn delete-btn" onclick="deletePlan(2)">删除计划</button>
                     </div>
@@ -478,7 +478,7 @@
                     <div class="plan-actions">
                         <button class="action-btn detail-btn" onclick="viewPlanDetail('${plan.planID}')">查看详情</button>
                         ${executionDigit === 0 ? `<button class="action-btn start-btn" onclick="startPlan('${plan.planID}')">开始训练</button>` : ''}
-                        ${executionDigit === 2 ? `<button class="action-btn start-btn" onclick="startPlan('${plan.planID}')">重新开始</button>` : ''}
+                        ${executionDigit === 2 ? `<button class="action-btn start-btn" onclick="startPlan('${plan.planID}')">开始训练</button>` : ''}
                         <button class="action-btn edit-btn" onclick="editPlan('${plan.planID}')">编辑计划</button>
                         <button class="action-btn delete-btn" onclick="deletePlan('${plan.planID}')">删除计划</button>
                     </div>
